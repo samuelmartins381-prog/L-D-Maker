@@ -1,6 +1,6 @@
 # 0001 — Moteur propre plutôt qu'une extension d'Adapt Learning
 
-- **Statut** : proposé (en attente de validation par Sam)
+- **Statut** : accepté (validé par Sam le 2026-10-15)
 - **Date** : 2026-10-15
 - **Décideur** : Claude (recommandation), Sam (validation)
 

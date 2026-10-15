@@ -4,8 +4,7 @@ Priorisées. Chaque demande d'installation précise : quoi, pourquoi, alternativ
 risques (permissions, données).
 
 ## P0 — bloquant pour démarrer le J1
-1. **Valider ou amender la phase 0** : `docs/phase0-research.md` et l'ADR
-   `docs/decisions/0001-own-engine-vs-adapt.md` (moteur propre plutôt qu'Adapt).
+1. ~~Valider la phase 0~~ — validée le 2026-10-15.
 2. **Confirmer deux hypothèses** (phase 0, §0) :
    - Les contenus clients peuvent être traités par Claude, mais par **aucun autre service tiers** sans ton accord au cas par cas. OK ?
    - Les clients n'ont pas de contrainte IT connue (navigateurs récents, pas d'IE, pas de LMS hors ligne). OK ?

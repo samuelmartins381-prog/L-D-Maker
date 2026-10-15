@@ -49,12 +49,30 @@ docs/decisions/           ADR
 docs/requests-for-sam.md  demandes à Sam, priorisées
 docs/phase0-research.md   livrable phase 0
 inspirations/             captures, maquettes, liens déposés par Sam
+packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
+scripts/                  outillage (ex. contrôle des licences)
+clients/, out/            sources clients et modules générés — ignorés par git
 ```
-La structure du code sera définie par l'ADR d'architecture issu de la phase 0.
+
+## Commandes
+- `pnpm install` — dépendances (Node ≥ 22, pnpm 10)
+- `pnpm check` — lint + typecheck + tests + licences : **doit passer avant chaque commit**
+- `pnpm format` — formatage (Biome)
+
+## Outillage (J1)
+TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
+`scripts/check-licenses.mjs` : liste stricte pour les dépendances de production
+(embarquées dans les modules), liste élargie pour l'outillage de développement.
 
 ## État d'avancement
 - [x] Lecture du brief, création de CLAUDE.md et de la structure
 - [x] Questions de cadrage — réponses reçues le 2026-10-15
 - [x] Phase 0 — `docs/phase0-research.md` + ADR 0001 (moteur propre, proposé)
-- [ ] **EN ATTENTE DE SAM** : validation phase 0 (voir `docs/requests-for-sam.md`, P0)
-- [ ] J1 — Fondations (ne pas démarrer avant validation)
+- [x] Phase 0 validée par Sam (« go », 2026-10-15) — ADR 0001 acceptée
+- [ ] J1 — Fondations, **étape par étape** (Sam valide après chaque étape) :
+  - [x] 1. Socle du dépôt (workspaces, TypeScript, tests, lint, licences)
+  - [ ] 2. Schéma de module v0.1 + validation + module de démo
+  - [ ] 3. Lecteur + thème (design tokens) + i18n FR/EN/AR (choix Svelte vs Preact, ADR 0002)
+  - [ ] 4. Composants : écran narratif, accordéon/onglets, QCU/QCM, récapitulatif
+  - [ ] 5. Suivi (interface Tracker) + export SCORM 1.2 et HTML5
+  - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again)
