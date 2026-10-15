@@ -10,6 +10,15 @@ Ambition : qualité supérieure à Rise, Storyline, Elucidat, Evolve, Adapt, iSp
 
 Brief complet : `docs/brief.md`.
 
+## Cadrage (réponses de Sam, 2026-10-15)
+- LMS de destination inconnus, potentiellement tous → tous les formats d'export + profils LMS.
+- Utilisateur unique : Sam, pour des commandes clients (usage commercial → licences permissives
+  pour tout code embarqué dans les modules, voir ADR 0001).
+- Dépôt GitHub privé. Budget outils : pas de limite fixée, à proposer au cas par cas.
+- Hypothèses à confirmer : contenus clients traités par Claude mais par aucun autre service tiers
+  sans accord ; pas de contrainte IT client connue (navigateurs récents).
+- Rise n'est pas un LMS : livrer au LMS du client, ou HTML5 via Code Block (sans suivi).
+
 ## Rôles
 - Claude pilote : recherche → recommandation argumentée → décision (ou attente de Sam si la
   décision lui appartient).
@@ -38,12 +47,14 @@ CLAUDE.md                 mémoire du projet (ce fichier)
 docs/brief.md             brief de Sam
 docs/decisions/           ADR
 docs/requests-for-sam.md  demandes à Sam, priorisées
-docs/phase0-research.md   livrable phase 0 (à venir)
+docs/phase0-research.md   livrable phase 0
 inspirations/             captures, maquettes, liens déposés par Sam
 ```
 La structure du code sera définie par l'ADR d'architecture issu de la phase 0.
 
 ## État d'avancement
 - [x] Lecture du brief, création de CLAUDE.md et de la structure
-- [ ] Questions de cadrage (≤ 5) — en attente des réponses de Sam
-- [ ] Phase 0 — recherche → `docs/phase0-research.md`, puis arrêt et attente de Sam
+- [x] Questions de cadrage — réponses reçues le 2026-10-15
+- [x] Phase 0 — `docs/phase0-research.md` + ADR 0001 (moteur propre, proposé)
+- [ ] **EN ATTENTE DE SAM** : validation phase 0 (voir `docs/requests-for-sam.md`, P0)
+- [ ] J1 — Fondations (ne pas démarrer avant validation)
