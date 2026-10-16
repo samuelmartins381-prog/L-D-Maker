@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@ldm/player": "workspace:*",
-    "@ldm/schema": "workspace:*"
+    "@ldm/schema": "workspace:*",
+    "fflate": "0.8.3"
   },
   "devDependencies": {
     "@types/node": "^22.20.5"

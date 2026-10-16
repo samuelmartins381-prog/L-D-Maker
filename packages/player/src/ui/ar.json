@@ -21,5 +21,12 @@
   "question.attempts.left": "المحاولات المتبقية: {count}",
   "question.choice.expected": "الإجابة المتوقّعة",
   "question.choice.notExpected": "ليست جزءًا من الإجابة",
-  "question.retry.hint": "عدّل إجابتك، ثم أكّدها."
+  "question.retry.hint": "عدّل إجابتك، ثم أكّدها.",
+  "finish.title": "انتهت الجلسة",
+  "finish.complete": "لقد أكملت هذه الوحدة.",
+  "finish.saved": "تم حفظ تقدّمك: يمكنك المتابعة من حيث توقّفت.",
+  "finish.score": "نتيجتك: {score}٪",
+  "finish.passed": "لقد بلغت درجة النجاح ({threshold}٪).",
+  "finish.failed": "لم تبلغ درجة النجاح ({threshold}٪).",
+  "finish.close": "يمكنك إغلاق هذه النافذة."
 }

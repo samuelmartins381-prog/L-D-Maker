@@ -4,9 +4,12 @@ import { fly } from "svelte/transition";
 import BlockView from "./blocks/BlockView.svelte";
 import Menu from "./Menu.svelte";
 import { usePlayer } from "./player.svelte.ts";
+import { useSession } from "./tracking/session.svelte.ts";
 
 const p = usePlayer();
+const session = useSession();
 const module = p.content.module;
+let endHeading: HTMLHeadingElement | undefined = $state();
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 let menuOpen = $state(false);
@@ -40,6 +43,13 @@ function go(delta: number): void {
   afterNavigate();
 }
 
+/** Finish button: closes the LMS session and shows the end panel. */
+async function finish(): Promise<void> {
+  session.finish();
+  await tick();
+  endHeading?.focus();
+}
+
 const offset = $derived(
   (reducedMotion ? 0 : 24) * direction * (p.dir === "rtl" ? -1 : 1),
 );
@@ -70,6 +80,21 @@ const offset = $derived(
 </header>
 
 <main id="ldm-main">
+  {#if p.finished}
+    {@const scorePercent = Math.round(p.score.scaled * 100)}
+    <article class="screen end">
+      <h1 bind:this={endHeading} tabindex="-1">{p.ui("finish.title")}</h1>
+      <div class="end-body">
+        {#if p.allViewed}<p>{p.ui("finish.complete")}</p>{/if}
+        {#if p.score.max > 0 && p.score.complete}
+          <p class="end-score">{p.ui("finish.score", { score: scorePercent })}</p>
+          <p>{p.ui(p.score.passed ? "finish.passed" : "finish.failed", { threshold: p.passingScore })}</p>
+        {/if}
+        {#if !p.allViewed || !p.score.complete}<p>{p.ui("finish.saved")}</p>{/if}
+        <p>{p.ui("finish.close")}</p>
+      </div>
+    </article>
+  {:else}
   {#key p.index}
     <article class="screen" in:fly={{ x: offset, duration: reducedMotion ? 0 : 320, opacity: 0 }}>
       <p class="eyebrow">
@@ -86,20 +111,27 @@ const offset = $derived(
       </div>
     </article>
   {/key}
+  {/if}
 </main>
 
+{#if !p.finished}
 <footer class="pager">
   <div class="pager-inner">
     <button class="secondary" disabled={p.isFirst} onclick={() => go(-1)}>
       <span class="arrow" aria-hidden="true">←</span>
       {p.ui("nav.previous")}
     </button>
-    <button class="primary" disabled={p.isLast} onclick={() => go(1)}>
-      {p.ui("nav.next")}
-      <span class="arrow" aria-hidden="true">→</span>
-    </button>
+    {#if p.isLast}
+      <button class="primary" onclick={finish}>{p.ui("nav.finish")}</button>
+    {:else}
+      <button class="primary" onclick={() => go(1)}>
+        {p.ui("nav.next")}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+    {/if}
   </div>
 </footer>
+{/if}
 
 <div class="visually-hidden" aria-live="polite">{announcement}</div>
 
@@ -207,6 +239,19 @@ const offset = $derived(
   }
   h1:focus {
     outline: none;
+  }
+  .end-body {
+    display: grid;
+    gap: var(--space-3);
+    font-size: var(--text-lg);
+  }
+  .end-body p {
+    margin: 0;
+  }
+  .end-score {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    color: var(--color-accent);
   }
   .blocks {
     display: grid;

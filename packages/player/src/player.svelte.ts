@@ -10,6 +10,7 @@ import {
   toggle,
 } from "./grading.ts";
 import { directionOf, interpolate, negotiateLocale } from "./locale.ts";
+import type { ResumeState } from "./tracking/suspend.ts";
 
 export interface ScreenRef {
   section: Section;
@@ -42,6 +43,7 @@ export class Player {
       section.screens.map((screen) => ({ section, sectionIndex, screen })),
     );
     const { locales, defaultLocale } = content.module;
+    this.passingScore = content.module.assessment.passingScore;
     this.locale = negotiateLocale(locales, defaultLocale, requestedLocales);
     // Every answer exists from the start (choice order fixed once), so rendering never writes state.
     for (const b of this.screens.flatMap((s) => s.screen.blocks)) {
@@ -70,9 +72,32 @@ export class Player {
     this.visited.add(this.current.screen.id);
   }
 
+  /** Module threshold, unless the LMS imposes its own (SCORM mastery score). */
+  passingScore = $state(0);
+  /** Set once the learner ends the session with the Finish button. */
+  finished = $state(false);
   readonly score = $derived.by(() =>
-    moduleScore(this.content.module, this.answers),
+    moduleScore(this.content.module, this.answers, this.passingScore),
   );
+  readonly allViewed = $derived.by(
+    () => this.visited.size === this.screens.length,
+  );
+
+  restore(r: ResumeState): void {
+    if (this.content.module.locales.includes(r.locale)) this.locale = r.locale;
+    for (const id of r.visited) this.visited.add(id);
+    for (const [id, a] of r.answers) this.answers.set(id, a);
+    this.goTo(r.index);
+  }
+
+  snapshot(): ResumeState {
+    return {
+      locale: this.locale,
+      index: this.index,
+      visited: [...this.visited],
+      answers: new Map(this.answers),
+    };
+  }
 
   answer(q: Question): AnswerState {
     return this.answers.get(q.id) ?? initialAnswer(q);

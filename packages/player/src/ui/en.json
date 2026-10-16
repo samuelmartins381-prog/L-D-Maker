@@ -21,5 +21,12 @@
   "question.attempts.left": "Attempts left: {count}",
   "question.choice.expected": "Expected answer",
   "question.choice.notExpected": "Not part of the answer",
-  "question.retry.hint": "Change your answer, then submit."
+  "question.retry.hint": "Change your answer, then submit.",
+  "finish.title": "Session ended",
+  "finish.complete": "You have completed this module.",
+  "finish.saved": "Your progress is saved: you can pick up where you left off.",
+  "finish.score": "Your score: {score}%",
+  "finish.passed": "You reached the passing score ({threshold}%).",
+  "finish.failed": "The passing score ({threshold}%) was not reached.",
+  "finish.close": "You can close this window."
 }

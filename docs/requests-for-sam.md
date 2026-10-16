@@ -15,6 +15,9 @@ risques (permissions, données).
    - _Alternative écartée_ : la recherche web au coup par coup, plus lente et moins fiable sur les versions.
    - _Risques_ : les requêtes (noms de bibliothèques, sujets techniques) partent chez Upstash. Aucun contenu client. Clé API optionnelle.
 4. **Créer un compte SCORM Cloud** (essai gratuit, sans limite de durée : 3 cours, 10 inscriptions actives).
+   **Devenu prioritaire** : le paquet SCORM 1.2 existe (`out/phishing-basics/*-scorm12.zip`) et passe
+   notre faux LMS. Il reste à le valider sur la référence du brief. En attendant, tu peux aussi
+   l'importer toi-même dans SCORM Cloud et me dire ce que tu vois.
    - Fournir l'App ID et la clé secrète comme **secrets de l'environnement cloud**, jamais dans le dépôt.
    - Plus tard, le plan Tester (environ 40 $/mois, à confirmer) quand le banc de test l'appellera à chaque build.
 5. **Un contenu de test non confidentiel** (PDF, PPTX ou texte, 15–30 min de formation) pour le module de démonstration.

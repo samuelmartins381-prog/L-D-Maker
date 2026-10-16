@@ -53,7 +53,8 @@ inspirations/             captures, maquettes, liens déposés par Sam
 packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
 packages/player/          lecteur Svelte 5 (IIFE), thèmes CSS, textes d'interface (src/ui/*.json)
-packages/builder/         module validé + lecteur → dossier web autonome (out/<id>/web)
+packages/builder/         module validé + lecteur → out/<id>/{web,scorm12}/ + ZIP par format
+qa/e2e/                   tests de bout en bout (faux LMS scorm-again, Chromium)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
 clients/, out/            sources clients et modules générés — ignorés par git
@@ -64,8 +65,9 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm check` — lint + typecheck + tests + licences : **doit passer avant chaque commit**
 - `pnpm format` — formatage (Biome)
 - `pnpm validate <dossier-module>` — valide un module (structure, pédagogie, traductions)
-- `pnpm build:player` puis `pnpm build <dossier-module>` — construit `out/<id>/web/index.html`
-  (fonctionne en `file://`, `?lang=ar` pour forcer une langue)
+- `pnpm build:player` puis `pnpm build <dossier-module> [--format web|scorm12|all]` — construit
+  `out/<id>/web/` (aperçu, marche en `file://`, `?lang=ar`), `out/<id>/scorm12/` et les ZIP
+- `pnpm test:e2e` — scénarios navigateur (suivi SCORM 1.2 sur 2 sessions, reprise HTML5)
 - `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
 
 ## Lecteur (ADR 0003)
@@ -82,6 +84,12 @@ en RTL), question = fieldset + radios/cases natives. La logique de question est 
 dans le constructeur du `Player` : **ne jamais écrire d'état dans un `$derived`** (erreur Svelte
 `state_unsafe_mutation`). `scroll-padding` sur `html` garde le focus visible sous les barres
 collantes (WCAG 2.4.11).
+
+## Suivi (ADR 0004)
+Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12` et `standalone`, cible fixée
+au build. Statut 1.2 : completed sans évaluation, passed/failed avec. État de reprise compact
+`suspend.ts`, lié à `id@version` du module (changer la version invalide les reprises). Ajouter
+SCORM 2004 / cmi5 / xAPI = un nouvel adaptateur, rien d'autre.
 
 ## Format de module (ADR 0002)
 Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.json` (catalogues
@@ -119,5 +127,6 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
   - [x] 2. Schéma de module v0.1 + validation + module de démo (ADR 0002)
   - [x] 3. Lecteur + thème + i18n FR/EN/AR (Svelte 5, ADR 0003) — JS 21 Ko gz, CSS 4 Ko gz
   - [x] 4. Composants : narratif (+ image), accordéon, onglets, QCU/QCM, récapitulatif — JS 25 Ko gz
-  - [ ] 5. Suivi (interface Tracker) + export SCORM 1.2 et HTML5
+  - [x] 5. Suivi (Tracker) + export SCORM 1.2 et HTML5 (ADR 0004) — validé sur faux LMS, pas
+        encore sur SCORM Cloud (compte à fournir)
   - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again, focus non masqué 2.4.11)

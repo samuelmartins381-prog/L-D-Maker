@@ -21,5 +21,12 @@
   "question.attempts.left": "Essais restants : {count}",
   "question.choice.expected": "Réponse attendue",
   "question.choice.notExpected": "Ne fait pas partie de la réponse",
-  "question.retry.hint": "Modifiez votre réponse, puis validez."
+  "question.retry.hint": "Modifiez votre réponse, puis validez.",
+  "finish.title": "Session terminée",
+  "finish.complete": "Vous avez terminé ce module.",
+  "finish.saved": "Votre progression est enregistrée : vous pourrez reprendre là où vous vous êtes arrêté.",
+  "finish.score": "Votre score : {score} %",
+  "finish.passed": "Vous avez atteint le seuil de réussite ({threshold} %).",
+  "finish.failed": "Le seuil de réussite ({threshold} %) n'est pas atteint.",
+  "finish.close": "Vous pouvez fermer cette fenêtre."
 }

@@ -109,6 +109,7 @@ export function scoredQuestions(m: Module): Question[] {
 export function moduleScore(
   m: Module,
   answers: ReadonlyMap<string, AnswerState>,
+  passingScore: number = m.assessment.passingScore,
 ): Score {
   const questions = scoredQuestions(m);
   let raw = 0;
@@ -125,6 +126,6 @@ export function moduleScore(
     max,
     scaled,
     complete,
-    passed: complete && scaled * 100 >= m.assessment.passingScore,
+    passed: complete && scaled * 100 >= passingScore,
   };
 }

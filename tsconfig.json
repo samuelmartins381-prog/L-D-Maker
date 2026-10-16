@@ -3,9 +3,11 @@
   "compilerOptions": {
     "composite": false,
     "declaration": false,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node"],
+    "allowImportingTsExtensions": true
   },
-  "include": ["vitest.config.ts"],
+  "include": ["vitest.config.ts", "qa/**/*.ts", "scripts/**/*.ts"],
   "references": [
     {
       "path": "packages/schema"

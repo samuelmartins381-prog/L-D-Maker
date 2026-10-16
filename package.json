@@ -12,15 +12,18 @@
     "typecheck": "tsc -b && pnpm --filter @ldm/player check:svelte",
     "test": "vitest run",
     "check:licenses": "node scripts/check-licenses.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/ && pnpm build:examples",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/ && pnpm build:examples && pnpm test:e2e",
     "validate": "node packages/schema/src/cli.ts",
     "build:player": "pnpm --filter @ldm/player build",
     "build": "node packages/builder/src/cli.ts",
-    "build:examples": "pnpm build:player && for d in examples/*/; do pnpm -s build \"$d\" || exit 1; done"
+    "build:examples": "pnpm build:player && for d in examples/*/; do pnpm -s build \"$d\" || exit 1; done",
+    "test:e2e": "node qa/e2e/tracking.e2e.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@types/node": "^22.20.5",
     "playwright-core": "^1.64.1",
+    "scorm-again": "3.4.6",
     "typescript": "7.0.2",
     "vitest": "5.0.5"
   }

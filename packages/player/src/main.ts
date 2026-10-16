@@ -7,15 +7,39 @@ import { mount } from "svelte";
 import App from "./App.svelte";
 import { CONTENT_ELEMENT_ID, type CompiledContent } from "./content.ts";
 import { PLAYER_KEY, Player } from "./player.svelte.ts";
+import { findScorm12Api, Scorm12Tracker } from "./tracking/scorm12.ts";
+import { SESSION_KEY, Session } from "./tracking/session.svelte.ts";
+import { StandaloneTracker } from "./tracking/standalone.ts";
+import type { Tracker } from "./tracking/tracker.ts";
 
 const raw = document.getElementById(CONTENT_ELEMENT_ID)?.textContent;
 if (!raw) throw new Error(`#${CONTENT_ELEMENT_ID} is missing`);
 const content = JSON.parse(raw) as CompiledContent;
+const { module } = content;
+
+function createTracker(): Tracker {
+  if (content.target === "scorm12") {
+    const api = findScorm12Api();
+    if (api) return new Scorm12Tracker(api);
+    console.warn(
+      "[ldm] SCORM 1.2 API not found: running standalone (preview outside an LMS)",
+    );
+  }
+  return new StandaloneTracker(`${module.id}@${module.version}`);
+}
+
 const requested = [
   new URLSearchParams(location.search).get("lang"),
   ...navigator.languages,
 ];
 const player = new Player(content, requested);
+const session = new Session(player, createTracker());
 const target = document.getElementById("ldm-app") ?? document.body;
 
-mount(App, { target, context: new Map([[PLAYER_KEY, player]]) });
+mount(App, {
+  target,
+  context: new Map<symbol, unknown>([
+    [PLAYER_KEY, player],
+    [SESSION_KEY, session],
+  ]),
+});

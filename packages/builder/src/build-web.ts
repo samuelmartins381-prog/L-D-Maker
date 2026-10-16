@@ -2,7 +2,12 @@ import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { CompiledContent } from "@ldm/player/content";
-import { type Issue, loadModuleSource, validateModule } from "@ldm/schema";
+import {
+  type Issue,
+  loadModuleSource,
+  type Module,
+  validateModule,
+} from "@ldm/schema";
 
 const PLAYER_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -69,8 +74,15 @@ const escapeHtml = (s: string) =>
 
 export interface WebBuild {
   outDir: string;
-  moduleId: string;
+  module: Module;
+  /** Module strings in the default locale (titles for manifests). */
+  defaultStrings: Record<string, string>;
   warnings: Issue[];
+}
+
+export interface WebBuildOptions {
+  /** Which tracker the player uses: browser storage ("web") or the SCORM 1.2 API ("scorm12"). */
+  target?: CompiledContent["target"];
 }
 
 /**
@@ -80,6 +92,7 @@ export interface WebBuild {
 export async function buildWeb(
   moduleDir: string,
   outDir: string,
+  { target = "web" }: WebBuildOptions = {},
 ): Promise<WebBuild> {
   const result = validateModule(await loadModuleSource(moduleDir));
   if (!result.ok || !result.module)
@@ -110,6 +123,7 @@ export async function buildWeb(
 
   const content: CompiledContent = {
     format: 1,
+    target,
     module,
     strings: Object.fromEntries(
       module.locales.map((l) => [
@@ -149,5 +163,10 @@ ${stylesheets.map((css) => `<link rel="stylesheet" href="${css}">`).join("\n")}
 </html>
 `;
   await writeFile(join(outDir, "index.html"), html);
-  return { outDir, moduleId: module.id, warnings: result.issues };
+  return {
+    outDir,
+    module,
+    defaultStrings: content.strings[module.defaultLocale] ?? {},
+    warnings: result.issues,
+  };
 }
