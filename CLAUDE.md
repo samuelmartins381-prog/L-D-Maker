@@ -18,6 +18,15 @@ Brief complet : `docs/brief.md`.
 - Hypothèses à confirmer : contenus clients traités par Claude mais par aucun autre service tiers
   sans accord ; pas de contrainte IT client connue (navigateurs récents).
 - Rise n'est pas un LMS : livrer au LMS du client, ou HTML5 via Code Block (sans suivi).
+- Domaine principal (Sam, 2026-10-16) : **l'horlogerie**. Conséquences à garder en tête :
+  - **Visuels :** beaucoup d'images techniques (mouvements, vues éclatées, macros). Il faut donc
+    des zones cliquables accessibles, du zoom et des légendes.
+  - **Vocabulaire :** très technique (échappement, spiral, complications…). Il faut un glossaire
+    par client, à respecter dans les traductions.
+  - **Langues clés du secteur :** fr, de, it, en, zh, ja.
+  - **Confidentialité :** forte sur les nouveautés produits (calibres non lancés). Le contenu
+    client ne va jamais dans le dépôt.
+  - **Public :** à confirmer (vente en boutique, service après-vente, grand public).
 
 ## Rôles
 - Claude pilote : recherche → recommandation argumentée → décision (ou attente de Sam si la
