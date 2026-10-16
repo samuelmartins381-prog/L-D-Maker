@@ -6,7 +6,8 @@ import { stat } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import { extname, join, normalize } from "node:path";
 
-const ROOT = join(import.meta.dirname, "../..");
+export const REPO_ROOT = join(import.meta.dirname, "../../..");
+const ROOT = REPO_ROOT;
 const TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript",

@@ -21,6 +21,7 @@ const DEV_ALLOWED = new Set([
   "CC-BY-4.0",
   "Python-2.0",
   "Unlicense",
+  "(MIT OR CC0-1.0)",
 ]);
 
 function listLicenses(prodOnly) {

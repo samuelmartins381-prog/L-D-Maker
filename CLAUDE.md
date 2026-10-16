@@ -54,7 +54,7 @@ packages/                 code (pnpm workspaces), un paquet par brique de l'arch
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
 packages/player/          lecteur Svelte 5 (IIFE), thèmes CSS, textes d'interface (src/ui/*.json)
 packages/builder/         module validé + lecteur → out/<id>/{web,scorm12}/ + ZIP par format
-qa/e2e/                   tests de bout en bout (faux LMS scorm-again, Chromium)
+packages/qa/               banc QA (axe, clavier, Lighthouse, faux LMS) + tests e2e (src/e2e/)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
 clients/, out/            sources clients et modules générés — ignorés par git
@@ -68,6 +68,8 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm build:player` puis `pnpm build <dossier-module> [--format web|scorm12|all]` — construit
   `out/<id>/web/` (aperçu, marche en `file://`, `?lang=ar`), `out/<id>/scorm12/` et les ZIP
 - `pnpm test:e2e` — scénarios navigateur (suivi SCORM 1.2 sur 2 sessions, reprise HTML5)
+- `pnpm qa <dossier-module> [--skip-lighthouse]` — banc QA sur le module construit → rapport
+  `out/<id>/qa/report.html` (autonome, à envoyer tel quel). Échec = code de sortie 1.
 - `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
 
 ## Lecteur (ADR 0003)
@@ -90,6 +92,15 @@ Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12` et `standal
 au build. Statut 1.2 : completed sans évaluation, passed/failed avec. État de reprise compact
 `suspend.ts`, lié à `id@version` du module (changer la version invalide les reprises). Ajouter
 SCORM 2004 / cmi5 / xAPI = un nouvel adaptateur, rien d'autre.
+
+## Banc QA (ADR 0005)
+Chaque écran × langue × mobile/desktop × état (affiché, après interaction) : axe 0 violation,
+parcours Tab (focus visible, jamais masqué : test `elementFromPoint`), débordement, mouvement
+réduit, erreurs. Plus le suivi SCORM générique (faux LMS), Lighthouse et le poids. Tout nouveau
+composant doit passer le banc ; un faux positif se corrige dans le banc **en le justifiant**
+(ex. roving tabindex APG), jamais en baissant un seuil.
+Piège d'outillage : Biome reformate les fichiers ; après un `pnpm format`, modifier avec Edit sur
+le texte relu, pas par remplacement aveugle.
 
 ## Format de module (ADR 0002)
 Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.json` (catalogues
@@ -122,11 +133,13 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
 - [x] Questions de cadrage — réponses reçues le 2026-10-15
 - [x] Phase 0 — `docs/phase0-research.md` + ADR 0001 (moteur propre, proposé)
 - [x] Phase 0 validée par Sam (« go », 2026-10-15) — ADR 0001 acceptée
-- [ ] J1 — Fondations, **étape par étape** (Sam valide après chaque étape) :
+- [x] J1 — Fondations, **étape par étape** (Sam valide après chaque étape) — terminé le 2026-10-16 :
   - [x] 1. Socle du dépôt (workspaces, TypeScript, tests, lint, licences)
   - [x] 2. Schéma de module v0.1 + validation + module de démo (ADR 0002)
   - [x] 3. Lecteur + thème + i18n FR/EN/AR (Svelte 5, ADR 0003) — JS 21 Ko gz, CSS 4 Ko gz
   - [x] 4. Composants : narratif (+ image), accordéon, onglets, QCU/QCM, récapitulatif — JS 25 Ko gz
   - [x] 5. Suivi (Tracker) + export SCORM 1.2 et HTML5 (ADR 0004) — validé sur faux LMS, pas
         encore sur SCORM Cloud (compte à fournir)
-  - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again, focus non masqué 2.4.11)
+  - [x] 6. Banc QA v1 (ADR 0005) — module de démo : 11 conformes, 0 non conforme, 4 manuels
+- [ ] Critère de sortie J1 restant : validation sur SCORM Cloud (compte à fournir par Sam)
+- [ ] J2 — MVP (voir `docs/phase0-research.md` §5.5) : à planifier avec Sam

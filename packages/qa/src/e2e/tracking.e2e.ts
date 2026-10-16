@@ -1,8 +1,8 @@
 // End-to-end tracking: the demo SCORM 1.2 package in a fake LMS, over two sessions (suspend, then resume
-// and finish). Run after `pnpm build:examples`: node qa/e2e/tracking.e2e.ts
+// and finish). Run after `pnpm build:examples`: node packages/qa/src/e2e/tracking.e2e.ts
 import assert from "node:assert/strict";
 import { chromium, type Frame, type Page } from "playwright-core";
-import { startFakeLms } from "./fake-lms.ts";
+import { startFakeLms } from "../fake-lms.ts";
 
 const SCO = "/out/phishing-basics/scorm12/index.html";
 const lms = await startFakeLms();

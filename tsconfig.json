@@ -7,7 +7,7 @@
     "types": ["node"],
     "allowImportingTsExtensions": true
   },
-  "include": ["vitest.config.ts", "qa/**/*.ts", "scripts/**/*.ts"],
+  "include": ["vitest.config.ts", "scripts/**/*.ts"],
   "references": [
     {
       "path": "packages/schema"
@@ -17,6 +17,9 @@
     },
     {
       "path": "packages/builder"
+    },
+    {
+      "path": "packages/qa"
     }
   ]
 }
