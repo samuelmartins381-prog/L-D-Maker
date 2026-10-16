@@ -50,6 +50,8 @@ docs/requests-for-sam.md  demandes à Sam, priorisées
 docs/phase0-research.md   livrable phase 0
 inspirations/             captures, maquettes, liens déposés par Sam
 packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
+packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
+examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
 clients/, out/            sources clients et modules générés — ignorés par git
 ```
@@ -58,6 +60,14 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm install` — dépendances (Node ≥ 22, pnpm 10)
 - `pnpm check` — lint + typecheck + tests + licences : **doit passer avant chaque commit**
 - `pnpm format` — formatage (Biome)
+- `pnpm validate <dossier-module>` — valide un module (structure, pédagogie, traductions)
+
+## Format de module (ADR 0002)
+Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.json` (catalogues
+plats clé → texte) + `media/`. Sections → écrans → blocs (`narrative`, `accordion`, `tabs`,
+`question` single/multiple, `summary`). Chaque choix de question a son feedback. Chaque objectif
+doit être évalué par une question notée ; chaque question notée est rattachée à un objectif.
+Après une modification du schéma : `pnpm --filter @ldm/schema json-schema`.
 
 ## Outillage (J1)
 TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
@@ -71,8 +81,8 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
 - [x] Phase 0 validée par Sam (« go », 2026-10-15) — ADR 0001 acceptée
 - [ ] J1 — Fondations, **étape par étape** (Sam valide après chaque étape) :
   - [x] 1. Socle du dépôt (workspaces, TypeScript, tests, lint, licences)
-  - [ ] 2. Schéma de module v0.1 + validation + module de démo
-  - [ ] 3. Lecteur + thème (design tokens) + i18n FR/EN/AR (choix Svelte vs Preact, ADR 0002)
+  - [x] 2. Schéma de module v0.1 + validation + module de démo (ADR 0002)
+  - [ ] 3. Lecteur + thème (design tokens) + i18n FR/EN/AR (choix Svelte vs Preact, ADR 0003)
   - [ ] 4. Composants : écran narratif, accordéon/onglets, QCU/QCM, récapitulatif
   - [ ] 5. Suivi (interface Tracker) + export SCORM 1.2 et HTML5
   - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again)

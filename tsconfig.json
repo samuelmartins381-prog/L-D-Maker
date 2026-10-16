@@ -6,5 +6,9 @@
     "noEmit": true
   },
   "include": ["vitest.config.ts"],
-  "references": []
+  "references": [
+    {
+      "path": "packages/schema"
+    }
+  ]
 }

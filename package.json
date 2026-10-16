@@ -12,7 +12,8 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "check:licenses": "node scripts/check-licenses.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/",
+    "validate": "node packages/schema/src/cli.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

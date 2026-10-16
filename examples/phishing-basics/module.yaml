@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=../../packages/schema/module.schema.json
+# Demo module (non-confidential) used to exercise the whole pipeline.
+schemaVersion: "0.1"
+id: phishing-basics
+version: 0.1.0
+defaultLocale: fr
+locales: [fr, en, ar]
+
+meta:
+  title: meta.title
+  description: meta.description
+  durationMinutes: 12
+
+objectives:
+  - id: obj-signs
+    bloom: understand
+    text: obj.signs
+  - id: obj-react
+    bloom: apply
+    text: obj.react
+
+assessment:
+  passingScore: 80
+  completion: all-screens-and-passed
+
+sections:
+  - id: s1
+    title: s1.title
+    screens:
+      - id: s1-welcome
+        title: s1.welcome.title
+        blocks:
+          - id: s1-welcome-intro
+            type: narrative
+            heading: s1.welcome.heading
+            body: s1.welcome.body
+          - id: s1-welcome-goals
+            type: summary
+            heading: s1.goals.heading
+            points: [obj.signs, obj.react]
+
+  - id: s2
+    title: s2.title
+    screens:
+      - id: s2-signals
+        title: s2.signals.title
+        blocks:
+          - id: s2-signals-list
+            type: accordion
+            intro: s2.signals.intro
+            items:
+              - { id: sender, title: s2.signal.sender.title, body: s2.signal.sender.body }
+              - { id: urgency, title: s2.signal.urgency.title, body: s2.signal.urgency.body }
+              - { id: links, title: s2.signal.links.title, body: s2.signal.links.body }
+              - { id: attachments, title: s2.signal.attachments.title, body: s2.signal.attachments.body }
+              - { id: requests, title: s2.signal.requests.title, body: s2.signal.requests.body }
+      - id: s2-practice
+        title: s2.practice.title
+        blocks:
+          - id: s2-practice-q
+            type: question
+            variant: multiple
+            scored: false
+            attempts: 2
+            prompt: s2.practice.prompt
+            objectives: [obj-signs]
+            choices:
+              - { id: a, text: s2.practice.a, correct: true, feedback: s2.practice.a.fb }
+              - { id: b, text: s2.practice.b, correct: false, feedback: s2.practice.b.fb }
+              - { id: c, text: s2.practice.c, correct: true, feedback: s2.practice.c.fb }
+
+  - id: s3
+    title: s3.title
+    screens:
+      - id: s3-react
+        title: s3.react.title
+        blocks:
+          - id: s3-react-steps
+            type: tabs
+            intro: s3.react.intro
+            items:
+              - { id: stop, title: s3.step.stop.title, body: s3.step.stop.body }
+              - { id: report, title: s3.step.report.title, body: s3.step.report.body }
+              - { id: clicked, title: s3.step.clicked.title, body: s3.step.clicked.body }
+
+  - id: s4
+    title: s4.title
+    screens:
+      - id: s4-quiz
+        title: s4.quiz.title
+        blocks:
+          - id: q-sender
+            type: question
+            variant: single
+            prompt: q.sender.prompt
+            objectives: [obj-signs]
+            choices:
+              - { id: a, text: q.sender.a, correct: false, feedback: q.sender.a.fb }
+              - { id: b, text: q.sender.b, correct: true, feedback: q.sender.b.fb }
+              - { id: c, text: q.sender.c, correct: false, feedback: q.sender.c.fb }
+          - id: q-signals
+            type: question
+            variant: multiple
+            prompt: q.signals.prompt
+            objectives: [obj-signs]
+            choices:
+              - { id: a, text: q.signals.a, correct: true, feedback: q.signals.a.fb }
+              - { id: b, text: q.signals.b, correct: true, feedback: q.signals.b.fb }
+              - { id: c, text: q.signals.c, correct: false, feedback: q.signals.c.fb }
+              - { id: d, text: q.signals.d, correct: false, feedback: q.signals.d.fb }
+          - id: q-react
+            type: question
+            variant: single
+            prompt: q.react.prompt
+            objectives: [obj-react]
+            choices:
+              - { id: a, text: q.react.a, correct: false, feedback: q.react.a.fb }
+              - { id: b, text: q.react.b, correct: false, feedback: q.react.b.fb }
+              - { id: c, text: q.react.c, correct: true, feedback: q.react.c.fb }
+      - id: s4-recap
+        title: s4.recap.title
+        blocks:
+          - id: s4-recap-points
+            type: summary
+            heading: s4.recap.heading
+            points: [s4.recap.p1, s4.recap.p2, s4.recap.p3]

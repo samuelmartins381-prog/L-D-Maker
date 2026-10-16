@@ -20,11 +20,15 @@ risques (permissions, données).
 5. **Un contenu de test non confidentiel** (PDF, PPTX ou texte, 15–30 min de formation) pour le module de démonstration.
 6. **Inspirations** dans `inspirations/` (captures, liens) : voir `inspirations/README.md`.
 
+7. **Relecture de l'arabe** du module de démo (`examples/phishing-basics/strings/ar.json`) par
+   un natif si tu en as un sous la main. C'est une traduction Claude, non relue. Ce n'est pas
+   bloquant : elle sert à tester le rendu RTL.
+
 ## P2 — plus tard
-7. **Figma MCP** (plugin officiel : `claude plugin install figma@claude-plugins-official`), **seulement si tu fais tes maquettes dans Figma**.
+8. **Figma MCP** (plugin officiel : `claude plugin install figma@claude-plugins-official`), **seulement si tu fais tes maquettes dans Figma**.
    - _Pourquoi_ : extraire les tokens exacts (couleurs, typographie, espacements) de tes maquettes.
    - _Alternative_ : des captures PNG dans `inspirations/`, moins précises.
    - _Risques_ : lecture des fichiers Figma auxquels tu donnes accès.
-8. **Playwright MCP** (Microsoft, Apache-2.0), optionnel : inspection interactive des modules pendant la conception. Les tests automatisés n'en ont pas besoin.
-9. **Accès sandbox à un LMS client** (Cornerstone, SuccessFactors, Docebo, 360Learning…) dès qu'une commande le permet : ce sera notre troisième LMS de test.
-10. **Higgsfield** (déjà connecté) : je ne l'utilise pas sans ton accord explicite, à cause du contenu client possible dans les prompts et des droits commerciaux des visuels à vérifier.
+9. **Playwright MCP** (Microsoft, Apache-2.0), optionnel : inspection interactive des modules pendant la conception. Les tests automatisés n'en ont pas besoin.
+10. **Accès sandbox à un LMS client** (Cornerstone, SuccessFactors, Docebo, 360Learning…) dès qu'une commande le permet : ce sera notre troisième LMS de test.
+11. **Higgsfield** (déjà connecté) : je ne l'utilise pas sans ton accord explicite, à cause du contenu client possible dans les prompts et des droits commerciaux des visuels à vérifier.
