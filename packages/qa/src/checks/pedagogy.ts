@@ -46,8 +46,9 @@ export function manualChecks(locales: readonly string[]): CheckResult[] {
       status: "manual",
       summary: "Check-list par composant, à rejouer quand un composant change",
       details: [
-        "Composants : narratif, zoom d'image, accordéon, onglets, image à repères, question (choix unique et multiple), récapitulatif, sommaire, fin de session",
+        "Composants : narratif, zoom d'image, accordéon, onglets, image à repères, question (choix unique, multiple et sur image), récapitulatif, sommaire, fin de session",
         "Zoom d'image : la fenêtre est annoncée avec son nom, le niveau de zoom est lu, Échap rend le focus au bouton",
+        "Question sur image : repères annoncés « Repère n, bouton radio, n sur N », flèches pour changer, explications reliées après validation",
         "Image à repères : chaque repère annonce son titre et son état (développé ou réduit) ; l'explication est lue à l'ouverture",
       ],
     },

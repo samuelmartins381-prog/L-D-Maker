@@ -236,6 +236,33 @@ describe("validateModule", () => {
     expect(validateModule(src).ok).toBe(true);
   });
 
+  it("checks hotspot questions: image, positions, one correct marker, no positions elsewhere", () => {
+    const src = fixture();
+    const q = src.module.sections[0].screens[0].blocks[1];
+    // Not checked here: the fixture's single scored question always triggers "assessment-tolerance",
+    // and, once it is a hotspot, "visual-only-assessment" (checked at the end).
+    const ignored = ["assessment-tolerance", "visual-only-assessment"];
+    const own = () => codes(src).filter((c) => !ignored.includes(c));
+    q.variant = "hotspot";
+    expect(own()).toEqual(["hotspot", "hotspot", "hotspot"]);
+    q.image = { src: "media/m.svg", alt: "body" };
+    q.choices[0] = { ...q.choices[0], x: 10, y: 10 };
+    q.choices[1] = { ...q.choices[1], x: 80, y: 80 };
+    expect(own()).toEqual(["media-missing"]);
+    src.mediaFiles = ["media/m.svg"];
+    expect(own()).toEqual([]);
+    q.choices[1] = { ...q.choices[1], x: 12, y: 12, correct: true };
+    expect(own()).toEqual(["hotspot-overlap", "answer-key"]);
+
+    // Its only scored question is visual: the objective needs a text alternative.
+    q.choices[1] = { ...q.choices[1], x: 80, y: 80, correct: false };
+    expect(codes(src)).toContain("visual-only-assessment");
+
+    const plain = fixture();
+    plain.module.sections[0].screens[0].blocks[1].choices[0].x = 5;
+    expect(codes(plain)).toContain("hotspot");
+  });
+
   it("checks hotspots: image file, alt and item strings, unique ids, overlapping markers", () => {
     const src = fixture();
     const item = (id: string, x: number, y: number) => ({

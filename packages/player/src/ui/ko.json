@@ -37,5 +37,7 @@
   "zoom.close": "닫기",
   "zoom.level": "확대 {percent}%",
   "zoom.area": "확대된 이미지: 스크롤하거나 화살표 키로 이동하세요",
-  "zoom.hint": "이미지를 끌어 이동하고, 두 손가락이나 + 및 −로 확대·축소하세요."
+  "zoom.hint": "이미지를 끌어 이동하고, 두 손가락이나 + 및 −로 확대·축소하세요.",
+  "question.instructions.hotspot": "해당하는 표시를 선택한 다음 제출하세요.",
+  "question.marker": "표시 {n}"
 }

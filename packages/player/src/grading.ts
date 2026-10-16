@@ -53,7 +53,7 @@ export function toggle(
 ): AnswerState {
   if (isFinal(q, state)) return state;
   const selected =
-    q.variant === "single"
+    q.variant !== "multiple"
       ? [choiceId]
       : state.selected.includes(choiceId)
         ? state.selected.filter((id) => id !== choiceId)

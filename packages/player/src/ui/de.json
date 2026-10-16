@@ -37,5 +37,7 @@
   "zoom.close": "Schließen",
   "zoom.level": "Zoom {percent} %",
   "zoom.area": "Vergrößertes Bild: scrollen oder mit den Pfeiltasten bewegen",
-  "zoom.hint": "Ziehen Sie das Bild, um sich zu bewegen; mit zwei Fingern oder + und − zoomen."
+  "zoom.hint": "Ziehen Sie das Bild, um sich zu bewegen; mit zwei Fingern oder + und − zoomen.",
+  "question.instructions.hotspot": "Wählen Sie die passende Markierung und senden Sie dann ab.",
+  "question.marker": "Markierung {n}"
 }

@@ -100,13 +100,19 @@ const Choice = z.strictObject({
    * whether or not the learner picked the option. The player displays the right/wrong verdict.
    */
   feedback: StringKey,
+  /** Marker position on the question image, in % (hotspot variant only, ADR 0010). */
+  x: z.number().min(0).max(100).optional(),
+  y: z.number().min(0).max(100).optional(),
 });
 
 export const Question = z.strictObject({
   ...blockBase,
   type: z.literal("question"),
-  variant: z.enum(["single", "multiple"]),
+  /** "hotspot": pick the right marker on an image ("identify the part"); graded like "single". */
+  variant: z.enum(["single", "multiple", "hotspot"]),
   prompt: StringKey,
+  /** Image the markers sit on (hotspot variant only). Its alt must not give the answer away. */
+  image: z.strictObject({ src: MediaSrc, alt: StringKey }).optional(),
   choices: z.array(Choice).min(2).max(8),
   /** Learning objectives this question provides evidence for. */
   objectives: z.array(Id).default([]),

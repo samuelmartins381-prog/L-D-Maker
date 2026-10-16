@@ -89,6 +89,19 @@ sections:
               - { id: a, text: s2.practice.a, correct: true, feedback: s2.practice.a.fb }
               - { id: b, text: s2.practice.b, correct: false, feedback: s2.practice.b.fb }
               - { id: c, text: s2.practice.c, correct: true, feedback: s2.practice.c.fb }
+          - id: s2-practice-where
+            type: question
+            variant: hotspot
+            scored: false
+            attempts: 2
+            prompt: s2.where.prompt
+            image: { src: media/fake-login.svg, alt: s2.where.alt }
+            objectives: [obj-signs]
+            choices:
+              - { id: padlock, x: 5.8, y: 11, text: s2.where.padlock, correct: false, feedback: s2.where.padlock.fb }
+              - { id: domain, x: 48, y: 11, text: s2.where.domain, correct: true, feedback: s2.where.domain.fb }
+              - { id: logo, x: 50, y: 30.6, text: s2.where.logo, correct: false, feedback: s2.where.logo.fb }
+              - { id: button, x: 50, y: 81.6, text: s2.where.button, correct: false, feedback: s2.where.button.fb }
 
   - id: s3
     title: s3.title

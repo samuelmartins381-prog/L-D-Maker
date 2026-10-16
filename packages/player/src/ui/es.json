@@ -37,5 +37,7 @@
   "zoom.close": "Cerrar",
   "zoom.level": "Zoom {percent} %",
   "zoom.area": "Imagen ampliada: desplácese o use las flechas para moverse",
-  "zoom.hint": "Arrastre la imagen para moverse; pellizque o use + y − para hacer zoom."
+  "zoom.hint": "Arrastre la imagen para moverse; pellizque o use + y − para hacer zoom.",
+  "question.instructions.hotspot": "Seleccione el marcador correspondiente y luego valide.",
+  "question.marker": "Marcador {n}"
 }

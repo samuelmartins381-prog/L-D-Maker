@@ -277,6 +277,57 @@ console.log("Image zoom — modal viewer, keyboard zoom, focus restored");
   await page.close();
 }
 
+console.log(
+  "Hotspot question — neutral marker names, graded like single choice",
+);
+{
+  const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
+  const page = await browser.newPage({ reducedMotion: "reduce" });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(`${web}index.html?lang=en`);
+  const h1 = page.locator("h1");
+  for (let i = 0; i < 30 && (await h1.innerText()) !== "Practice"; i++)
+    await page.locator("footer.pager .primary").click();
+  const form = page.locator("form.question", {
+    has: page.getByText("really tells you which site"),
+  });
+  const radios = form.getByRole("radio");
+  await step(
+    "names markers by number only, so the name never gives the answer",
+    async () => {
+      assert.equal(await radios.count(), 4);
+      for (let n = 1; n <= 4; n++)
+        assert.equal(
+          await form
+            .getByRole("radio", { name: `Marker ${n}`, exact: true })
+            .count(),
+          1,
+        );
+    },
+  );
+  await step("a wrong answer explains only the chosen marker", async () => {
+    await form.locator("input[value=padlock]").check();
+    await form.getByRole("button", { name: "Submit" }).click();
+    assert.match(
+      await form.locator(".verdict").innerText(),
+      /Attempts left: 1/,
+    );
+    assert.equal(await form.locator(".results li").count(), 1);
+    assert.match(await form.locator(".results").innerText(), /The padlock/);
+  });
+  await step(
+    "the right marker ends the question and shows every explanation",
+    async () => {
+      await form.locator("input[value=domain]").check();
+      await form.getByRole("button", { name: "Submit" }).click();
+      assert.equal(await form.locator(".verdict").innerText(), "Correct");
+      assert.equal(await form.locator(".results li").count(), 4);
+      assert.equal(await radios.and(page.locator(":disabled")).count(), 4);
+    },
+  );
+  await page.close();
+}
+
 console.log("Locale packs — loaded on demand, missing pack keeps the language");
 {
   const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");

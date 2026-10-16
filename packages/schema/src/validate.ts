@@ -79,6 +79,7 @@ function blockKeys(block: Block, at: string): KeyRef[] {
       break;
     case "question":
       add(block.prompt, "prompt");
+      add(block.image?.alt, "image.alt");
       block.choices.forEach((c, i) => {
         add(c.text, `choices[${i}].text`);
         add(c.feedback, `choices[${i}].feedback`);
@@ -130,6 +131,20 @@ function checkSemantics(
     });
   const warn = (code: string, path: string, message: string) =>
     issues.push({ severity: "warning", code, path, message });
+  const warnOverlaps = (
+    markers: readonly { id: string; x: number; y: number }[],
+    path: string,
+  ) =>
+    markers.forEach((a, i) => {
+      for (const c of markers.slice(i + 1)) {
+        if (Math.hypot(a.x - c.x, a.y - c.y) < HOTSPOT_MIN_DISTANCE)
+          warn(
+            "hotspot-overlap",
+            path,
+            `markers "${a.id}" and "${c.id}" are closer than ${HOTSPOT_MIN_DISTANCE} % and may overlap on a phone`,
+          );
+      }
+    });
 
   // Unique ids across the whole module: they become tracking and bookmark identifiers.
   const seen = new Map<string, string>();
@@ -141,6 +156,8 @@ function checkSemantics(
   for (const [i, o] of m.objectives.entries()) claim(o.id, `objectives[${i}]`);
   const objectiveIds = new Set(m.objectives.map((o) => o.id));
   const assessed = new Set<string>();
+  /** Objectives with at least one scored question a screen reader user can answer (not hotspot). */
+  const assessedInText = new Set<string>();
 
   if (new Set(m.locales).size !== m.locales.length)
     err("duplicate-locale", "locales", "locale listed twice");
@@ -187,16 +204,7 @@ function checkSemantics(
               `${at}.image.src`,
               `file not found: ${b.image.src}`,
             );
-          b.items.forEach((a, i) => {
-            for (const c of b.items.slice(i + 1)) {
-              if (Math.hypot(a.x - c.x, a.y - c.y) < HOTSPOT_MIN_DISTANCE)
-                warn(
-                  "hotspot-overlap",
-                  `module.yaml: ${at}.items`,
-                  `markers "${a.id}" and "${c.id}" are closer than ${HOTSPOT_MIN_DISTANCE} % and may overlap on a phone`,
-                );
-            }
-          });
+          warnOverlaps(b.items, `module.yaml: ${at}.items`);
         }
         if (
           (b.type === "accordion" ||
@@ -217,11 +225,43 @@ function checkSemantics(
               `${at}.choices`,
               "choice ids must be unique within the question",
             );
-          if (b.variant === "single" && correct !== 1)
+          if (b.variant === "hotspot") {
+            if (!b.image) err("hotspot", at, "hotspot question needs an image");
+            else if (!mediaFiles.has(b.image.src))
+              err(
+                "media-missing",
+                `${at}.image.src`,
+                `file not found: ${b.image.src}`,
+              );
+            b.choices.forEach((c, i) => {
+              if (c.x === undefined || c.y === undefined)
+                err(
+                  "hotspot",
+                  `${at}.choices[${i}]`,
+                  "hotspot choice needs x and y",
+                );
+            });
+            warnOverlaps(
+              b.choices.filter(
+                (c): c is typeof c & { x: number; y: number } =>
+                  c.x !== undefined && c.y !== undefined,
+              ),
+              `module.yaml: ${at}.choices`,
+            );
+          } else if (
+            b.image ||
+            b.choices.some((c) => c.x !== undefined || c.y !== undefined)
+          )
+            err(
+              "hotspot",
+              at,
+              "image and x/y positions are only for the hotspot variant",
+            );
+          if (b.variant !== "multiple" && correct !== 1)
             err(
               "answer-key",
               `${at}.choices`,
-              `single-choice question needs exactly 1 correct choice, found ${correct}`,
+              `${b.variant} question needs exactly 1 correct choice, found ${correct}`,
             );
           if (
             b.variant === "multiple" &&
@@ -239,7 +279,10 @@ function checkSemantics(
                 `${at}.objectives`,
                 `unknown objective "${o}"`,
               );
-            else if (b.scored) assessed.add(o);
+            else if (b.scored) {
+              assessed.add(o);
+              if (b.variant !== "hotspot") assessedInText.add(o);
+            }
           }
           if (b.scored && b.objectives.length === 0)
             err(
@@ -259,6 +302,14 @@ function checkSemantics(
         "alignment",
         `objectives[${i}]`,
         `objective "${o.id}" is not assessed by any scored question`,
+      );
+    // A hotspot question is visual by nature (WCAG 1.1.1 test exception): blind learners need
+    // another way to show the same objective (ADR 0010).
+    else if (!assessedInText.has(o.id))
+      warn(
+        "visual-only-assessment",
+        `module.yaml: objectives[${i}]`,
+        `objective "${o.id}" is only assessed by hotspot questions: add a scored text question so every learner can pass it`,
       );
   });
   const scoredCount = m.sections

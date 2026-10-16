@@ -37,5 +37,7 @@
   "zoom.close": "閉じる",
   "zoom.level": "ズーム {percent}%",
   "zoom.area": "拡大画像：スクロールまたは矢印キーで移動できます",
-  "zoom.hint": "画像をドラッグして移動します。ピンチ操作または＋と−で拡大・縮小できます。"
+  "zoom.hint": "画像をドラッグして移動します。ピンチ操作または＋と−で拡大・縮小できます。",
+  "question.instructions.hotspot": "該当するマーカーを選んでから、回答してください。",
+  "question.marker": "マーカー {n}"
 }

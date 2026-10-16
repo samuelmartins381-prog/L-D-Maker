@@ -37,5 +37,7 @@
   "zoom.close": "Close",
   "zoom.level": "Zoom {percent}%",
   "zoom.area": "Enlarged image: scroll or use the arrow keys to move around",
-  "zoom.hint": "Drag the image to move around; pinch or use + and − to zoom."
+  "zoom.hint": "Drag the image to move around; pinch or use + and − to zoom.",
+  "question.instructions.hotspot": "Select the matching marker, then submit.",
+  "question.marker": "Marker {n}"
 }

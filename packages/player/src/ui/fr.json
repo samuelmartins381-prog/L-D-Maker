@@ -37,5 +37,7 @@
   "zoom.close": "Fermer",
   "zoom.level": "Zoom {percent} %",
   "zoom.area": "Image agrandie : faites défiler ou utilisez les flèches pour vous déplacer",
-  "zoom.hint": "Faites glisser l'image pour vous déplacer ; pincez ou utilisez + et − pour zoomer."
+  "zoom.hint": "Faites glisser l'image pour vous déplacer ; pincez ou utilisez + et − pour zoomer.",
+  "question.instructions.hotspot": "Sélectionnez le repère qui correspond, puis validez.",
+  "question.marker": "Repère {n}"
 }

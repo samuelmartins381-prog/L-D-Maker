@@ -37,5 +37,7 @@
   "zoom.close": "Fechar",
   "zoom.level": "Zoom {percent}%",
   "zoom.area": "Imagem ampliada: role ou use as setas para se mover",
-  "zoom.hint": "Arraste a imagem para se mover; use dois dedos ou + e − para o zoom."
+  "zoom.hint": "Arraste a imagem para se mover; use dois dedos ou + e − para o zoom.",
+  "question.instructions.hotspot": "Selecione o marcador correspondente e depois envie.",
+  "question.marker": "Marcador {n}"
 }

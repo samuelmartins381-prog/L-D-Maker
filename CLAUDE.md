@@ -134,7 +134,9 @@ plats clé → texte) + `media/`. Sections → écrans → blocs (`narrative`, `
 `hotspots`, `question` single/multiple, `summary`). `hotspots` (ADR 0008) : repères = boutons,
 explication dans un panneau sous l'image, `x`/`y` en % non inversés en RTL ; texte dans les images
 limité à l'invariable (adresses, références). Image du bloc narratif : `zoom: true` (+ `zoomSrc` HD
-facultatif) ouvre une visionneuse `<dialog>` (ADR 0009) ; le banc audite alors un 3e état « zoom ». Chaque choix de question a son feedback. Chaque objectif
+facultatif) ouvre une visionneuse `<dialog>` (ADR 0009) ; le banc audite alors un 3e état « zoom ». Question
+`variant: hotspot` (ADR 0010) : radios natives en pastilles sur `image`, `x`/`y` par choix, notée comme
+« single » ; nom « Repère n » avant réponse ; avertissement si un objectif n'est évalué que visuellement. Chaque choix de question a son feedback. Chaque objectif
 doit être évalué par une question notée ; chaque question notée est rattachée à un objectif.
 Après une modification du schéma : `pnpm --filter @ldm/schema json-schema`.
 
@@ -183,7 +185,7 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
     - [x] a. Image à repères (ADR 0008) — démo « Anatomie d'un message », banc 352 pages OK
     - [x] b. Zoom sur image (ADR 0009) — visionneuse `<dialog>`, banc 374 pages OK ; lien
           d'évitement corrigé (masquait le sélecteur de langue en russe)
-    - [ ] c. Question « identifie la pièce » (repère à choisir, notée)
+    - [x] c. Question « identifie la pièce » (ADR 0010) — variante `hotspot`, banc 374 pages OK
     - [ ] d. Remise en ordre d'étapes (clavier, sans glisser-déposer obligatoire)
     - [ ] e. Glossaire (termes soulignés + glossaire client transmis aux traducteurs)
     - [ ] f. Banque de questions, vrai/faux, appariement ; scénario à embranchements selon le public

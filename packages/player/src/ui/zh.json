@@ -37,5 +37,7 @@
   "zoom.close": "关闭",
   "zoom.level": "缩放 {percent}%",
   "zoom.area": "放大的图片：滚动或使用方向键移动",
-  "zoom.hint": "拖动图片即可移动；双指缩放或使用 + 和 − 进行缩放。"
+  "zoom.hint": "拖动图片即可移动；双指缩放或使用 + 和 − 进行缩放。",
+  "question.instructions.hotspot": "选择对应的标记，然后提交。",
+  "question.marker": "标记 {n}"
 }

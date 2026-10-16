@@ -37,5 +37,7 @@
   "zoom.close": "Chiudi",
   "zoom.level": "Zoom {percent}%",
   "zoom.area": "Immagine ingrandita: scorra o usi le frecce per spostarsi",
-  "zoom.hint": "Trascini l'immagine per spostarsi; usi due dita o + e − per lo zoom."
+  "zoom.hint": "Trascini l'immagine per spostarsi; usi due dita o + e − per lo zoom.",
+  "question.instructions.hotspot": "Selezioni l'indicatore corrispondente, poi confermi.",
+  "question.marker": "Indicatore {n}"
 }

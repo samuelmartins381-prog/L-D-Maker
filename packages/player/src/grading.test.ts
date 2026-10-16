@@ -36,6 +36,15 @@ const multiple: Question = {
 };
 
 describe("question grading", () => {
+  it("hotspot questions are graded like single choice (one marker at a time)", () => {
+    const hotspot: Question = { ...single, id: "q3", variant: "hotspot" };
+    let s = initialAnswer(hotspot);
+    s = toggle(hotspot, s, "a");
+    s = toggle(hotspot, s, "b");
+    expect(s.selected).toEqual(["b"]);
+    expect(submit(hotspot, s).correct).toBe(true);
+  });
+
   it("single choice replaces the selection", () => {
     let s = initialAnswer(single);
     s = toggle(single, s, "a");
