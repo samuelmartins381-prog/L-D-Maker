@@ -143,18 +143,20 @@ const offset = $derived(
 <div class="visually-hidden" aria-live="polite">{announcement}</div>
 
 <style>
+  /* Skip link: off-screen until focused, then in the flow above the top bar (GOV.UK pattern), so it
+     pushes the header down instead of covering its controls (long labels, e.g. Russian, hid the
+     language menu: WCAG 2.5.8 / 2.4.11). */
   .skip {
     position: absolute;
-    inset-inline-start: var(--space-4);
     inset-block-start: -100px;
-    z-index: 20;
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-4);
     background: var(--color-ink);
     color: var(--color-surface);
-    border-radius: var(--radius-sm);
+    font-weight: 600;
   }
   .skip:focus {
-    inset-block-start: var(--space-4);
+    position: static;
+    display: block;
   }
 
   .topbar {
