@@ -36,7 +36,7 @@ for (const [name, viewport] of Object.entries(viewports)) {
         m.type() === "error" && errors.push(`${locale}/${name}: ${m.text()}`),
     );
     await page.goto(`file://${resolve(webDir, "index.html")}?lang=${locale}`);
-    await page.locator("h1").waitFor(); // other locales are loaded before the first render
+    await page.locator("html[data-ldm-ready] h1").waitFor(); // the live player, not the prerender
     await page.evaluate(() => document.fonts.ready);
     let current = 0;
     for (const target of screens) {

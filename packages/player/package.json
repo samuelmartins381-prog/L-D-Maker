@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./content": "./src/content.ts"
+    "./content": "./src/content.ts",
+    "./locale": "./src/locale.ts"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/prerender.ts",
     "check:svelte": "svelte-check --tsgo --tsconfig ./tsconfig.svelte-check.json --fail-on-warnings"
   },
   "dependencies": {

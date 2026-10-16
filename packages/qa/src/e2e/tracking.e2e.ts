@@ -34,7 +34,7 @@ async function open(
   );
   await page.goto(lms.url(`${SCO}?lang=fr`, initial));
   const sco = page.frameLocator("#sco");
-  await sco.locator("h1").waitFor();
+  await sco.locator("html[data-ldm-ready] h1").waitFor();
   const frame = page.frames().find((f) => f.url().includes(SCO));
   assert.ok(frame, "SCO frame loaded");
   return { page, sco: frame };
@@ -183,9 +183,11 @@ console.log("HTML5 standalone — reload resumes from browser storage");
     .url("/")
     .replace(/\/__lms.*/, "/out/phishing-basics/web/index.html?lang=en");
   await page.goto(url);
+  await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
   for (let i = 0; i < 2; i++)
     await page.locator("footer.pager .primary").click();
   await page.reload();
+  await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
   await step("comes back to the same screen after a reload", async () => {
     assert.equal(await page.locator("h1").innerText(), "A worked example");
   });
@@ -198,6 +200,7 @@ console.log("Hotspots — markers open one explanation at a time");
   const page = await browser.newPage({ reducedMotion: "reduce" });
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(`${web}index.html?lang=en`);
+  await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
   const h1 = page.locator("h1");
   for (
     let i = 0;
@@ -236,6 +239,7 @@ console.log("Image zoom — modal viewer, keyboard zoom, focus restored");
   const page = await browser.newPage({ reducedMotion: "reduce" });
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(`${web}index.html?lang=en`);
+  await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
   const h1 = page.locator("h1");
   for (let i = 0; i < 30 && (await h1.innerText()) !== "A worked example"; i++)
     await page.locator("footer.pager .primary").click();
@@ -285,6 +289,7 @@ console.log(
   const page = await browser.newPage({ reducedMotion: "reduce" });
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(`${web}index.html?lang=en`);
+  await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
   const h1 = page.locator("h1");
   for (let i = 0; i < 30 && (await h1.innerText()) !== "Practice"; i++)
     await page.locator("footer.pager .primary").click();
@@ -328,13 +333,59 @@ console.log(
   await page.close();
 }
 
+console.log(
+  "Prerendered first screen — visible before the script, replaced by the live player",
+);
+{
+  const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
+  const blocked = await browser.newPage({ reducedMotion: "reduce" });
+  await blocked.route("**/player-*.js", (r) => r.abort());
+  await step(
+    "shows the first screen without the player script, inert",
+    async () => {
+      // ?lang=fr: the browser's own languages (en-US here) would otherwise rightly hide it.
+      await blocked.goto(`${web}index.html?lang=fr`);
+      assert.equal(await blocked.locator("h1").innerText(), "Bienvenue");
+      assert.ok(
+        await blocked.locator("#ldm-app[inert][data-prerender]").isVisible(),
+      );
+    },
+  );
+  await step(
+    "hides it when the learner will get another language",
+    async () => {
+      await blocked.goto(`${web}index.html?lang=en`);
+      const visibility = await blocked
+        .locator("#ldm-app")
+        .evaluate((e) => getComputedStyle(e).visibility);
+      assert.equal(visibility, "hidden");
+    },
+  );
+  await blocked.close();
+  const page = await browser.newPage({ reducedMotion: "reduce" });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await step("is replaced by one live, interactive screen", async () => {
+    await page.goto(`${web}index.html?lang=en`);
+    await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
+    assert.equal(await page.locator("h1").count(), 1);
+    assert.equal(await page.locator("h1").innerText(), "Welcome");
+    assert.equal(
+      await page.locator("#ldm-app[inert], [data-prerender]").count(),
+      0,
+    );
+    await page.locator("footer.pager .primary").click();
+    assert.notEqual(await page.locator("h1").innerText(), "Welcome");
+  });
+  await page.close();
+}
+
 console.log("Locale packs — loaded on demand, missing pack keeps the language");
 {
   const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
   const page = await browser.newPage({ reducedMotion: "reduce" });
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(`${web}index.html?lang=fr`);
-  await page.locator("h1").waitFor();
+  await page.locator("html[data-ldm-ready] h1").waitFor();
   await step("embeds only the default locale in index.html", async () => {
     const html = await (await fetch(`${web}index.html`)).text();
     assert.ok(html.includes("Bienvenue"));

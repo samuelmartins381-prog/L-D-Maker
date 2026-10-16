@@ -136,7 +136,10 @@ export async function scormChecks(
         problems.push(`valeur refusée par le LMS : ${m.text()}`);
     });
     await page.goto(lms.url(sco, initial, version));
-    await page.frameLocator("#sco").locator("h1").waitFor();
+    await page
+      .frameLocator("#sco")
+      .locator("html[data-ldm-ready] h1")
+      .waitFor();
     // The LMS page URL also contains "index.html" (as a query parameter): target the iframe itself.
     const frame = (await (await page.$("#sco"))?.contentFrame()) as Frame;
     return { page, frame };

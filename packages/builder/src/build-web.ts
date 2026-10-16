@@ -14,12 +14,15 @@ import {
   type StringCatalog,
   validateModule,
 } from "@ldm/schema";
+import { guardScript, guardStyle } from "./prerender-guard.ts";
 
 const PLAYER_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../player",
 );
 const PLAYER_DIST = join(PLAYER_DIR, "dist");
+/** Build-time renderer of the first screen (ADR 0012), produced by the player's --ssr build. */
+const PRERENDER = join(PLAYER_DIR, "dist-ssr/prerender.js");
 const UI_DIR = join(PLAYER_DIR, "src/ui");
 
 export class BuildError extends Error {
@@ -142,6 +145,16 @@ export async function buildWeb(
     ui: { [def]: ui[def] as StringCatalog, en: ui.en as StringCatalog },
   };
 
+  const { prerender } = (await import(PRERENDER).catch(() => {
+    throw new BuildError(
+      "player prerenderer is not built: run `pnpm --filter @ldm/player build`",
+    );
+  })) as { prerender: (c: CompiledContent) => string };
+  // Rendered before the content is embedded: the prerender works on its own copy.
+  const firstScreen = prerender(structuredClone(content));
+  const storageKey =
+    target === "web" ? `ldm:${module.id}@${module.version}` : null;
+
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
   await cp(join(PLAYER_DIST, entry.file), join(outDir, entry.file));
@@ -174,12 +187,14 @@ export async function buildWeb(
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(defaultTitle)}</title>
+<style>${guardStyle}</style>
+<script>${guardScript(module.locales, module.defaultLocale, storageKey)}</script>
 ${stylesheets.map((css) => `<link rel="stylesheet" href="${css}">`).join("\n")}
+<script defer src="${entry.file}"></script>
 </head>
 <body>
-<div id="ldm-app"></div>
+<div id="ldm-app" inert data-prerender>${firstScreen}</div>
 <script type="application/json" id="ldm-content">${embedJson(content)}</script>
-<script src="${entry.file}"></script>
 </body>
 </html>
 `;

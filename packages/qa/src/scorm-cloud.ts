@@ -188,7 +188,7 @@ async function launch(): Promise<{ page: Page; sco: Frame }> {
       for (const frame of p.frames()) {
         if (
           (await frame
-            .locator("footer.pager")
+            .locator("html[data-ldm-ready] footer.pager")
             .count()
             .catch(() => 0)) > 0
         )

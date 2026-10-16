@@ -108,6 +108,10 @@ langue = `player.setLocale()` (asynchrone), jamais `player.locale = …`. Typogr
 dans le thème via `:root:lang(…)` : polices système en CJK (pas de Noto CJK, ~14,5 Mo), Inter pour
 les titres en cyrillique (Fraunces n'a pas de cyrillique), césure automatique. Catalogue
 d'interface régional absent → celui de la langue (pt-BR → `pt.json`).
+Pré-rendu (ADR 0012) : `pnpm build:player` produit aussi `dist-ssr/prerender.js` ; le premier écran
+est inséré dans `index.html` (`inert data-prerender`), script en `defer`, puis remplacé par le lecteur.
+Code rendu au build : pas d'API navigateur hors `$effect` (protéger `matchMedia`). Tests et outils
+attendent `html[data-ldm-ready]`, jamais le seul `h1`.
 
 ## Suivi (ADR 0004)
 Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12`, `scorm2004` et `standalone`,

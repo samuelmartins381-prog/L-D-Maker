@@ -30,14 +30,14 @@ export async function openModule(
       errors.push(`HTTP ${r.status()} ${new URL(r.url()).pathname}`);
   });
   await page.goto(url);
-  await page.locator("h1").waitFor();
+  await page.locator("html[data-ldm-ready] h1").waitFor();
   await page.evaluate(() => document.fonts.ready);
   return { page, errors };
 }
 
 export async function nextScreen(page: Page): Promise<void> {
   await page.locator("footer.pager .primary").click();
-  await page.locator("h1").waitFor();
+  await page.locator("html[data-ldm-ready] h1").waitFor();
 }
 
 /** Puts a screen in its "interacted" state: every accordion panel and hotspot opened, every question answered to its final state. */

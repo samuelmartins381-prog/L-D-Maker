@@ -10,7 +10,10 @@ const p = usePlayer();
 const session = useSession();
 const module = p.content.module;
 let endHeading: HTMLHeadingElement | undefined = $state();
-const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Also rendered at build time (prerender.ts), where matchMedia does not exist.
+const reducedMotion =
+  typeof matchMedia === "function" &&
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 let menuOpen = $state(false);
 let heading: HTMLHeadingElement | undefined = $state();

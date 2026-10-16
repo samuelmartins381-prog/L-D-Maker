@@ -49,13 +49,19 @@ const player = new Player(content, requested, loadLocalePack);
 const session = new Session(player, tracker, start);
 const target = document.getElementById("ldm-app") ?? document.body;
 
-// Mount once the starting locale is loaded, so the first paint is in the right language.
-player.localeReady.then(() =>
+// Mount once the starting locale is loaded, so the first paint is in the right language. The
+// prerendered first screen (ADR 0012) is replaced in the same task: no frame without content.
+player.localeReady.then(() => {
+  target.replaceChildren();
+  target.removeAttribute("inert");
+  target.removeAttribute("data-prerender");
   mount(App, {
     target,
     context: new Map<symbol, unknown>([
       [PLAYER_KEY, player],
       [SESSION_KEY, session],
     ]),
-  }),
-);
+  });
+  // Signal for tests and tools: the live player (not the prerender) is on screen.
+  document.documentElement.dataset.ldmReady = "1";
+});
