@@ -39,5 +39,12 @@
   "zoom.area": "Vergrößertes Bild: scrollen oder mit den Pfeiltasten bewegen",
   "zoom.hint": "Ziehen Sie das Bild, um sich zu bewegen; mit zwei Fingern oder + und − zoomen.",
   "question.instructions.hotspot": "Wählen Sie die passende Markierung und senden Sie dann ab.",
-  "question.marker": "Markierung {n}"
+  "question.marker": "Markierung {n}",
+  "question.instructions.sequence": "Bringen Sie die Schritte mit den Schaltflächen ↑ und ↓ in die richtige Reihenfolge und senden Sie dann ab.",
+  "sequence.up": "Nach oben: {step}",
+  "sequence.down": "Nach unten: {step}",
+  "sequence.moved": "„{step}“ steht jetzt an Position {position} von {total}.",
+  "sequence.incorrect.retry": "Nicht ganz: {placed} von {total} Schritten an der richtigen Stelle. Verbleibende Versuche: {count}. Ändern Sie die Reihenfolge und senden Sie dann ab.",
+  "sequence.placed": "An der richtigen Stelle",
+  "sequence.yourPosition": "Sie hatten ihn an Position {position}"
 }

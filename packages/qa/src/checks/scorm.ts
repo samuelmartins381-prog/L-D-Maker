@@ -149,12 +149,26 @@ export async function scormChecks(
   async function answerScreen(f: Frame, index: number): Promise<void> {
     for (const block of screens[index]?.blocks ?? []) {
       if (block.type !== "question") continue;
-      const form = f
-        .locator("form.question")
-        .filter({ has: f.locator(`input[name="${block.id}"]`) });
+      const form = f.locator(`form.question[data-question="${block.id}"]`);
       if ((await form.locator('button[type="submit"]').count()) === 0) continue;
-      for (const c of block.choices.filter((c) => c.correct))
-        await form.locator(`input[value="${c.id}"]`).check();
+      if (block.variant === "sequence") {
+        // Bring each step up to its place, in order, with the Move up buttons.
+        for (const [i, c] of block.choices.entries()) {
+          for (;;) {
+            const ids = await form
+              .locator('.steps button[data-move="up"]')
+              .evaluateAll((bs) =>
+                bs.map((b) => (b as HTMLElement).dataset.id),
+              );
+            if (ids.indexOf(c.id) <= i) break;
+            await form
+              .locator(`button[data-id="${c.id}"][data-move="up"]`)
+              .click();
+          }
+        }
+      } else
+        for (const c of block.choices.filter((c) => c.correct))
+          await form.locator(`input[value="${c.id}"]`).check();
       await form.locator('button[type="submit"]').click();
     }
   }

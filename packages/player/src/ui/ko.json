@@ -39,5 +39,12 @@
   "zoom.area": "확대된 이미지: 스크롤하거나 화살표 키로 이동하세요",
   "zoom.hint": "이미지를 끌어 이동하고, 두 손가락이나 + 및 −로 확대·축소하세요.",
   "question.instructions.hotspot": "해당하는 표시를 선택한 다음 제출하세요.",
-  "question.marker": "표시 {n}"
+  "question.marker": "표시 {n}",
+  "question.instructions.sequence": "↑ 및 ↓ 버튼으로 단계를 순서대로 놓은 다음 제출하세요.",
+  "sequence.up": "위로 이동: {step}",
+  "sequence.down": "아래로 이동: {step}",
+  "sequence.moved": "“{step}”은(는) 이제 {total}개 중 {position}번째입니다.",
+  "sequence.incorrect.retry": "아쉽습니다: {total}단계 중 {placed}단계가 제자리에 있습니다. 남은 시도: {count}회. 순서를 바꾼 다음 제출하세요.",
+  "sequence.placed": "제자리",
+  "sequence.yourPosition": "{position}번째에 두었습니다"
 }

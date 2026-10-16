@@ -39,5 +39,12 @@
   "zoom.area": "Imagen ampliada: desplácese o use las flechas para moverse",
   "zoom.hint": "Arrastre la imagen para moverse; pellizque o use + y − para hacer zoom.",
   "question.instructions.hotspot": "Seleccione el marcador correspondiente y luego valide.",
-  "question.marker": "Marcador {n}"
+  "question.marker": "Marcador {n}",
+  "question.instructions.sequence": "Ordene los pasos con los botones ↑ y ↓ y luego valide.",
+  "sequence.up": "Subir: {step}",
+  "sequence.down": "Bajar: {step}",
+  "sequence.moved": "«{step}» está ahora en la posición {position} de {total}.",
+  "sequence.incorrect.retry": "No del todo: {placed} de {total} pasos en su lugar. Intentos restantes: {count}. Cambie el orden y luego valide.",
+  "sequence.placed": "En su lugar",
+  "sequence.yourPosition": "Lo había puesto en la posición {position}"
 }

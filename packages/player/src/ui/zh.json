@@ -39,5 +39,12 @@
   "zoom.area": "放大的图片：滚动或使用方向键移动",
   "zoom.hint": "拖动图片即可移动；双指缩放或使用 + 和 − 进行缩放。",
   "question.instructions.hotspot": "选择对应的标记，然后提交。",
-  "question.marker": "标记 {n}"
+  "question.marker": "标记 {n}",
+  "question.instructions.sequence": "用 ↑ 和 ↓ 按钮把步骤排好顺序，然后提交。",
+  "sequence.up": "上移：{step}",
+  "sequence.down": "下移：{step}",
+  "sequence.moved": "“{step}”现在位于第 {position} 位（共 {total} 位）。",
+  "sequence.incorrect.retry": "还不完全对：{total} 个步骤中有 {placed} 个位置正确。剩余尝试次数：{count}。调整顺序后再提交。",
+  "sequence.placed": "位置正确",
+  "sequence.yourPosition": "您把它放在了第 {position} 位"
 }

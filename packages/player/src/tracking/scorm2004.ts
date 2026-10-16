@@ -136,7 +136,7 @@ export class Scorm2004Tracker implements Tracker {
     if (this.#finished) return;
     const base = `cmi.interactions.${this.#interactionIndex++}`;
     this.#set(`${base}.id`, i.id);
-    this.#set(`${base}.type`, "choice");
+    this.#set(`${base}.type`, i.type);
     for (const [k, o] of i.objectiveIds.entries())
       this.#set(`${base}.objectives.${k}.id`, o);
     this.#set(`${base}.timestamp`, isoTimestamp(i.at));

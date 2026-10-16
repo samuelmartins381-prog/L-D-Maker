@@ -75,6 +75,21 @@ sections:
               - { id: subject, x: 66, y: 36, title: s2.anatomy.subject.title, body: s2.anatomy.subject.body }
               - { id: link, x: 77.5, y: 73, title: s2.anatomy.link.title, body: s2.anatomy.link.body }
               - { id: attachment, x: 39.5, y: 87.5, title: s2.anatomy.attachment.title, body: s2.anatomy.attachment.body }
+      - id: s2-check
+        title: s2.check.title
+        blocks:
+          - id: s2-check-steps
+            type: question
+            variant: sequence
+            scored: false
+            attempts: 2
+            prompt: s2.check.prompt
+            objectives: [obj-signs]
+            choices:
+              - { id: hover, text: s2.check.hover, feedback: s2.check.hover.fb }
+              - { id: read, text: s2.check.read, feedback: s2.check.read.fb }
+              - { id: domain, text: s2.check.domain, feedback: s2.check.domain.fb }
+              - { id: compare, text: s2.check.compare, feedback: s2.check.compare.fb }
       - id: s2-practice
         title: s2.practice.title
         blocks:

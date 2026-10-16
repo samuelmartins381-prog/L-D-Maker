@@ -39,5 +39,12 @@
   "zoom.area": "Imagem ampliada: role ou use as setas para se mover",
   "zoom.hint": "Arraste a imagem para se mover; use dois dedos ou + e − para o zoom.",
   "question.instructions.hotspot": "Selecione o marcador correspondente e depois envie.",
-  "question.marker": "Marcador {n}"
+  "question.marker": "Marcador {n}",
+  "question.instructions.sequence": "Coloque as etapas em ordem com os botões ↑ e ↓ e depois envie.",
+  "sequence.up": "Mover para cima: {step}",
+  "sequence.down": "Mover para baixo: {step}",
+  "sequence.moved": "“{step}” está agora na posição {position} de {total}.",
+  "sequence.incorrect.retry": "Não exatamente: {placed} de {total} etapas no lugar certo. Tentativas restantes: {count}. Mude a ordem e depois envie.",
+  "sequence.placed": "No lugar certo",
+  "sequence.yourPosition": "Você a colocou na posição {position}"
 }

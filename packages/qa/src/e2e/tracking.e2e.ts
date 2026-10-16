@@ -333,6 +333,76 @@ console.log(
   await page.close();
 }
 
+console.log("Sequence question — move buttons, announcements, graded order");
+{
+  const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
+  const page = await browser.newPage({ reducedMotion: "reduce" });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(`${web}index.html?lang=en`);
+  await page.locator("html[data-ldm-ready]").waitFor({ state: "attached" });
+  const h1 = page.locator("h1");
+  for (let i = 0; i < 30 && (await h1.innerText()) !== "Checking a link"; i++)
+    await page.locator("footer.pager .primary").click();
+  const form = page.locator('form.question[data-question="s2-check-steps"]');
+  const order = () =>
+    form
+      .locator('.steps button[data-move="up"]')
+      .evaluateAll((bs) => bs.map((b) => (b as HTMLElement).dataset.id));
+  await step(
+    "starts shuffled, never solved, with buttons named after each step",
+    async () => {
+      assert.notDeepEqual(await order(), [
+        "hover",
+        "read",
+        "domain",
+        "compare",
+      ]);
+      assert.equal(
+        await form
+          .getByRole("button", {
+            name: "Move up: Read the address that appears",
+          })
+          .count(),
+        1,
+      );
+    },
+  );
+  await step(
+    "a move is announced and keeps focus on the moved step",
+    async () => {
+      const [first] = await order();
+      await form
+        .locator(`button[data-id="${first}"][data-move="down"]`)
+        .focus();
+      await page.keyboard.press("Enter");
+      assert.equal((await order())[1], first);
+      assert.match(
+        await form.locator("[aria-live=polite]").innerText(),
+        /is now in position 2 of 4/,
+      );
+      assert.equal(
+        await page.evaluate(
+          () => (document.activeElement as HTMLElement).dataset.id,
+        ),
+        first,
+      );
+    },
+  );
+  await step(
+    "the right order is graded correct and shows every explanation",
+    async () => {
+      for (const [i, id] of ["hover", "read", "domain", "compare"].entries())
+        while ((await order()).indexOf(id) > i)
+          await form.locator(`button[data-id="${id}"][data-move="up"]`).click();
+      await form.getByRole("button", { name: "Submit" }).click();
+      assert.equal(await form.locator(".verdict").innerText(), "Correct");
+      assert.equal(await form.locator(".final li").count(), 4);
+      assert.equal(await form.getByText("In the right place").count(), 4);
+    },
+  );
+  await page.close();
+}
+
 console.log(
   "Prerendered first screen — visible before the script, replaced by the live player",
 );

@@ -1,6 +1,7 @@
 <!--
-  Single/multiple choice question, and the hotspot variant (ADR 0010): the same native radios, drawn as
-  numbered markers on an image ("Marker 3" until answered, so the name never gives the answer away). Native radios/checkboxes in a fieldset (robust with screen readers).
+  Single/multiple choice question. Native radios/checkboxes in a fieldset (robust with screen readers).
+  Hotspot variant (ADR 0010): the same native radios, drawn as numbered markers on an image ("Marker 3"
+  until answered, so the name never gives the answer away). Sequence variant (ADR 0011): SequenceSteps.
   Feedback rules (ADR 0002 addendum): the player gives the verdict; choice explanations are neutral.
   Wrong with attempts left → only the selected choices are explained (the key stays hidden).
   Final (correct or out of attempts) → every choice is explained and the answer key is shown.
@@ -8,13 +9,20 @@
 <script lang="ts">
 import type { Question } from "@ldm/schema";
 import { tick } from "svelte";
-import { attemptsLeft, isFinal } from "../grading.ts";
+import { attemptsLeft, isFinal, placedCount } from "../grading.ts";
 import { usePlayer } from "../player.svelte.ts";
 import Rich from "../Rich.svelte";
+import SequenceSteps from "./SequenceSteps.svelte";
 
 let { block }: { block: Question } = $props();
 const p = usePlayer();
 let verdictEl: HTMLParagraphElement | undefined = $state();
+// Hotspot variant: markers are placed in % of the image; hidden until it has loaded (height 0 before).
+let img: HTMLImageElement | undefined = $state();
+let loaded = $state(false);
+$effect(() => {
+  if (img?.complete) loaded = true;
+});
 
 const answer = $derived(p.answer(block));
 const final = $derived(isFinal(block, answer));
@@ -30,11 +38,17 @@ const verdict = $derived(
     ? p.ui("question.correct")
     : answer.correct === false && final
       ? p.ui("question.incorrect.final")
-      : answer.correct === false
-        ? p.ui("question.incorrect.retry", {
+      : answer.correct === false && block.variant === "sequence"
+        ? p.ui("sequence.incorrect.retry", {
+            placed: placedCount(block, answer.selected),
+            total: block.choices.length,
             count: attemptsLeft(block, answer),
           })
-        : "",
+        : answer.correct === false
+          ? p.ui("question.incorrect.retry", {
+              count: attemptsLeft(block, answer),
+            })
+          : "",
 );
 
 const explained = (id: string) =>
@@ -48,7 +62,7 @@ async function onsubmit(e: SubmitEvent): Promise<void> {
 }
 </script>
 
-<form class="question" class:final {onsubmit} novalidate>
+<form class="question" class:final data-question={block.id} {onsubmit} novalidate>
   {#if block.heading}<h2 class="block-heading">{p.t(block.heading)}</h2>{/if}
   <!-- The legend must be the fieldset's first child to name the group. -->
   <fieldset aria-describedby="{block.id}-instructions">
@@ -58,9 +72,18 @@ async function onsubmit(e: SubmitEvent): Promise<void> {
       {p.ui(`question.instructions.${block.variant}`)}
     </p>
 
-    {#if block.variant === "hotspot" && block.image}
-      <div class="stage">
-        <img src={block.image.src} alt={p.t(block.image.alt)} decoding="async" />
+    {#if block.variant === "sequence"}
+      <SequenceSteps {block} {answer} {final} />
+    {:else if block.variant === "hotspot" && block.image}
+      <div class="stage" class:loaded>
+        <img
+          bind:this={img}
+          src={block.image.src}
+          alt={p.t(block.image.alt)}
+          decoding="async"
+          onload={() => (loaded = true)}
+          onerror={() => (loaded = true)}
+        />
         {#each choices as choice, i (choice.id)}
           {@const selected = answer.selected.includes(choice.id)}
           {@const show = explained(choice.id)}
@@ -301,6 +324,9 @@ async function onsubmit(e: SubmitEvent): Promise<void> {
   /* Hotspot variant: radios drawn as markers on the image (same look as ADR 0008 markers). */
   .stage {
     position: relative;
+  }
+  .stage:not(.loaded) .marker {
+    visibility: hidden;
   }
   .stage img {
     display: block;

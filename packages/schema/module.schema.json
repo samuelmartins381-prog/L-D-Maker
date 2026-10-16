@@ -376,7 +376,12 @@
                           },
                           "variant": {
                             "type": "string",
-                            "enum": ["single", "multiple", "hotspot"]
+                            "enum": [
+                              "single",
+                              "multiple",
+                              "hotspot",
+                              "sequence"
+                            ]
                           },
                           "prompt": {
                             "type": "string",
@@ -430,7 +435,7 @@
                                   "maximum": 100
                                 }
                               },
-                              "required": ["id", "text", "correct", "feedback"],
+                              "required": ["id", "text", "feedback"],
                               "additionalProperties": false
                             }
                           },

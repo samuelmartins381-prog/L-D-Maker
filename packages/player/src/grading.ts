@@ -29,16 +29,21 @@ export function initialAnswer(
   rng: Rng = Math.random,
 ): AnswerState {
   const ids = q.choices.map((c) => c.id);
-  return {
-    order: q.shuffle ? shuffled(ids, rng) : ids,
-    selected: [],
-    attempts: 0,
-    correct: null,
-  };
+  let order = q.shuffle ? shuffled(ids, rng) : ids;
+  if (q.variant === "sequence") {
+    // A sequence must never start solved: rotate a shuffle that happens to give the answer.
+    if (order.every((id, i) => id === ids[i]))
+      order = [...order.slice(1), ...order.slice(0, 1)];
+    // The learner's arrangement is the selection; it starts in the display order.
+    return { order, selected: [...order], attempts: 0, correct: null };
+  }
+  return { order, selected: [], attempts: 0, correct: null };
 }
 
 /** All-or-nothing in schema v0.1 (ADR 0002): the selection must equal the set of correct choices. */
 export function isCorrect(q: Question, selected: readonly string[]): boolean {
+  if (q.variant === "sequence")
+    return placedCount(q, selected) === q.choices.length;
   const expected = q.choices.filter((c) => c.correct).map((c) => c.id);
   return (
     expected.length === selected.length &&
@@ -60,6 +65,27 @@ export function toggle(
         : [...state.selected, choiceId];
   // Changing the selection after a wrong attempt starts a new attempt.
   return { ...state, selected, correct: null };
+}
+
+/** Sequence: moves a step one place up (-1) or down (+1) in the learner's arrangement. */
+export function move(
+  q: Question,
+  state: AnswerState,
+  choiceId: string,
+  delta: -1 | 1,
+): AnswerState {
+  if (q.variant !== "sequence" || isFinal(q, state)) return state;
+  const from = state.selected.indexOf(choiceId);
+  const to = from + delta;
+  if (from < 0 || to < 0 || to >= state.selected.length) return state;
+  const selected = [...state.selected];
+  [selected[from], selected[to]] = [selected[to] as string, choiceId];
+  return { ...state, selected, correct: null };
+}
+
+/** Sequence: how many steps sit at their right place. */
+export function placedCount(q: Question, selected: readonly string[]): number {
+  return q.choices.filter((c, i) => selected[i] === c.id).length;
 }
 
 export function submit(q: Question, state: AnswerState): AnswerState {

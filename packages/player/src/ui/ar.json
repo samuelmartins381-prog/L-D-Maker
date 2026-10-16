@@ -39,5 +39,12 @@
   "zoom.area": "صورة مكبّرة: مرّر أو استخدم مفاتيح الأسهم للتنقل",
   "zoom.hint": "اسحب الصورة للتنقل؛ استخدم إصبعين أو + و − للتكبير والتصغير.",
   "question.instructions.hotspot": "اختر العلامة المطابقة، ثم أرسل.",
-  "question.marker": "العلامة {n}"
+  "question.marker": "العلامة {n}",
+  "question.instructions.sequence": "رتّب الخطوات باستخدام الزرّين ↑ و↓، ثم أرسل.",
+  "sequence.up": "نقل إلى الأعلى: {step}",
+  "sequence.down": "نقل إلى الأسفل: {step}",
+  "sequence.moved": "«{step}» الآن في الموضع {position} من {total}.",
+  "sequence.incorrect.retry": "ليس تمامًا: {placed} من {total} خطوات في مكانها الصحيح. المحاولات المتبقية: {count}. غيّر الترتيب، ثم أرسل.",
+  "sequence.placed": "في المكان الصحيح",
+  "sequence.yourPosition": "كنت قد وضعتها في الموضع {position}"
 }
