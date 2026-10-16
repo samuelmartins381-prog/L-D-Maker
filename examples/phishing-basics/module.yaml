@@ -9,7 +9,7 @@ locales: [fr, en, ar]
 meta:
   title: meta.title
   description: meta.description
-  durationMinutes: 12
+  durationMinutes: 15
 
 objectives:
   - id: obj-signs
@@ -54,6 +54,13 @@ sections:
               - { id: links, title: s2.signal.links.title, body: s2.signal.links.body }
               - { id: attachments, title: s2.signal.attachments.title, body: s2.signal.attachments.body }
               - { id: requests, title: s2.signal.requests.title, body: s2.signal.requests.body }
+      - id: s2-example
+        title: s2.example.title
+        blocks:
+          - id: s2-example-email
+            type: narrative
+            heading: s2.example.heading
+            body: s2.example.body
       - id: s2-practice
         title: s2.practice.title
         blocks:
@@ -108,6 +115,33 @@ sections:
               - { id: b, text: q.signals.b, correct: true, feedback: q.signals.b.fb }
               - { id: c, text: q.signals.c, correct: false, feedback: q.signals.c.fb }
               - { id: d, text: q.signals.d, correct: false, feedback: q.signals.d.fb }
+          - id: q-link
+            type: question
+            variant: single
+            prompt: q.link.prompt
+            objectives: [obj-signs]
+            choices:
+              - { id: a, text: q.link.a, correct: false, feedback: q.link.a.fb }
+              - { id: b, text: q.link.b, correct: true, feedback: q.link.b.fb }
+              - { id: c, text: q.link.c, correct: false, feedback: q.link.c.fb }
+          - id: q-report
+            type: question
+            variant: single
+            prompt: q.report.prompt
+            objectives: [obj-react]
+            choices:
+              - { id: a, text: q.report.a, correct: false, feedback: q.report.a.fb }
+              - { id: b, text: q.report.b, correct: true, feedback: q.report.b.fb }
+              - { id: c, text: q.report.c, correct: false, feedback: q.report.c.fb }
+          - id: q-verify
+            type: question
+            variant: single
+            prompt: q.verify.prompt
+            objectives: [obj-react]
+            choices:
+              - { id: a, text: q.verify.a, correct: false, feedback: q.verify.a.fb }
+              - { id: b, text: q.verify.b, correct: false, feedback: q.verify.b.fb }
+              - { id: c, text: q.verify.c, correct: true, feedback: q.verify.c.fb }
           - id: q-react
             type: question
             variant: single
@@ -123,4 +157,4 @@ sections:
           - id: s4-recap-points
             type: summary
             heading: s4.recap.heading
-            points: [s4.recap.p1, s4.recap.p2, s4.recap.p3]
+            points: [s4.recap.p1, s4.recap.p2, s4.recap.p3, s4.recap.p4]

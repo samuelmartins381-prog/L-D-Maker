@@ -67,7 +67,10 @@ const Choice = z.strictObject({
   id: Id,
   text: StringKey,
   correct: z.boolean(),
-  /** Explanatory feedback for this specific answer (brief §4: feedback per answer). */
+  /**
+   * Explanation of this option (brief §4: feedback per answer), written neutrally — it is shown
+   * whether or not the learner picked the option. The player displays the right/wrong verdict.
+   */
   feedback: StringKey,
 });
 

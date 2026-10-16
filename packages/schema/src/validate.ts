@@ -218,6 +218,15 @@ function checkSemantics(
   const scoredCount = m.sections
     .flatMap((s) => s.screens.flatMap((sc) => sc.blocks))
     .filter((b) => b.type === "question" && b.scored).length;
+  // With too few scored items, a single mistake fails the learner (e.g. 3 items at 80 % need 3/3).
+  const tolerated =
+    scoredCount - Math.ceil((scoredCount * m.assessment.passingScore) / 100);
+  if (scoredCount > 0 && m.assessment.passingScore > 0 && tolerated < 1)
+    warn(
+      "assessment-tolerance",
+      "module.yaml: assessment.passingScore",
+      `${scoredCount} scored question(s) at ${m.assessment.passingScore} %: a single mistake fails the module; add questions or lower the threshold`,
+    );
   if (m.assessment.completion === "all-screens-and-passed" && scoredCount === 0)
     err(
       "assessment",

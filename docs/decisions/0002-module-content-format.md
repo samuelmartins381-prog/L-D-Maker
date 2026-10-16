@@ -43,3 +43,15 @@ media/               images, vidéos, sous-titres
 - [Zod 4 — JSON Schema](https://zod.dev/json-schema)
 - [XLIFF 2.0 (OASIS)](https://docs.oasis-open.org/xliff/xliff-core/v2.0/xliff-core-v2.0.html) : unités de traduction identifiées par clé
 - Brief §4 (pipeline, pédagogie, multilingue)
+
+## Addendum — 2026-10-16 (audit pédagogique du module de démo)
+- **Feedback de choix neutre** : `choices[].feedback` explique l'option, sans présumer de la
+  réponse de l'apprenant (« C'est un signal : … », pas « Exact : … »). Le lecteur affiche le
+  verdict (bonne / mauvaise réponse) séparément, et en choix multiple il montre l'explication de
+  **chaque** option. On sépare ainsi le feedback de tâche (verdict, généré) du feedback de
+  processus (explication et réflexe transférable, rédigé). Voir Hattie & Timperley (2007).
+- **Notation du choix multiple v0.1 : tout ou rien.** Le crédit partiel sera une option du schéma
+  si un client le demande.
+- **Nombre d'items notés** : avec un seuil de réussite donné, vérifier qu'une erreur reste
+  tolérable (au moins 5 items pour un seuil de 80 %). Avertissement `assessment-tolerance` du
+  validateur.

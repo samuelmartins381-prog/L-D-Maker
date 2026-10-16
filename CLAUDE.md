@@ -48,6 +48,7 @@ docs/brief.md             brief de Sam
 docs/decisions/           ADR
 docs/requests-for-sam.md  demandes à Sam, priorisées
 docs/phase0-research.md   livrable phase 0
+docs/audits/              audits pédagogiques (skills éducation)
 inspirations/             captures, maquettes, liens déposés par Sam
 packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
@@ -82,6 +83,20 @@ plats clé → texte) + `media/`. Sections → écrans → blocs (`narrative`, `
 `question` single/multiple, `summary`). Chaque choix de question a son feedback. Chaque objectif
 doit être évalué par une question notée ; chaque question notée est rattachée à un objectif.
 Après une modification du schéma : `pnpm --filter @ldm/schema json-schema`.
+
+## Skills éducation (audit du 2026-10-16, `docs/audits/`)
+Utiliser une sélection, pas tous : beaucoup visent le scolaire (histoire, Reggio, extérieur…).
+- Objectifs : `backwards-design-unit-planner`, `competency-unpacker`, `kud-knowledge-type-mapper`
+- Storyboard : `cognitive-load-analyser`, `dual-coding-designer`, `experiential-learning-cycle-designer`
+- Évaluation : `assessment-validity-checker`, `hinge-question-designer`, `retrieval-practice-generator`,
+  `erroneous-example-designer`
+- Feedback : `feedback-quality-analyser`
+- Inclusion et langues : `udl-barrier-anticipator`, `cross-cultural-task-validity-checker`,
+  `language-demand-analyser`
+Règles tirées de l'audit : feedback de choix **neutre** (le lecteur donne le verdict), au moins
+une erreur tolérée par le seuil, distracteurs fondés sur des idées reçues réelles, un exemple
+travaillé avant l'entraînement, une routine d'autorégulation dans le récapitulatif.
+Au J2 : en faire des étapes formelles du pipeline (ADR à écrire).
 
 ## Outillage (J1)
 TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences

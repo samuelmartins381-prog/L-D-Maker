@@ -73,7 +73,7 @@ const codes = (src: ModuleSource) =>
 describe("validateModule", () => {
   it("accepts a minimal valid module and applies defaults", () => {
     const result = validateModule(fixture());
-    expect(result.issues).toEqual([]);
+    expect(result.issues.filter((i) => i.severity === "error")).toEqual([]);
     expect(result.ok).toBe(true);
     expect(result.module?.assessment.completion).toBe("all-screens");
   });
@@ -132,6 +132,16 @@ describe("validateModule", () => {
     const unknown = fixture();
     unknown.module.sections[0].screens[0].blocks[1].objectives = ["nope"];
     expect(codes(unknown)).toContain("unknown-objective");
+  });
+
+  it("warns when a single mistake would fail the module", () => {
+    const issues = validateModule(fixture()).issues;
+    expect(issues).toContainEqual(
+      expect.objectContaining({
+        code: "assessment-tolerance",
+        severity: "warning",
+      }),
+    );
   });
 
   it("does not count practice questions as assessment", () => {
