@@ -42,8 +42,13 @@ autre domaine interrompt la recherche de l'API.
 ## Conséquences
 - Faux LMS de test : `scorm-again` (MIT, dev uniquement) dans `qa/e2e/`. Le scénario sur deux
   sessions (suspension, reprise, réussite) tourne à chaque `pnpm check`.
-- **Pas encore validé sur SCORM Cloud** : il faut le compte demandé à Sam. Les fichiers XSD de
-  l'ADL ne sont pas inclus dans le paquet : à revoir si SCORM Cloud ou un LMS le réclame.
+- **Validé sur SCORM Cloud le 2026-10-16** (`pnpm qa:scorm-cloud`) : import sans avertissement
+  d'analyse, malgré l'absence des XSD de l'ADL ; interruption gardée « incomplete » ; reprise au bon
+  écran ; « completed / passed », score 100, temps suivi, 7 interactions avec réponse attendue.
+  SCORM Cloud ouvre le SCO dans une **fenêtre popup** par défaut : la recherche de l'API par
+  l'`opener` fonctionne.
+- Langue : le lecteur lit `cmi.student_preference.language` (préférence LMS), après `?lang=` et
+  avant la langue du navigateur.
 - Le crédit partiel et les nouvelles tentatives après échec ne sont pas gérés (v0.1).
 
 ## Sources

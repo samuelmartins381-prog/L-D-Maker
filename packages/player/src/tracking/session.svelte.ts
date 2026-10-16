@@ -5,7 +5,7 @@ import { getContext } from "svelte";
 import { isFinal } from "../grading.ts";
 import type { Player } from "../player.svelte.ts";
 import { decodeSuspend, encodeSuspend } from "./suspend.ts";
-import type { Progress, Tracker } from "./tracker.ts";
+import type { Progress, Tracker, TrackerStart } from "./tracker.ts";
 
 export class Session {
   readonly #player: Player;
@@ -14,7 +14,8 @@ export class Session {
   readonly #recorded = new Set<string>();
   readonly #questions: Question[];
 
-  constructor(player: Player, tracker: Tracker) {
+  /** `start` is the result of `tracker.start()`, called earlier so the LMS language can pick the locale. */
+  constructor(player: Player, tracker: Tracker, start: TrackerStart) {
     this.#player = player;
     this.#tracker = tracker;
     const m = player.content.module;
@@ -22,7 +23,6 @@ export class Session {
       .flatMap((s) => s.screen.blocks)
       .filter((b): b is Question => b.type === "question");
 
-    const start = tracker.start();
     if (start.masteryScore !== null) player.passingScore = start.masteryScore;
     const resume = decodeSuspend(m, start.suspend);
     if (resume) player.restore(resume);

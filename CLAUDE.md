@@ -70,6 +70,9 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm test:e2e` — scénarios navigateur (suivi SCORM 1.2 sur 2 sessions, reprise HTML5)
 - `pnpm qa <dossier-module> [--skip-lighthouse]` — banc QA sur le module construit → rapport
   `out/<id>/qa/report.html` (autonome, à envoyer tel quel). Échec = code de sortie 1.
+- `pnpm qa:scorm-cloud <dossier-module>` — validation réelle sur SCORM Cloud (2 sessions). Exige
+  `SCORM_CLOUD_APP_ID` / `SCORM_CLOUD_SECRET_KEY` en secrets d'environnement, **jamais dans le
+  dépôt**. Hors de `pnpm check` (réseau, limites de l'essai : 10 inscriptions actives).
 - `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
 
 ## Lecteur (ADR 0003)
@@ -91,7 +94,10 @@ collantes (WCAG 2.4.11).
 Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12` et `standalone`, cible fixée
 au build. Statut 1.2 : completed sans évaluation, passed/failed avec. État de reprise compact
 `suspend.ts`, lié à `id@version` du module (changer la version invalide les reprises). Ajouter
-SCORM 2004 / cmi5 / xAPI = un nouvel adaptateur, rien d'autre.
+SCORM 2004 / cmi5 / xAPI = un nouvel adaptateur, rien d'autre. Langue : `?lang=` > préférence
+LMS (`cmi.student_preference.language`) > navigateur. SCORM Cloud : SCO en popup par défaut,
+données du SCO dans `activityDetails.children[]` de l'API ; la suppression par API dépend du
+réglage « Allow Delete API calls » de l'application.
 
 ## Banc QA (ADR 0005)
 Chaque écran × langue × mobile/desktop × état (affiché, après interaction) : axe 0 violation,
@@ -141,5 +147,5 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
   - [x] 5. Suivi (Tracker) + export SCORM 1.2 et HTML5 (ADR 0004) — validé sur faux LMS, pas
         encore sur SCORM Cloud (compte à fournir)
   - [x] 6. Banc QA v1 (ADR 0005) — module de démo : 11 conformes, 0 non conforme, 4 manuels
-- [ ] Critère de sortie J1 restant : validation sur SCORM Cloud (compte à fournir par Sam)
+- [x] Critère de sortie J1 : validé sur SCORM Cloud le 2026-10-16 (passed, score 100, reprise OK)
 - [ ] J2 — MVP (voir `docs/phase0-research.md` §5.5) : à planifier avec Sam

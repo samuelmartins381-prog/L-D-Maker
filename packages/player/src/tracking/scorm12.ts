@@ -96,6 +96,8 @@ export class Scorm12Tracker implements Tracker {
     return {
       suspend: this.#api.LMSGetValue("cmi.suspend_data") || null,
       masteryScore: Number.isFinite(mastery) ? mastery : null,
+      language:
+        this.#api.LMSGetValue("cmi.student_preference.language") || null,
     };
   }
 

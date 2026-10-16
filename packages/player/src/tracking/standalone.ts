@@ -11,9 +11,13 @@ export class StandaloneTracker implements Tracker {
 
   start(): TrackerStart {
     try {
-      return { suspend: localStorage.getItem(this.#key), masteryScore: null };
+      return {
+        suspend: localStorage.getItem(this.#key),
+        masteryScore: null,
+        language: null,
+      };
     } catch {
-      return { suspend: null, masteryScore: null }; // storage blocked (private mode, policy)
+      return { suspend: null, masteryScore: null, language: null }; // storage blocked (private mode, policy)
     }
   }
 

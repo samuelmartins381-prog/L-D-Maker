@@ -28,12 +28,16 @@ function createTracker(): Tracker {
   return new StandaloneTracker(`${module.id}@${module.version}`);
 }
 
+// Language: explicit URL parameter, then the LMS learner preference, then the browser.
+const tracker = createTracker();
+const start = tracker.start();
 const requested = [
   new URLSearchParams(location.search).get("lang"),
+  start.language,
   ...navigator.languages,
 ];
 const player = new Player(content, requested);
-const session = new Session(player, createTracker());
+const session = new Session(player, tracker, start);
 const target = document.getElementById("ldm-app") ?? document.body;
 
 mount(App, {

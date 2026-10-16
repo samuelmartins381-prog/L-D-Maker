@@ -27,6 +27,8 @@ export interface TrackerStart {
   suspend: string | null;
   /** Passing threshold set by the LMS, 0–100, overriding the module's own when present. */
   masteryScore: number | null;
+  /** Learner's language preference held by the LMS (SCORM 1.2: cmi.student_preference.language). */
+  language: string | null;
 }
 
 export interface Tracker {

@@ -71,7 +71,8 @@ export function manualChecks(locales: readonly string[]): CheckResult[] {
       title: "Validation SCORM Cloud",
       criterion: "Le paquet passe SCORM Cloud sans erreur (référence du brief)",
       status: "manual",
-      summary: "En attente du compte SCORM Cloud (docs/requests-for-sam.md)",
+      summary:
+        "À lancer avant livraison : pnpm qa:scorm-cloud <module> (identifiants en secrets d'environnement)",
       details: [],
     },
   ];

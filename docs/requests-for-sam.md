@@ -14,12 +14,12 @@ risques (permissions, données).
    - _Pourquoi_ : documentation à jour des bibliothèques utilisées (Svelte, Vite, Playwright, axe…) pour éviter le code obsolète ou les API inventées.
    - _Alternative écartée_ : la recherche web au coup par coup, plus lente et moins fiable sur les versions.
    - _Risques_ : les requêtes (noms de bibliothèques, sujets techniques) partent chez Upstash. Aucun contenu client. Clé API optionnelle.
-4. **Créer un compte SCORM Cloud** (essai gratuit, sans limite de durée : 3 cours, 10 inscriptions actives).
-   **Devenu prioritaire** : le paquet SCORM 1.2 existe (`out/phishing-basics/*-scorm12.zip`) et passe
-   notre faux LMS. Il reste à le valider sur la référence du brief. En attendant, tu peux aussi
-   l'importer toi-même dans SCORM Cloud et me dire ce que tu vois.
-   - Fournir l'App ID et la clé secrète comme **secrets de l'environnement cloud**, jamais dans le dépôt.
-   - Plus tard, le plan Tester (environ 40 $/mois, à confirmer) quand le banc de test l'appellera à chaque build.
+4. ~~Créer un compte SCORM Cloud~~ — fait, validation réussie le 2026-10-16. **Reste à faire** :
+   - **Régénérer la clé secrète** de l'application (celle-ci a été collée dans la conversation),
+     supprimer l'ancienne, et mettre la nouvelle dans les secrets d'environnement :
+     `SCORM_CLOUD_APP_ID`, `SCORM_CLOUD_SECRET_KEY`.
+   - Optionnel : activer « Allow Delete API calls » dans les détails de l'application, pour que
+     le banc efface ses inscriptions de test (l'essai en limite 10 actives).
 5. **Un contenu de test non confidentiel** (PDF, PPTX ou texte, 15–30 min de formation) pour le module de démonstration.
 6. **Inspirations** dans `inspirations/` (captures, liens) : voir `inspirations/README.md`.
 

@@ -94,9 +94,10 @@ describe("Scorm12Tracker", () => {
     const { api, data } = mockApi({
       "cmi.suspend_data": "2|x",
       "cmi.student_data.mastery_score": "70",
+      "cmi.student_preference.language": "ar",
     });
     const start = new Scorm12Tracker(api).start();
-    expect(start).toEqual({ suspend: "2|x", masteryScore: 70 });
+    expect(start).toEqual({ suspend: "2|x", masteryScore: 70, language: "ar" });
     expect(data["cmi.core.lesson_status"]).toBe("incomplete");
   });
 
