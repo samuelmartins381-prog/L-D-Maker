@@ -15,9 +15,9 @@ risques (permissions, données).
    - _Alternative écartée_ : la recherche web au coup par coup, plus lente et moins fiable sur les versions.
    - _Risques_ : les requêtes (noms de bibliothèques, sujets techniques) partent chez Upstash. Aucun contenu client. Clé API optionnelle.
 4. ~~Créer un compte SCORM Cloud~~ — fait, validation réussie le 2026-10-16. **Reste à faire** :
-   - **Régénérer la clé secrète** de l'application (celle-ci a été collée dans la conversation),
-     supprimer l'ancienne, et mettre la nouvelle dans les secrets d'environnement :
-     `SCORM_CLOUD_APP_ID`, `SCORM_CLOUD_SECRET_KEY`.
+   - ~~Régénérer la clé secrète~~ — fait par Sam le 2026-10-16 (ancienne clé supprimée). Nouvelle
+     clé enregistrée dans les secrets d'environnement : **à vérifier au début de la prochaine
+     session** (`SCORM_CLOUD_APP_ID`, `SCORM_CLOUD_SECRET_KEY` présents + ping de l'API).
    - Optionnel : activer « Allow Delete API calls » dans les détails de l'application, pour que
      le banc efface ses inscriptions de test (l'essai en limite 10 actives).
 5. **Un contenu de test non confidentiel** (PDF, PPTX ou texte, 15–30 min de formation) pour le module de démonstration.
