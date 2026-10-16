@@ -1,0 +1,19 @@
+{
+  "name": "@ldm/builder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "ldm-build": "./src/cli.ts"
+  },
+  "dependencies": {
+    "@ldm/player": "workspace:*",
+    "@ldm/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5"
+  }
+}

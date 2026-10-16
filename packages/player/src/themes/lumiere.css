@@ -1,0 +1,55 @@
+/*
+ * Theme "Lumière" — default theme. Components only read these custom properties,
+ * so a client theme is a different set of values, never different components.
+ */
+:root {
+  /* Colors — contrast ratios checked against --color-bg (WCAG 2.2 AA). */
+  --color-bg: #f7f4ee;
+  --color-surface: #fffdf9;
+  --color-ink: #1d1b18; /* 16.2:1 */
+  --color-ink-muted: #5c5750; /* 6.6:1 */
+  --color-line: #e3ddd2;
+  --color-accent: #8a4b2a; /* 6.3:1 — links, focus, progress */
+  --color-accent-ink: #fffdf9;
+  --color-accent-soft: #f1e4da;
+  --color-focus: #8a4b2a;
+
+  /* Typography */
+  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-body:
+    "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-arabic: "Noto Sans Arabic Variable", "Segoe UI", Tahoma, sans-serif;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --text-2xl: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --leading-tight: 1.15;
+  --leading-body: 1.65;
+  --measure: 66ch;
+
+  /* Spacing (4px base) and shape */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --shadow-raised: 0 1px 2px rgb(29 27 24 / 6%), 0 8px 24px rgb(29 27 24 / 6%);
+
+  /* Motion — neutralized under prefers-reduced-motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 160ms;
+  --duration-base: 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+}

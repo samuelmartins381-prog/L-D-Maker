@@ -1,0 +1,15 @@
+{
+  "skip.content": "الانتقال إلى المحتوى",
+  "nav.previous": "السابق",
+  "nav.next": "التالي",
+  "nav.finish": "إنهاء",
+  "nav.menu": "الفهرس",
+  "nav.menu.close": "إغلاق الفهرس",
+  "nav.label": "التنقل في الوحدة",
+  "nav.visited": "تمت مشاهدته",
+  "nav.current": "الشاشة الحالية",
+  "progress.label": "الشاشة {current} من {total}",
+  "progress.percent": "تمت مشاهدة {percent}٪",
+  "locale.label": "اللغة",
+  "block.pending": "سيتوفر هذا النوع من المحتوى قريبًا."
+}

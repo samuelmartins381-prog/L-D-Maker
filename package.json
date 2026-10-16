@@ -9,14 +9,18 @@
   "scripts": {
     "lint": "biome check .",
     "format": "biome check --write .",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -b && pnpm --filter @ldm/player check:svelte",
     "test": "vitest run",
     "check:licenses": "node scripts/check-licenses.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/",
-    "validate": "node packages/schema/src/cli.ts"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/ && pnpm build:examples",
+    "validate": "node packages/schema/src/cli.ts",
+    "build:player": "pnpm --filter @ldm/player build",
+    "build": "node packages/builder/src/cli.ts",
+    "build:examples": "pnpm build:player && for d in examples/*/; do pnpm -s build \"$d\" || exit 1; done"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "playwright-core": "^1.64.1",
     "typescript": "7.0.2",
     "vitest": "5.0.5"
   }

@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "declaration": true,
-    "composite": true
+    "composite": true,
+    "erasableSyntaxOnly": true
   }
 }

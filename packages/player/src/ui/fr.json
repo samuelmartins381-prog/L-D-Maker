@@ -1,0 +1,15 @@
+{
+  "skip.content": "Aller au contenu",
+  "nav.previous": "Précédent",
+  "nav.next": "Suivant",
+  "nav.finish": "Terminer",
+  "nav.menu": "Sommaire",
+  "nav.menu.close": "Fermer le sommaire",
+  "nav.label": "Navigation du module",
+  "nav.visited": "vu",
+  "nav.current": "écran actuel",
+  "progress.label": "Écran {current} sur {total}",
+  "progress.percent": "{percent} % parcouru",
+  "locale.label": "Langue",
+  "block.pending": "Ce type de contenu sera disponible prochainement."
+}

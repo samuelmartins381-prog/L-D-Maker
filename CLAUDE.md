@@ -51,6 +51,8 @@ docs/phase0-research.md   livrable phase 0
 inspirations/             captures, maquettes, liens déposés par Sam
 packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
+packages/player/          lecteur Svelte 5 (IIFE), thèmes CSS, textes d'interface (src/ui/*.json)
+packages/builder/         module validé + lecteur → dossier web autonome (out/<id>/web)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
 clients/, out/            sources clients et modules générés — ignorés par git
@@ -61,6 +63,18 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm check` — lint + typecheck + tests + licences : **doit passer avant chaque commit**
 - `pnpm format` — formatage (Biome)
 - `pnpm validate <dossier-module>` — valide un module (structure, pédagogie, traductions)
+- `pnpm build:player` puis `pnpm build <dossier-module>` — construit `out/<id>/web/index.html`
+  (fonctionne en `file://`, `?lang=ar` pour forcer une langue)
+- `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
+
+## Lecteur (ADR 0003)
+Svelte 5, build IIFE + contenu inséré dans index.html (pas de module ES ni de fetch : `file://`
+doit marcher). Les avertissements du compilateur (accessibilité incluse) **cassent le build**.
+CSS en propriétés logiques uniquement (RTL sans feuille dédiée). Les composants ne lisent que
+les variables du thème (`themes/*.css`, contrastes testés). Tout texte d'interface vient de
+`src/ui/<langue>.json` (mêmes clés partout, testé) ; une langue de module sans catalogue
+d'interface fait échouer le build. svelte-check exige TS 6 + TS 7 (`--tsgo`) : voir
+`packages/player/package.json`.
 
 ## Format de module (ADR 0002)
 Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.json` (catalogues
@@ -82,7 +96,7 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
 - [ ] J1 — Fondations, **étape par étape** (Sam valide après chaque étape) :
   - [x] 1. Socle du dépôt (workspaces, TypeScript, tests, lint, licences)
   - [x] 2. Schéma de module v0.1 + validation + module de démo (ADR 0002)
-  - [ ] 3. Lecteur + thème (design tokens) + i18n FR/EN/AR (choix Svelte vs Preact, ADR 0003)
+  - [x] 3. Lecteur + thème + i18n FR/EN/AR (Svelte 5, ADR 0003) — JS 21 Ko gz, CSS 4 Ko gz
   - [ ] 4. Composants : écran narratif, accordéon/onglets, QCU/QCM, récapitulatif
   - [ ] 5. Suivi (interface Tracker) + export SCORM 1.2 et HTML5
   - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again)

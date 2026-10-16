@@ -10,3 +10,4 @@ coverage/
 # Client sources and generated modules never go into git (confidentiality rule).
 clients/
 out/
+.svelte-check/

@@ -1,0 +1,28 @@
+{
+  "name": "@ldm/player",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./content": "./src/content.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "check:svelte": "svelte-check --tsgo --tsconfig ./tsconfig.svelte-check.json --fail-on-warnings"
+  },
+  "dependencies": {
+    "@fontsource-variable/fraunces": "5.3.0",
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource-variable/noto-sans-arabic": "5.3.0",
+    "svelte": "5.57.2"
+  },
+  "devDependencies": {
+    "@ldm/schema": "workspace:*",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@types/node": "^22.20.5",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "svelte-check": "^4.7.7",
+    "typescript": "~6.0.3",
+    "vite": "8.3.4"
+  }
+}

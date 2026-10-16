@@ -1,0 +1,15 @@
+{
+  "skip.content": "Skip to content",
+  "nav.previous": "Previous",
+  "nav.next": "Next",
+  "nav.finish": "Finish",
+  "nav.menu": "Contents",
+  "nav.menu.close": "Close contents",
+  "nav.label": "Module navigation",
+  "nav.visited": "viewed",
+  "nav.current": "current screen",
+  "progress.label": "Screen {current} of {total}",
+  "progress.percent": "{percent}% viewed",
+  "locale.label": "Language",
+  "block.pending": "This type of content will be available soon."
+}

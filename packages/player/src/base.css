@@ -1,0 +1,58 @@
+/* Global base styles. Layout uses logical properties only, so RTL needs no separate stylesheet. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  min-block-size: 100vh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+:lang(ar) body,
+body:lang(ar),
+:lang(ar) h1,
+:lang(ar) h2 {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+#ldm-app {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+}
+#ldm-app > main {
+  flex: 1;
+  inline-size: 100%;
+}
+a {
+  color: var(--color-accent);
+  text-underline-offset: 0.15em;
+}
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
