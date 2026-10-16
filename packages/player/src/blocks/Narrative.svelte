@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Block } from "@ldm/schema";
+import ImageZoom from "../ImageZoom.svelte";
 import { usePlayer } from "../player.svelte.ts";
 import Rich from "../Rich.svelte";
 
@@ -12,6 +13,9 @@ const image = $derived(block.media?.kind === "image" ? block.media : undefined);
   {#if image}
     <figure class="media">
       <img src={image.src} alt={image.decorative || !image.alt ? "" : p.t(image.alt)} loading="lazy" decoding="async" />
+      {#if image.zoom && image.alt}
+        <ImageZoom id="{block.id}-zoom" src={image.src} zoomSrc={image.zoomSrc} alt={p.t(image.alt)} />
+      {/if}
     </figure>
   {/if}
   <div class="content">
@@ -36,6 +40,7 @@ const image = $derived(block.media?.kind === "image" ? block.media : undefined);
     }
   }
   figure {
+    position: relative;
     margin: 0;
   }
   img {

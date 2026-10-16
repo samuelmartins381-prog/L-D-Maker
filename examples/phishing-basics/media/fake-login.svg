@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <!-- Demo illustration drawn for L-D-Maker (no third-party asset). Only the address is text: it is the
+       same in every language. -->
+  <rect x="6" y="6" width="888" height="608" rx="16" fill="#fffdf9" stroke="#d9d2c7" stroke-width="2"/>
+  <path d="M6 22a16 16 0 0 1 16-16h856a16 16 0 0 1 16 16v74H6z" fill="#efe9df"/>
+  <circle cx="32" cy="30" r="7" fill="#d9a38f"/><circle cx="54" cy="30" r="7" fill="#e3c98f"/><circle cx="76" cy="30" r="7" fill="#a9c6a0"/>
+  <rect x="26" y="50" width="848" height="36" rx="18" fill="#fffdf9" stroke="#d9d2c7"/>
+  <rect x="46" y="64" width="12" height="11" rx="2" fill="#5c5750"/>
+  <path d="M48.5 64v-3.5a3.5 3.5 0 0 1 7 0V64" fill="none" stroke="#5c5750" stroke-width="2"/>
+  <text x="70" y="74" font-family="system-ui, sans-serif" font-size="15" fill="#1d1b18">https://<tspan font-weight="700">payroll.secure-login.co</tspan>/signin?session=8f3a2c</text>
+  <!-- Login form look-alike -->
+  <circle cx="450" cy="190" r="40" fill="#cdb9a5"/>
+  <rect x="330" y="258" width="240" height="16" rx="8" fill="#3b3631"/>
+  <rect x="300" y="310" width="120" height="10" rx="5" fill="#bdb5a9"/>
+  <rect x="300" y="328" width="300" height="44" rx="8" fill="#fffdf9" stroke="#bdb5a9" stroke-width="2"/>
+  <rect x="300" y="392" width="120" height="10" rx="5" fill="#bdb5a9"/>
+  <rect x="300" y="410" width="300" height="44" rx="8" fill="#fffdf9" stroke="#bdb5a9" stroke-width="2"/>
+  <g fill="#3b3631"><circle cx="322" cy="432" r="5"/><circle cx="340" cy="432" r="5"/><circle cx="358" cy="432" r="5"/><circle cx="376" cy="432" r="5"/><circle cx="394" cy="432" r="5"/></g>
+  <rect x="300" y="482" width="300" height="48" rx="24" fill="#2f5aa8"/>
+  <rect x="400" y="501" width="100" height="10" rx="5" fill="#fff"/>
+</svg>

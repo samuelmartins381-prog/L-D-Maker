@@ -28,5 +28,14 @@
   "finish.close": "Sie können dieses Fenster schließen.",
   "question.incorrect.retry": "Das ist nicht die richtige Antwort. Verbleibende Versuche: {count}. Ändern Sie Ihre Antwort und bestätigen Sie erneut.",
   "hotspots.instructions": "Wählen Sie eine nummerierte Markierung, um ihre Erklärung anzuzeigen.",
-  "hotspots.progress": "{explored} von {total} erkundet"
+  "hotspots.progress": "{explored} von {total} erkundet",
+  "zoom.open": "Bild vergrößern",
+  "zoom.title": "Vergrößertes Bild",
+  "zoom.in": "Vergrößern",
+  "zoom.out": "Verkleinern",
+  "zoom.reset": "Einpassen",
+  "zoom.close": "Schließen",
+  "zoom.level": "Zoom {percent} %",
+  "zoom.area": "Vergrößertes Bild: scrollen oder mit den Pfeiltasten bewegen",
+  "zoom.hint": "Ziehen Sie das Bild, um sich zu bewegen; mit zwei Fingern oder + und − zoomen."
 }

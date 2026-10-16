@@ -165,6 +165,20 @@ function checkSemantics(
               `${at}.media.src`,
               `file not found: ${b.media.src}`,
             );
+          if (b.media.zoomSrc && !mediaFiles.has(b.media.zoomSrc))
+            err(
+              "media-missing",
+              `${at}.media.zoomSrc`,
+              `file not found: ${b.media.zoomSrc}`,
+            );
+          if (b.media.zoomSrc && !b.media.zoom)
+            err("zoom", `${at}.media.zoomSrc`, "zoomSrc requires zoom: true");
+          if (b.media.zoom && b.media.decorative)
+            err(
+              "zoom",
+              `${at}.media.zoom`,
+              "a decorative image cannot be zoomable: give it alt text instead",
+            );
         }
         if (b.type === "hotspots") {
           if (!mediaFiles.has(b.image.src))

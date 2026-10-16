@@ -4,7 +4,13 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 import type { Browser, Page } from "playwright-core";
-import { interact, nextScreen, openModule } from "./browser.ts";
+import {
+  closeZoom,
+  interact,
+  nextScreen,
+  openModule,
+  openZoom,
+} from "./browser.ts";
 import { VIEWPORTS, type Viewport } from "./types.ts";
 
 const require = createRequire(import.meta.url);
@@ -16,7 +22,8 @@ export interface Where {
   locale: string;
   viewport: Viewport["name"];
   screen: number;
-  state: "initial" | "interacted";
+  /** "zoomed": the image viewer opened and zoomed in (screens with a zoomable image only). */
+  state: "initial" | "interacted" | "zoomed";
 }
 
 export interface AxeViolation extends Where {
@@ -39,6 +46,8 @@ export interface KeyboardIssue extends Where {
 export interface WalkResult {
   screens: number;
   pagesAudited: number;
+  /** Pages audited with the image viewer open (included in pagesAudited). */
+  zoomViews: number;
   axe: AxeViolation[];
   keyboard: KeyboardIssue[];
   focusStops: number;
@@ -89,11 +98,16 @@ async function tabWalk(
   where: Where,
 ): Promise<{ issues: KeyboardIssue[]; stops: number }> {
   // Restart sequential navigation from the top of the document (not from the last clicked button).
+  // With a modal dialog open, the browser refuses focus outside it (the body included): start from
+  // the dialog itself, so the walk covers its whole focus loop from the first control.
   await page.evaluate(() => {
     window.scrollTo(0, 0);
-    document.body.tabIndex = -1;
-    document.body.focus();
-    document.body.removeAttribute("tabindex");
+    const start =
+      document.querySelector<HTMLElement>("dialog[open]:modal") ??
+      document.body;
+    start.tabIndex = -1;
+    start.focus();
+    start.removeAttribute("tabindex");
   });
   const issues: KeyboardIssue[] = [];
   const seen = new Set<string>();
@@ -162,8 +176,10 @@ async function tabWalk(
   }
   // Every visible, enabled control must have been reached (one stop per radio group).
   const unreached = await page.evaluate((reachedCount) => {
+    // With a modal dialog open, the rest of the page is inert by design: only the dialog counts.
+    const scope = document.querySelector("dialog[open]:modal") ?? document;
     const controls = [
-      ...document.querySelectorAll<HTMLElement>(
+      ...scope.querySelectorAll<HTMLElement>(
         // tabindex="-1" marks controls deliberately out of the Tab sequence (APG roving tabindex: tabs use arrows).
         "a[href], button:not([disabled]):not([tabindex='-1']), input:not([disabled]):not([tabindex='-1']), select, [tabindex='0']",
       ),
@@ -263,6 +279,7 @@ export async function walkModule(
   const result: WalkResult = {
     screens,
     pagesAudited: 0,
+    zoomViews: 0,
     axe: [],
     keyboard: [],
     focusStops: 0,
@@ -276,7 +293,7 @@ export async function walkModule(
       const { page, errors } = await openModule(browser, url(locale), viewport);
       for (let screen = 0; screen < screens; screen++) {
         if (screen > 0) await nextScreen(page);
-        for (const state of ["initial", "interacted"] as const) {
+        for (const state of ["initial", "interacted", "zoomed"] as const) {
           const where: Where = {
             locale,
             viewport: viewport.name,
@@ -284,6 +301,7 @@ export async function walkModule(
             state,
           };
           if (state === "interacted") await interact(page);
+          if (state === "zoomed" && !(await openZoom(page))) continue;
           result.axe.push(...(await runAxe(page, where)));
           result.overflow.push(...(await overflow(page, where)));
           const keyboard = await tabWalk(page, where);
@@ -291,6 +309,10 @@ export async function walkModule(
           result.focusStops += keyboard.stops;
           result.motion.push(...(await motion(page, where)));
           result.pagesAudited++;
+          if (state === "zoomed") {
+            result.zoomViews++;
+            await closeZoom(page);
+          }
           if (viewport.name === "mobile" && state === "initial") {
             const file = join(
               screenshotDir,

@@ -28,5 +28,14 @@
   "finish.close": "يمكنك إغلاق هذه النافذة.",
   "question.incorrect.retry": "هذه ليست الإجابة الصحيحة. المحاولات المتبقية: {count}. عدّل إجابتك، ثم أكّدها.",
   "hotspots.instructions": "اختر علامة مرقّمة لعرض شرحها.",
-  "hotspots.progress": "تم استكشاف {explored} من {total}"
+  "hotspots.progress": "تم استكشاف {explored} من {total}",
+  "zoom.open": "تكبير الصورة",
+  "zoom.title": "صورة مكبّرة",
+  "zoom.in": "تكبير",
+  "zoom.out": "تصغير",
+  "zoom.reset": "ملاءمة",
+  "zoom.close": "إغلاق",
+  "zoom.level": "التكبير {percent}٪",
+  "zoom.area": "صورة مكبّرة: مرّر أو استخدم مفاتيح الأسهم للتنقل",
+  "zoom.hint": "اسحب الصورة للتنقل؛ استخدم إصبعين أو + و − للتكبير والتصغير."
 }

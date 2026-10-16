@@ -205,6 +205,37 @@ describe("validateModule", () => {
     expect(validateModule(ok).ok).toBe(true);
   });
 
+  it("checks zoomable images: high-resolution file, zoom flag, not decorative", () => {
+    const src = fixture();
+    const block = src.module.sections[0].screens[0].blocks[0];
+    block.media = {
+      kind: "image",
+      src: "media/a.png",
+      alt: "body",
+      zoomSrc: "media/a-hd.png",
+    };
+    src.mediaFiles = ["media/a.png"];
+    expect(codes(src)).toEqual(
+      expect.arrayContaining(["media-missing", "zoom"]),
+    );
+    block.media = {
+      kind: "image",
+      src: "media/a.png",
+      decorative: true,
+      zoom: true,
+    };
+    expect(codes(src)).toContain("zoom");
+    block.media = {
+      kind: "image",
+      src: "media/a.png",
+      alt: "body",
+      zoom: true,
+      zoomSrc: "media/a-hd.png",
+    };
+    src.mediaFiles = ["media/a.png", "media/a-hd.png"];
+    expect(validateModule(src).ok).toBe(true);
+  });
+
   it("checks hotspots: image file, alt and item strings, unique ids, overlapping markers", () => {
     const src = fixture();
     const item = (id: string, x: number, y: number) => ({

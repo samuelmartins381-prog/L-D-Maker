@@ -28,5 +28,14 @@
   "finish.close": "Vous pouvez fermer cette fenêtre.",
   "question.incorrect.retry": "Ce n'est pas la bonne réponse. Essais restants : {count}. Modifiez votre réponse, puis validez.",
   "hotspots.instructions": "Sélectionnez un repère numéroté pour afficher son explication.",
-  "hotspots.progress": "{explored} sur {total} exploré(s)"
+  "hotspots.progress": "{explored} sur {total} exploré(s)",
+  "zoom.open": "Agrandir l'image",
+  "zoom.title": "Image agrandie",
+  "zoom.in": "Zoom avant",
+  "zoom.out": "Zoom arrière",
+  "zoom.reset": "Ajuster",
+  "zoom.close": "Fermer",
+  "zoom.level": "Zoom {percent} %",
+  "zoom.area": "Image agrandie : faites défiler ou utilisez les flèches pour vous déplacer",
+  "zoom.hint": "Faites glisser l'image pour vous déplacer ; pincez ou utilisez + et − pour zoomer."
 }

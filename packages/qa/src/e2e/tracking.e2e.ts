@@ -230,6 +230,53 @@ console.log("Hotspots — markers open one explanation at a time");
   await page.close();
 }
 
+console.log("Image zoom — modal viewer, keyboard zoom, focus restored");
+{
+  const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
+  const page = await browser.newPage({ reducedMotion: "reduce" });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(`${web}index.html?lang=en`);
+  const h1 = page.locator("h1");
+  for (let i = 0; i < 30 && (await h1.innerText()) !== "A worked example"; i++)
+    await page.locator("footer.pager .primary").click();
+  const open = page.getByRole("button", { name: "Enlarge image" });
+  const dialog = page.getByRole("dialog", { name: "Enlarged image" });
+  const level = dialog.locator("output");
+  await step("opens a named modal viewer from the keyboard", async () => {
+    await open.focus();
+    await page.keyboard.press("Enter");
+    await dialog.locator("img").waitFor();
+    assert.match(
+      (await dialog.locator("img").getAttribute("alt")) ?? "",
+      /payroll\.secure-login\.co/,
+    );
+    assert.equal(await level.innerText(), "Zoom 100%");
+  });
+  await step(
+    "zooms in and out with + and −, the image overflows to pan",
+    async () => {
+      await page.keyboard.press("+");
+      await page.keyboard.press("+");
+      assert.equal(await level.innerText(), "Zoom 225%");
+      const pan = await dialog
+        .locator(".viewport")
+        .evaluate((v) => v.scrollWidth > v.clientWidth);
+      assert.ok(pan, "zoomed image wider than the viewer");
+      await page.keyboard.press("-");
+      assert.equal(await level.innerText(), "Zoom 150%");
+    },
+  );
+  await step(
+    "closes with Escape and gives focus back to the button",
+    async () => {
+      await page.keyboard.press("Escape");
+      assert.equal(await dialog.count(), 0);
+      assert.ok(await open.evaluate((b) => b === document.activeElement));
+    },
+  );
+  await page.close();
+}
+
 console.log("Locale packs — loaded on demand, missing pack keeps the language");
 {
   const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");

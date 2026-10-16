@@ -26,6 +26,10 @@ export const Image = z.strictObject({
   /** Required unless the image is purely decorative. */
   alt: StringKey.optional(),
   decorative: z.boolean().default(false),
+  /** Adds an "Enlarge" button opening a full-screen viewer with zoom and pan (ADR 0009). */
+  zoom: z.boolean().default(false),
+  /** Higher-resolution file shown in the viewer only (loaded when it opens). Requires zoom. */
+  zoomSrc: MediaSrc.optional(),
 });
 
 export const Media = z.discriminatedUnion("kind", [Image]);

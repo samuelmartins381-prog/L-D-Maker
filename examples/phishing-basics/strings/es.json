@@ -24,6 +24,7 @@
   "s2.example.title": "Un ejemplo analizado",
   "s2.example.heading": "Tres señales en un solo mensaje",
   "s2.example.body": "Este es un mensaje recibido un lunes por la mañana. Remitente: «Nóminas <payroll@hr-employee-portal.com>». Asunto: «Acción necesaria: su nómina está bloqueada». Texto: «Inicie sesión antes de las 12:00 para evitar un retraso en el pago».\n\n**1. La dirección.** El nombre «Nóminas» tranquiliza, pero el dominio *hr-employee-portal.com* no es el de la empresa.\n\n**2. La urgencia.** «Antes de las 12:00» y «retraso en el pago» presionan para actuar sin comprobar.\n\n**3. La petición.** Le empujan a iniciar sesión mediante un enlace, es decir, a escribir su contraseña en una página desconocida.\n\nPor separado, cada uno de estos elementos podría tener una explicación. Juntos, deben hacer que se detenga.",
+  "s2.example.alt": "Página de inicio de sesión que abre el enlace del mensaje: la barra de direcciones muestra el dominio payroll.secure-login.co, ajeno a la empresa, encima de un formulario de usuario y contraseña.",
   "s2.anatomy.title": "Anatomía de un mensaje",
   "s2.anatomy.intro": "Explore las cuatro zonas que conviene comprobar en este mensaje sospechoso.",
   "s2.anatomy.alt": "Maqueta de un correo: el remitente y su dirección, un asunto marcado con una alerta y un reloj, un botón cuya dirección real aparece al pasar el ratón y un adjunto ZIP.",

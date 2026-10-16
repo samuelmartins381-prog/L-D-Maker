@@ -71,6 +71,7 @@
   "s2.example.title": "Un exemple décortiqué",
   "s2.example.heading": "Trois signaux dans un seul message",
   "s2.example.body": "Voici un message reçu un lundi matin. Expéditeur : « Service Paie <paie@rh-portail-salaries.com> ». Objet : « Action requise : votre bulletin de salaire est bloqué ». Texte : « Connectez-vous avant 12 h pour éviter un retard de paiement. »\n\n**1. L'adresse.** Le nom « Service Paie » est rassurant, mais le domaine *rh-portail-salaries.com* n'est pas celui de l'entreprise.\n\n**2. L'urgence.** « Avant 12 h » et « retard de paiement » créent une pression pour agir sans vérifier.\n\n**3. La demande.** On vous pousse à vous connecter via un lien, donc à saisir votre mot de passe sur une page inconnue.\n\nPris séparément, chacun de ces éléments pourrait s'expliquer. Réunis, ils doivent vous arrêter.",
+  "s2.example.alt": "Page de connexion ouverte par le lien du message : la barre d'adresse affiche le domaine payroll.secure-login.co, étranger à l'entreprise, au-dessus d'un formulaire d'identifiant et de mot de passe.",
   "s2.anatomy.title": "Anatomie d'un message",
   "s2.anatomy.intro": "Explorez les quatre zones à vérifier sur ce message suspect.",
   "s2.anatomy.alt": "Maquette d'un e-mail : l'expéditeur et son adresse, un objet marqué d'une alerte et d'une horloge, un bouton dont l'adresse réelle s'affiche au survol, et une pièce jointe ZIP.",

@@ -65,3 +65,18 @@ export async function interact(page: Page): Promise<void> {
     }
   }
 }
+
+/** Opens the first zoomable image of the screen and zooms in once; false when there is none. */
+export async function openZoom(page: Page): Promise<boolean> {
+  const button = page.locator("figure button.open").first();
+  if ((await button.count()) === 0) return false;
+  await button.click();
+  await page.locator("dialog.zoom[open] .viewport img").waitFor();
+  await page.keyboard.press("+");
+  return true;
+}
+
+export async function closeZoom(page: Page): Promise<void> {
+  await page.keyboard.press("Escape");
+  await page.locator("dialog.zoom[open]").waitFor({ state: "detached" });
+}

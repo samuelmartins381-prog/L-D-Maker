@@ -28,5 +28,14 @@
   "finish.close": "이 창을 닫아도 됩니다.",
   "question.incorrect.retry": "정답이 아닙니다. 남은 시도 횟수: {count}. 답을 바꾼 뒤 다시 제출하세요.",
   "hotspots.instructions": "번호가 매겨진 표시를 선택하면 설명이 나타납니다.",
-  "hotspots.progress": "{total}개 중 {explored}개 확인함"
+  "hotspots.progress": "{total}개 중 {explored}개 확인함",
+  "zoom.open": "이미지 확대",
+  "zoom.title": "확대된 이미지",
+  "zoom.in": "확대",
+  "zoom.out": "축소",
+  "zoom.reset": "화면에 맞추기",
+  "zoom.close": "닫기",
+  "zoom.level": "확대 {percent}%",
+  "zoom.area": "확대된 이미지: 스크롤하거나 화살표 키로 이동하세요",
+  "zoom.hint": "이미지를 끌어 이동하고, 두 손가락이나 + 및 −로 확대·축소하세요."
 }

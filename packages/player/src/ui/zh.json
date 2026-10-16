@@ -28,5 +28,14 @@
   "finish.close": "你可以关闭此窗口。",
   "question.incorrect.retry": "回答不正确。剩余尝试次数：{count}。请修改答案后再次提交。",
   "hotspots.instructions": "选择一个带编号的标记，查看相应说明。",
-  "hotspots.progress": "已查看 {explored}/{total} 处"
+  "hotspots.progress": "已查看 {explored}/{total} 处",
+  "zoom.open": "放大图片",
+  "zoom.title": "放大的图片",
+  "zoom.in": "放大",
+  "zoom.out": "缩小",
+  "zoom.reset": "适应屏幕",
+  "zoom.close": "关闭",
+  "zoom.level": "缩放 {percent}%",
+  "zoom.area": "放大的图片：滚动或使用方向键移动",
+  "zoom.hint": "拖动图片即可移动；双指缩放或使用 + 和 − 进行缩放。"
 }

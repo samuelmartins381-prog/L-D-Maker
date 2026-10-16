@@ -17,7 +17,7 @@ export function walkChecks(
   w: WalkResult,
   locales: readonly string[],
 ): CheckResult[] {
-  const scope = `${w.screens} écrans × ${locales.length} langues × 2 formats × 2 états = ${w.pagesAudited} pages`;
+  const scope = `${w.screens} écrans × ${locales.length} langues × 2 formats × 2 états${w.zoomViews ? ` + ${w.zoomViews} vues zoom` : ""} = ${w.pagesAudited} pages`;
   const blocking = w.keyboard.filter((k) => k.kind !== "partly-obscured");
   const partly = w.keyboard.filter((k) => k.kind === "partly-obscured");
   const labels: Record<string, string> = {

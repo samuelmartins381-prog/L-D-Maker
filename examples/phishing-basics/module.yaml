@@ -61,6 +61,8 @@ sections:
             type: narrative
             heading: s2.example.heading
             body: s2.example.body
+            layout: media-end
+            media: { kind: image, src: media/fake-login.svg, alt: s2.example.alt, zoom: true }
       - id: s2-anatomy
         title: s2.anatomy.title
         blocks:

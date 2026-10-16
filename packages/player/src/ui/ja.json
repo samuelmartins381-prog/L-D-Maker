@@ -28,5 +28,14 @@
   "finish.close": "このウィンドウは閉じてかまいません。",
   "question.incorrect.retry": "正解ではありません。残りの回答回数：{count}。答えを選び直して、もう一度回答してください。",
   "hotspots.instructions": "番号付きのマーカーを選ぶと、説明が表示されます。",
-  "hotspots.progress": "{total}か所中{explored}か所を確認済み"
+  "hotspots.progress": "{total}か所中{explored}か所を確認済み",
+  "zoom.open": "画像を拡大",
+  "zoom.title": "拡大画像",
+  "zoom.in": "拡大",
+  "zoom.out": "縮小",
+  "zoom.reset": "全体を表示",
+  "zoom.close": "閉じる",
+  "zoom.level": "ズーム {percent}%",
+  "zoom.area": "拡大画像：スクロールまたは矢印キーで移動できます",
+  "zoom.hint": "画像をドラッグして移動します。ピンチ操作または＋と−で拡大・縮小できます。"
 }

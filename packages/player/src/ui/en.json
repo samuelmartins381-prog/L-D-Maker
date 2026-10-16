@@ -28,5 +28,14 @@
   "finish.close": "You can close this window.",
   "question.incorrect.retry": "Not quite. Attempts left: {count}. Change your answer, then submit.",
   "hotspots.instructions": "Select a numbered marker to see its explanation.",
-  "hotspots.progress": "{explored} of {total} explored"
+  "hotspots.progress": "{explored} of {total} explored",
+  "zoom.open": "Enlarge image",
+  "zoom.title": "Enlarged image",
+  "zoom.in": "Zoom in",
+  "zoom.out": "Zoom out",
+  "zoom.reset": "Fit",
+  "zoom.close": "Close",
+  "zoom.level": "Zoom {percent}%",
+  "zoom.area": "Enlarged image: scroll or use the arrow keys to move around",
+  "zoom.hint": "Drag the image to move around; pinch or use + and − to zoom."
 }

@@ -133,7 +133,8 @@ Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.
 plats clé → texte) + `media/`. Sections → écrans → blocs (`narrative`, `accordion`, `tabs`,
 `hotspots`, `question` single/multiple, `summary`). `hotspots` (ADR 0008) : repères = boutons,
 explication dans un panneau sous l'image, `x`/`y` en % non inversés en RTL ; texte dans les images
-limité à l'invariable (adresses, références). Chaque choix de question a son feedback. Chaque objectif
+limité à l'invariable (adresses, références). Image du bloc narratif : `zoom: true` (+ `zoomSrc` HD
+facultatif) ouvre une visionneuse `<dialog>` (ADR 0009) ; le banc audite alors un 3e état « zoom ». Chaque choix de question a son feedback. Chaque objectif
 doit être évalué par une question notée ; chaque question notée est rattachée à un objectif.
 Après une modification du schéma : `pnpm --filter @ldm/schema json-schema`.
 
@@ -180,7 +181,8 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
         traductions Claude à faire relire par des natifs avant toute livraison
   - [ ] 4. Nouveaux composants + banque de questions, dans l'ordre choisi pour l'horlogerie :
     - [x] a. Image à repères (ADR 0008) — démo « Anatomie d'un message », banc 352 pages OK
-    - [ ] b. Zoom sur image (macros de finitions)
+    - [x] b. Zoom sur image (ADR 0009) — visionneuse `<dialog>`, banc 374 pages OK ; lien
+          d'évitement corrigé (masquait le sélecteur de langue en russe)
     - [ ] c. Question « identifie la pièce » (repère à choisir, notée)
     - [ ] d. Remise en ordre d'étapes (clavier, sans glisser-déposer obligatoire)
     - [ ] e. Glossaire (termes soulignés + glossaire client transmis aux traducteurs)
