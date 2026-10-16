@@ -28,6 +28,14 @@ const PAIRS: [fg: string, bg: string, min: number][] = [
   ["--color-ink", "--color-accent-soft", 4.5],
   ["--color-accent-ink", "--color-accent", 4.5],
   ["--color-surface", "--color-ink", 4.5],
+  ["--color-success", "--color-surface", 4.5],
+  ["--color-error", "--color-surface", 4.5],
+  ["--color-ink", "--color-success-soft", 4.5],
+  ["--color-ink", "--color-error-soft", 4.5],
+  ["--color-success", "--color-success-soft", 4.5],
+  ["--color-error", "--color-error-soft", 4.5],
+  ["--color-success", "--color-bg", 3], // choice borders (non-text)
+  ["--color-error", "--color-bg", 3],
   ["--color-focus", "--color-bg", 3], // non-text contrast (focus indicator)
 ];
 

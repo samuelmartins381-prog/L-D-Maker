@@ -13,6 +13,10 @@
   --color-accent-ink: #fffdf9;
   --color-accent-soft: #f1e4da;
   --color-focus: #8a4b2a;
+  --color-success: #2d6a45;
+  --color-success-soft: #e3efe6;
+  --color-error: #a3362b;
+  --color-error-soft: #f6e3df;
 
   /* Typography */
   --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;

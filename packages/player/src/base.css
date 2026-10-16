@@ -5,6 +5,8 @@
   box-sizing: border-box;
 }
 html {
+  /* WCAG 2.2 SC 2.4.11: focused elements must not hide under the sticky top bar and pager. */
+  scroll-padding-block: 6rem 7rem;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }

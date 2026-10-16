@@ -76,6 +76,12 @@ les variables du thème (`themes/*.css`, contrastes testés). Tout texte d'inter
 `src/ui/<langue>.json` (mêmes clés partout, testé) ; une langue de module sans catalogue
 d'interface fait échouer le build. svelte-check exige TS 6 + TS 7 (`--tsgo`) : voir
 `packages/player/package.json`.
+Composants (J1 étape 4) : accordéon et onglets selon les patterns WAI-ARIA APG (flèches inversées
+en RTL), question = fieldset + radios/cases natives. La logique de question est pure et testée
+(`src/grading.ts` : tout ou rien, essais, ordre mélangé figé, score). Les réponses sont créées
+dans le constructeur du `Player` : **ne jamais écrire d'état dans un `$derived`** (erreur Svelte
+`state_unsafe_mutation`). `scroll-padding` sur `html` garde le focus visible sous les barres
+collantes (WCAG 2.4.11).
 
 ## Format de module (ADR 0002)
 Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.json` (catalogues
@@ -112,6 +118,6 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
   - [x] 1. Socle du dépôt (workspaces, TypeScript, tests, lint, licences)
   - [x] 2. Schéma de module v0.1 + validation + module de démo (ADR 0002)
   - [x] 3. Lecteur + thème + i18n FR/EN/AR (Svelte 5, ADR 0003) — JS 21 Ko gz, CSS 4 Ko gz
-  - [ ] 4. Composants : écran narratif, accordéon/onglets, QCU/QCM, récapitulatif
+  - [x] 4. Composants : narratif (+ image), accordéon, onglets, QCU/QCM, récapitulatif — JS 25 Ko gz
   - [ ] 5. Suivi (interface Tracker) + export SCORM 1.2 et HTML5
-  - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again)
+  - [ ] 6. Banc QA v1 (axe, clavier, Lighthouse, faux LMS scorm-again, focus non masqué 2.4.11)

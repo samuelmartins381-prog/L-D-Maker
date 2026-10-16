@@ -11,5 +11,15 @@
   "progress.label": "Screen {current} of {total}",
   "progress.percent": "{percent}% viewed",
   "locale.label": "Language",
-  "block.pending": "This type of content will be available soon."
+  "question.instructions.single": "Only one answer.",
+  "question.instructions.multiple": "Several answers possible.",
+  "question.practice": "Practice: this question is not scored.",
+  "question.submit": "Submit",
+  "question.correct": "Correct",
+  "question.incorrect": "Not quite",
+  "question.incorrect.final": "Not quite. Here are the explanations.",
+  "question.attempts.left": "Attempts left: {count}",
+  "question.choice.expected": "Expected answer",
+  "question.choice.notExpected": "Not part of the answer",
+  "question.retry.hint": "Change your answer, then submit."
 }

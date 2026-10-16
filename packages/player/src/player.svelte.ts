@@ -1,7 +1,14 @@
-import type { Block, Screen, Section } from "@ldm/schema";
+import type { Block, Question, Screen, Section } from "@ldm/schema";
 import { getContext } from "svelte";
-import { SvelteSet } from "svelte/reactivity";
+import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import type { CompiledContent } from "./content.ts";
+import {
+  type AnswerState,
+  initialAnswer,
+  moduleScore,
+  submit,
+  toggle,
+} from "./grading.ts";
 import { directionOf, interpolate, negotiateLocale } from "./locale.ts";
 
 export interface ScreenRef {
@@ -17,6 +24,8 @@ export class Player {
   locale = $state("");
   index = $state(0);
   readonly visited = new SvelteSet<string>();
+  /** Answers by question id, kept for the whole session (and later restored from the LMS). */
+  readonly answers = new SvelteMap<string, AnswerState>();
 
   readonly current = $derived.by(() => this.screens[this.index] as ScreenRef);
   readonly dir = $derived(directionOf(this.locale));
@@ -34,6 +43,10 @@ export class Player {
     );
     const { locales, defaultLocale } = content.module;
     this.locale = negotiateLocale(locales, defaultLocale, requestedLocales);
+    // Every answer exists from the start (choice order fixed once), so rendering never writes state.
+    for (const b of this.screens.flatMap((s) => s.screen.blocks)) {
+      if (b.type === "question") this.answers.set(b.id, initialAnswer(b));
+    }
     this.goTo(0);
   }
 
@@ -55,6 +68,22 @@ export class Player {
     if (index < 0 || index >= this.screens.length) return;
     this.index = index;
     this.visited.add(this.current.screen.id);
+  }
+
+  readonly score = $derived.by(() =>
+    moduleScore(this.content.module, this.answers),
+  );
+
+  answer(q: Question): AnswerState {
+    return this.answers.get(q.id) ?? initialAnswer(q);
+  }
+
+  select(q: Question, choiceId: string): void {
+    this.answers.set(q.id, toggle(q, this.answer(q), choiceId));
+  }
+
+  submit(q: Question): void {
+    this.answers.set(q.id, submit(q, this.answer(q)));
   }
 
   get isFirst(): boolean {

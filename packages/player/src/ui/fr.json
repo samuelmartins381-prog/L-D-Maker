@@ -11,5 +11,15 @@
   "progress.label": "Écran {current} sur {total}",
   "progress.percent": "{percent} % parcouru",
   "locale.label": "Langue",
-  "block.pending": "Ce type de contenu sera disponible prochainement."
+  "question.instructions.single": "Une seule réponse possible.",
+  "question.instructions.multiple": "Plusieurs réponses possibles.",
+  "question.practice": "Entraînement : cette question n'est pas notée.",
+  "question.submit": "Valider",
+  "question.correct": "Bonne réponse",
+  "question.incorrect": "Ce n'est pas la bonne réponse",
+  "question.incorrect.final": "Ce n'est pas la bonne réponse. Voici les explications.",
+  "question.attempts.left": "Essais restants : {count}",
+  "question.choice.expected": "Réponse attendue",
+  "question.choice.notExpected": "Ne fait pas partie de la réponse",
+  "question.retry.hint": "Modifiez votre réponse, puis validez."
 }

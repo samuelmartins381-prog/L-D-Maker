@@ -11,5 +11,15 @@
   "progress.label": "الشاشة {current} من {total}",
   "progress.percent": "تمت مشاهدة {percent}٪",
   "locale.label": "اللغة",
-  "block.pending": "سيتوفر هذا النوع من المحتوى قريبًا."
+  "question.instructions.single": "إجابة واحدة فقط.",
+  "question.instructions.multiple": "يمكن اختيار عدة إجابات.",
+  "question.practice": "تدريب: هذا السؤال غير محتسب في التقييم.",
+  "question.submit": "تأكيد",
+  "question.correct": "إجابة صحيحة",
+  "question.incorrect": "هذه ليست الإجابة الصحيحة",
+  "question.incorrect.final": "هذه ليست الإجابة الصحيحة. إليك الشروح.",
+  "question.attempts.left": "المحاولات المتبقية: {count}",
+  "question.choice.expected": "الإجابة المتوقّعة",
+  "question.choice.notExpected": "ليست جزءًا من الإجابة",
+  "question.retry.hint": "عدّل إجابتك، ثم أكّدها."
 }
