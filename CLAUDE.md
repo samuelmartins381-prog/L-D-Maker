@@ -150,8 +150,8 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
   - [x] 6. Banc QA v1 (ADR 0005) — module de démo : 11 conformes, 0 non conforme, 4 manuels
 - [x] Critère de sortie J1 : validé sur SCORM Cloud le 2026-10-16 (passed, score 100, reprise OK)
 - [ ] J2 — MVP, étape par étape :
-  - [x] 1. Export SCORM 2004 4e édition (ADR 0004, addendum) — validé sur faux LMS ; SCORM Cloud à
-        lancer quand la nouvelle clé sera visible (`--version 2004`)
+  - [x] 1. Export SCORM 2004 4e édition (ADR 0004, addendum) — validé sur faux LMS et sur SCORM
+        Cloud le 2026-10-16 (completed/passed, score 100, reprise OK, 7 interactions)
   - [ ] 2. Traduction : export/import XLIFF
   - [ ] 3. 11 langues dont CJK (polices, expansion du texte)
   - [ ] 4. Nouveaux composants + banque de questions

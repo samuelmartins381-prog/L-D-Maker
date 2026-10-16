@@ -70,5 +70,6 @@ autre domaine interrompt la recherche de l'API.
   refusée par le LMS.
 - Docebo ne gère que la 3e édition et pas le séquençage (phase 0 §2.2) : pour Docebo, livrer en
   SCORM 1.2 en attendant un profil LMS dédié.
-- Validation SCORM Cloud en 2004 : `pnpm qa:scorm-cloud <module> --version 2004`, à lancer dès que
-  la nouvelle clé est disponible dans une session.
+- **Validé sur SCORM Cloud le 2026-10-16** (`--version 2004`) : import sans avertissement, session
+  interrompue « incomplete », reprise au bon écran, completed/passed, score 100, exit « normal »,
+  7 interactions.
