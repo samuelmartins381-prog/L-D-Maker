@@ -14,6 +14,12 @@ const p = usePlayer();
 // Created by the Player for every hotspots block (state is never created during rendering).
 const explored = $derived(p.explored.get(block.id) as SvelteSet<string>);
 let active = $state<string | null>(null);
+// Markers are placed in % of the image: until it has loaded, its height is 0 and they would pile up.
+let img: HTMLImageElement | undefined = $state();
+let loaded = $state(false);
+$effect(() => {
+  if (img?.complete) loaded = true;
+});
 const current = $derived(block.items.findIndex((i) => i.id === active));
 const detailId = $derived(`${block.id}-detail`);
 // Item headings sit one level below the block heading (h1 is the screen title).
@@ -29,8 +35,15 @@ function toggle(id: string): void {
   {#if block.heading}<h2 class="block-heading">{p.t(block.heading)}</h2>{/if}
   {#if block.intro}<p class="intro"><Rich text={p.t(block.intro)} /></p>{/if}
   <figure>
-    <div class="stage">
-      <img src={block.image.src} alt={p.t(block.image.alt)} decoding="async" />
+    <div class="stage" class:loaded>
+      <img
+        bind:this={img}
+        src={block.image.src}
+        alt={p.t(block.image.alt)}
+        decoding="async"
+        onload={() => (loaded = true)}
+        onerror={() => (loaded = true)}
+      />
       {#each block.items as item, i (item.id)}
         <button
           class="marker"
@@ -85,6 +98,9 @@ function toggle(id: string): void {
   }
   .stage {
     position: relative;
+  }
+  .stage:not(.loaded) .marker {
+    visibility: hidden;
   }
   img {
     display: block;

@@ -39,5 +39,12 @@
   "zoom.area": "Image agrandie : faites défiler ou utilisez les flèches pour vous déplacer",
   "zoom.hint": "Faites glisser l'image pour vous déplacer ; pincez ou utilisez + et − pour zoomer.",
   "question.instructions.hotspot": "Sélectionnez le repère qui correspond, puis validez.",
-  "question.marker": "Repère {n}"
+  "question.marker": "Repère {n}",
+  "question.instructions.sequence": "Remettez les étapes dans l'ordre avec les boutons ↑ et ↓, puis validez.",
+  "sequence.up": "Monter : {step}",
+  "sequence.down": "Descendre : {step}",
+  "sequence.moved": "« {step} » est maintenant en position {position} sur {total}.",
+  "sequence.incorrect.retry": "Pas tout à fait : {placed} étape(s) sur {total} à la bonne place. Essais restants : {count}. Modifiez l'ordre, puis validez.",
+  "sequence.placed": "À la bonne place",
+  "sequence.yourPosition": "Vous l'aviez placée en position {position}"
 }

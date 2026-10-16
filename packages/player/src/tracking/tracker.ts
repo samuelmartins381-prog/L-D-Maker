@@ -18,6 +18,8 @@ export interface Progress {
 
 export interface Interaction {
   id: string;
+  /** SCORM interaction type: an answer set ("choice") or an ordered answer ("sequencing"). */
+  type: "choice" | "sequencing";
   /** Choice positions in the module (0-based): SCORM 1.2 only accepts single-character responses. */
   response: number[];
   correctResponse: number[];

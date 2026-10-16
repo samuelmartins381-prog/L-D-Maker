@@ -6,6 +6,7 @@ import {
   type AnswerState,
   initialAnswer,
   moduleScore,
+  move,
   submit,
   toggle,
 } from "./grading.ts";
@@ -143,6 +144,11 @@ export class Player {
 
   select(q: Question, choiceId: string): void {
     this.answers.set(q.id, toggle(q, this.answer(q), choiceId));
+  }
+
+  /** Sequence: moves a step one place up (-1) or down (+1). */
+  move(q: Question, choiceId: string, delta: -1 | 1): void {
+    this.answers.set(q.id, move(q, this.answer(q), choiceId, delta));
   }
 
   submit(q: Question): void {

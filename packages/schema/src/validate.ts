@@ -257,13 +257,38 @@ function checkSemantics(
               at,
               "image and x/y positions are only for the hotspot variant",
             );
-          if (b.variant !== "multiple" && correct !== 1)
+          if (b.variant === "sequence") {
+            if (b.choices.some((c) => c.correct !== undefined))
+              err(
+                "answer-key",
+                `${at}.choices`,
+                "sequence steps have no correct flag: their order in the file is the answer",
+              );
+            if (!b.shuffle)
+              err(
+                "answer-key",
+                `${at}.shuffle`,
+                "a sequence must be shuffled, otherwise it is shown already solved",
+              );
+            if (b.choices.length < 3)
+              err(
+                "answer-key",
+                `${at}.choices`,
+                "a sequence needs at least 3 steps",
+              );
+          } else if (b.choices.some((c) => c.correct === undefined))
+            err(
+              "answer-key",
+              `${at}.choices`,
+              "every choice needs correct: true or false",
+            );
+          else if (b.variant !== "multiple" && correct !== 1)
             err(
               "answer-key",
               `${at}.choices`,
               `${b.variant} question needs exactly 1 correct choice, found ${correct}`,
             );
-          if (
+          else if (
             b.variant === "multiple" &&
             (correct < 1 || correct === b.choices.length)
           )

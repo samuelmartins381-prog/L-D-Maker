@@ -39,5 +39,12 @@
   "zoom.area": "Immagine ingrandita: scorra o usi le frecce per spostarsi",
   "zoom.hint": "Trascini l'immagine per spostarsi; usi due dita o + e − per lo zoom.",
   "question.instructions.hotspot": "Selezioni l'indicatore corrispondente, poi confermi.",
-  "question.marker": "Indicatore {n}"
+  "question.marker": "Indicatore {n}",
+  "question.instructions.sequence": "Metta i passaggi in ordine con i pulsanti ↑ e ↓, poi confermi.",
+  "sequence.up": "Sposta su: {step}",
+  "sequence.down": "Sposta giù: {step}",
+  "sequence.moved": "«{step}» è ora in posizione {position} su {total}.",
+  "sequence.incorrect.retry": "Non del tutto: {placed} passaggi su {total} al posto giusto. Tentativi rimasti: {count}. Cambi l'ordine, poi confermi.",
+  "sequence.placed": "Al posto giusto",
+  "sequence.yourPosition": "L'aveva messo in posizione {position}"
 }

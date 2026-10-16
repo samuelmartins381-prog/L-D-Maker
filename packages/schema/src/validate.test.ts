@@ -236,6 +236,30 @@ describe("validateModule", () => {
     expect(validateModule(src).ok).toBe(true);
   });
 
+  it("checks sequences: no correct flag, always shuffled, at least 3 steps; others need the flag", () => {
+    const src = fixture();
+    const q = src.module.sections[0].screens[0].blocks[1];
+    // Rewriting the steps leaves the fixture's "q.b" strings unused: not checked here either.
+    const own = () =>
+      codes(src).filter(
+        (c) => c !== "assessment-tolerance" && c !== "unused-string",
+      );
+    q.variant = "sequence";
+    expect(own()).toEqual(["answer-key", "answer-key"]); // correct flags, only 2 steps
+    q.choices = ["a", "b", "c"].map((id) => ({
+      id,
+      text: "q.a",
+      feedback: "q.a.fb",
+    }));
+    expect(own()).toEqual([]);
+    q.shuffle = false;
+    expect(own()).toEqual(["answer-key"]);
+
+    const missing = fixture();
+    delete missing.module.sections[0].screens[0].blocks[1].choices[0].correct;
+    expect(codes(missing)).toContain("answer-key");
+  });
+
   it("checks hotspot questions: image, positions, one correct marker, no positions elsewhere", () => {
     const src = fixture();
     const q = src.module.sections[0].screens[0].blocks[1];

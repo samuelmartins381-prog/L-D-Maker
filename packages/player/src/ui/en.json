@@ -39,5 +39,12 @@
   "zoom.area": "Enlarged image: scroll or use the arrow keys to move around",
   "zoom.hint": "Drag the image to move around; pinch or use + and − to zoom.",
   "question.instructions.hotspot": "Select the matching marker, then submit.",
-  "question.marker": "Marker {n}"
+  "question.marker": "Marker {n}",
+  "question.instructions.sequence": "Put the steps in order with the ↑ and ↓ buttons, then submit.",
+  "sequence.up": "Move up: {step}",
+  "sequence.down": "Move down: {step}",
+  "sequence.moved": "\"{step}\" is now in position {position} of {total}.",
+  "sequence.incorrect.retry": "Not quite: {placed} of {total} steps in the right place. Attempts left: {count}. Change the order, then submit.",
+  "sequence.placed": "In the right place",
+  "sequence.yourPosition": "You had it in position {position}"
 }

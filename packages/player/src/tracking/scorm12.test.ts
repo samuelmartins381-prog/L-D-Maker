@@ -163,6 +163,7 @@ describe("Scorm12Tracker", () => {
     t.start();
     t.recordInteraction({
       id: "q-signals",
+      type: "choice",
       response: [0, 2],
       correctResponse: [0, 1],
       correct: false,
@@ -179,6 +180,28 @@ describe("Scorm12Tracker", () => {
       "cmi.interactions.2.result": "wrong",
       "cmi.interactions.2.time": "09:05:07",
       "cmi.interactions.2.objectives.0.id": "obj-signs",
+    });
+  });
+
+  it("records a sequence in the learner's order", () => {
+    const { api, data } = mockApi();
+    const t = new Scorm12Tracker(api);
+    t.start();
+    t.recordInteraction({
+      id: "q-steps",
+      type: "sequencing",
+      response: [2, 0, 1],
+      correctResponse: [0, 1, 2],
+      responseIds: ["c", "a", "b"],
+      correctResponseIds: ["a", "b", "c"],
+      correct: false,
+      objectiveIds: [],
+      at: new Date(2026, 0, 1, 9, 5, 7),
+    });
+    expect(data).toMatchObject({
+      "cmi.interactions.0.type": "sequencing",
+      "cmi.interactions.0.student_response": "c,a,b",
+      "cmi.interactions.0.correct_responses.0.pattern": "a,b,c",
     });
   });
 });

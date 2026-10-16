@@ -177,6 +177,7 @@ describe("Scorm2004Tracker", () => {
     t.start();
     t.recordInteraction({
       id: "q-signals",
+      type: "choice",
       response: [0, 2],
       correctResponse: [0, 1],
       responseIds: ["a", "c"],
@@ -193,6 +194,29 @@ describe("Scorm2004Tracker", () => {
       "cmi.interactions.1.result": "incorrect",
       "cmi.interactions.1.timestamp": "2026-01-01T09:05:07.00Z",
       "cmi.interactions.1.objectives.0.id": "obj-signs",
+    });
+  });
+
+  it("records a sequence in the learner's order", () => {
+    const { api, data } = mockApi();
+    const t = new Scorm2004Tracker(api);
+    t.start();
+    t.recordInteraction({
+      id: "q-steps",
+      type: "sequencing",
+      response: [2, 0, 1],
+      correctResponse: [0, 1, 2],
+      responseIds: ["stop", "report", "change"],
+      correctResponseIds: ["report", "change", "stop"],
+      correct: false,
+      objectiveIds: [],
+      at: new Date(Date.UTC(2026, 0, 1, 9, 5, 7)),
+    });
+    expect(data).toMatchObject({
+      "cmi.interactions.0.type": "sequencing",
+      "cmi.interactions.0.learner_response": "stop[,]report[,]change",
+      "cmi.interactions.0.correct_responses.0.pattern":
+        "report[,]change[,]stop",
     });
   });
 

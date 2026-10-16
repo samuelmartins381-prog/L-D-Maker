@@ -5,6 +5,8 @@ import {
   initialAnswer,
   isFinal,
   moduleScore,
+  move,
+  placedCount,
   shuffled,
   submit,
   toggle,
@@ -36,6 +38,33 @@ const multiple: Question = {
 };
 
 describe("question grading", () => {
+  it("sequence: never starts solved, moves steps, grades the exact order", () => {
+    const seq: Question = {
+      ...single,
+      id: "q4",
+      variant: "sequence",
+      shuffle: true,
+      attempts: 2,
+      choices: ["a", "b", "c"].map((id) => ({ id, text: id, feedback: id })),
+    };
+    // A shuffle that returns the answer (rng → 0.99 keeps the order) is rotated.
+    let s = initialAnswer(seq, () => 0.99);
+    expect(s.order).toEqual(["b", "c", "a"]);
+    expect(s.selected).toEqual(s.order);
+    expect(move(seq, s, "b", -1)).toBe(s); // already first
+    s = submit(seq, s);
+    expect(s.correct).toBe(false);
+    expect(placedCount(seq, s.selected)).toBe(0);
+    s = move(seq, s, "a", -1); // b a c
+    expect(s.correct).toBeNull(); // a change starts a new attempt
+    s = move(seq, s, "a", -1); // a b c
+    expect(s.selected).toEqual(["a", "b", "c"]);
+    s = submit(seq, s);
+    expect(s.correct).toBe(true);
+    expect(isFinal(seq, s)).toBe(true);
+    expect(move(seq, s, "c", -1)).toBe(s); // locked once final
+  });
+
   it("hotspot questions are graded like single choice (one marker at a time)", () => {
     const hotspot: Question = { ...single, id: "q3", variant: "hotspot" };
     let s = initialAnswer(hotspot);

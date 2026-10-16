@@ -39,5 +39,12 @@
   "zoom.area": "拡大画像：スクロールまたは矢印キーで移動できます",
   "zoom.hint": "画像をドラッグして移動します。ピンチ操作または＋と−で拡大・縮小できます。",
   "question.instructions.hotspot": "該当するマーカーを選んでから、回答してください。",
-  "question.marker": "マーカー {n}"
+  "question.marker": "マーカー {n}",
+  "question.instructions.sequence": "↑ と ↓ のボタンで手順を正しい順に並べ替えてから、回答してください。",
+  "sequence.up": "上へ移動：{step}",
+  "sequence.down": "下へ移動：{step}",
+  "sequence.moved": "「{step}」は {total} 中 {position} 番目になりました。",
+  "sequence.incorrect.retry": "惜しい：{total} 手順中 {placed} 手順が正しい位置です。残りの回答回数：{count}。順番を変えてから回答してください。",
+  "sequence.placed": "正しい位置",
+  "sequence.yourPosition": "あなたは {position} 番目に置いていました"
 }

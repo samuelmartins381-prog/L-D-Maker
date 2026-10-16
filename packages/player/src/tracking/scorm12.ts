@@ -105,7 +105,7 @@ export class Scorm12Tracker implements Tracker {
     for (const [k, o] of i.objectiveIds.entries())
       this.#set(`${base}.objectives.${k}.id`, o);
     this.#set(`${base}.time`, scorm12Time(i.at));
-    this.#set(`${base}.type`, "choice");
+    this.#set(`${base}.type`, i.type);
     this.#set(
       `${base}.correct_responses.0.pattern`,
       i.correctResponse.map(letter).join(","),

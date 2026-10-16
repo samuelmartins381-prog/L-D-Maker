@@ -73,15 +73,24 @@ export class Session {
       if (this.#recorded.has(q.id) || !isFinal(q, a)) continue;
       this.#recorded.add(q.id);
       const pos = (id: string) => q.choices.findIndex((c) => c.id === id);
+      const sequence = q.variant === "sequence";
       this.#tracker.recordInteraction({
         id: q.id,
-        response: a.selected.map(pos).sort((x, y) => x - y),
-        correctResponse: q.choices.flatMap((c, i) => (c.correct ? [i] : [])),
+        type: sequence ? "sequencing" : "choice",
+        // A sequence is reported in the learner's order; a choice answer as a sorted set.
+        response: sequence
+          ? a.selected.map(pos)
+          : a.selected.map(pos).sort((x, y) => x - y),
+        correctResponse: sequence
+          ? q.choices.map((_, i) => i)
+          : q.choices.flatMap((c, i) => (c.correct ? [i] : [])),
         // Ids in module order, so the same answer always reads the same in LMS reports.
-        responseIds: q.choices
-          .filter((c) => a.selected.includes(c.id))
-          .map((c) => c.id),
-        correctResponseIds: q.choices.filter((c) => c.correct).map((c) => c.id),
+        responseIds: sequence
+          ? [...a.selected]
+          : q.choices.filter((c) => a.selected.includes(c.id)).map((c) => c.id),
+        correctResponseIds: sequence
+          ? q.choices.map((c) => c.id)
+          : q.choices.filter((c) => c.correct).map((c) => c.id),
         correct: a.correct === true,
         objectiveIds: q.objectives,
         at: new Date(),

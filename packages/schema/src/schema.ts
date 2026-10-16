@@ -94,7 +94,8 @@ export const Hotspots = z.strictObject({
 const Choice = z.strictObject({
   id: Id,
   text: StringKey,
-  correct: z.boolean(),
+  /** Required for single, multiple and hotspot; absent for sequence (the YAML order is the key). */
+  correct: z.boolean().optional(),
   /**
    * Explanation of this option (brief §4: feedback per answer), written neutrally — it is shown
    * whether or not the learner picked the option. The player displays the right/wrong verdict.
@@ -108,8 +109,11 @@ const Choice = z.strictObject({
 export const Question = z.strictObject({
   ...blockBase,
   type: z.literal("question"),
-  /** "hotspot": pick the right marker on an image ("identify the part"); graded like "single". */
-  variant: z.enum(["single", "multiple", "hotspot"]),
+  /**
+   * "hotspot": pick the right marker on an image ("identify the part"); graded like "single".
+   * "sequence": put the steps in order; the correct order is the order of `choices` (ADR 0011).
+   */
+  variant: z.enum(["single", "multiple", "hotspot", "sequence"]),
   prompt: StringKey,
   /** Image the markers sit on (hotspot variant only). Its alt must not give the answer away. */
   image: z.strictObject({ src: MediaSrc, alt: StringKey }).optional(),

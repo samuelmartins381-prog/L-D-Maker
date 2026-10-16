@@ -39,5 +39,12 @@
   "zoom.area": "Увеличенное изображение: прокручивайте или используйте клавиши со стрелками",
   "zoom.hint": "Перетаскивайте изображение, чтобы перемещаться; для масштаба сведите пальцы или нажмите + и −.",
   "question.instructions.hotspot": "Выберите подходящую метку и отправьте ответ.",
-  "question.marker": "Метка {n}"
+  "question.marker": "Метка {n}",
+  "question.instructions.sequence": "Расставьте шаги по порядку кнопками ↑ и ↓, затем отправьте ответ.",
+  "sequence.up": "Вверх: {step}",
+  "sequence.down": "Вниз: {step}",
+  "sequence.moved": "«{step}» теперь на позиции {position} из {total}.",
+  "sequence.incorrect.retry": "Не совсем: на своём месте {placed} шаг(ов) из {total}. Осталось попыток: {count}. Измените порядок и отправьте ответ.",
+  "sequence.placed": "На своём месте",
+  "sequence.yourPosition": "Вы поставили его на позицию {position}"
 }
