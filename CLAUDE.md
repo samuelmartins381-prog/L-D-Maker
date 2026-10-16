@@ -54,6 +54,7 @@ packages/                 code (pnpm workspaces), un paquet par brique de l'arch
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
 packages/player/          lecteur Svelte 5 (IIFE), thèmes CSS, textes d'interface (src/ui/*.json)
 packages/builder/         module validé + lecteur → out/<id>/{web,scorm12,scorm2004}/ + ZIP par format
+packages/l10n/             traduction : export/import XLIFF 1.2 et 2.0 (ADR 0006)
 packages/qa/               banc QA (axe, clavier, Lighthouse, faux LMS) + tests e2e (src/e2e/)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
@@ -73,6 +74,8 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm qa:scorm-cloud <dossier-module> [--version 1.2|2004]` — validation réelle sur SCORM Cloud. Exige
   `SCORM_CLOUD_APP_ID` / `SCORM_CLOUD_SECRET_KEY` en secrets d'environnement, **jamais dans le
   dépôt**. Hors de `pnpm check` (réseau, limites de l'essai : 10 inscriptions actives).
+- `pnpm l10n export <module> --to <lang> [--xliff 1.2|2.0]` puis `pnpm l10n import <module> <xlf>` —
+  aller-retour de traduction (URL des liens jamais exportées ; lien perdu ⇒ import refusé)
 - `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
 
 ## Lecteur (ADR 0003)
@@ -152,7 +155,8 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
 - [ ] J2 — MVP, étape par étape :
   - [x] 1. Export SCORM 2004 4e édition (ADR 0004, addendum) — validé sur faux LMS et sur SCORM
         Cloud le 2026-10-16 (completed/passed, score 100, reprise OK, 7 interactions)
-  - [ ] 2. Traduction : export/import XLIFF
+  - [x] 2. Traduction : export/import XLIFF 1.2 et 2.0 (ADR 0006) — fichiers valides contre les
+        schémas OASIS stricts, aller-retour EN/AR identique
   - [ ] 3. 11 langues dont CJK (polices, expansion du texte)
   - [ ] 4. Nouveaux composants + banque de questions
   - [ ] 5. Lecture des sources (PDF, PPTX, DOCX) — contenu de test de Sam requis

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseInline, splitParagraphs } from "./markup.ts";
+import { parseInline, renderInline, splitParagraphs } from "./markup.ts";
 
 describe("parseInline", () => {
   it("parses bold, italic and nested markup", () => {
@@ -47,5 +47,18 @@ describe("parseInline", () => {
 describe("splitParagraphs", () => {
   it("splits on blank lines", () => {
     expect(splitParagraphs("a\n\n b \n \nc")).toEqual(["a", "b", "c"]);
+  });
+});
+
+describe("renderInline", () => {
+  it("round-trips the markup of every demo string pattern", () => {
+    for (const s of [
+      "plain",
+      "a **b** c",
+      "*x* and **y *z***",
+      "see [the site](https://example.com) now",
+      "مدخل **معظم الهجمات**: نص",
+    ])
+      expect(renderInline(parseInline(s))).toBe(s);
   });
 });

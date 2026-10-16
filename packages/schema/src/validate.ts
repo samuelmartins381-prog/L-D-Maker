@@ -42,7 +42,7 @@ function zodIssues(file: string, error: z.ZodError): Issue[] {
 }
 
 /** A string key referenced by the module, with where it is used (for error messages). */
-interface KeyRef {
+export interface KeyRef {
   key: string;
   at: string;
 }
@@ -80,7 +80,8 @@ function blockKeys(block: Block, at: string): KeyRef[] {
   return refs;
 }
 
-function collectKeys(m: Module): KeyRef[] {
+/** Every string key the module references, in reading order, with where it is used. */
+export function collectKeys(m: Module): KeyRef[] {
   const refs: KeyRef[] = [
     { key: m.meta.title, at: "meta.title" },
     { key: m.meta.description, at: "meta.description" },

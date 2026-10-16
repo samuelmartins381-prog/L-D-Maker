@@ -44,3 +44,14 @@ export function splitParagraphs(source: string): string[] {
     .map((p) => p.trim())
     .filter(Boolean);
 }
+
+/** Inverse of parseInline: tokens back to the source markup (used when importing translations). */
+export function renderInline(nodes: readonly Inline[]): string {
+  const one = (n: Inline): string => {
+    if (n.kind === "text") return n.text;
+    if (n.kind === "strong") return `**${renderInline(n.children)}**`;
+    if (n.kind === "em") return `*${renderInline(n.children)}*`;
+    return `[${renderInline(n.children)}](${n.href})`;
+  };
+  return nodes.map(one).join("");
+}

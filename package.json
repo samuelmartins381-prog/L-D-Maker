@@ -19,7 +19,8 @@
     "build:examples": "pnpm build:player && for d in examples/*/; do pnpm -s build \"$d\" || exit 1; done",
     "test:e2e": "node packages/qa/src/e2e/tracking.e2e.ts",
     "qa": "node packages/qa/src/cli.ts",
-    "qa:scorm-cloud": "NODE_USE_ENV_PROXY=1 node --no-warnings packages/qa/src/scorm-cloud.ts"
+    "qa:scorm-cloud": "NODE_USE_ENV_PROXY=1 node --no-warnings packages/qa/src/scorm-cloud.ts",
+    "l10n": "node packages/l10n/src/cli.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

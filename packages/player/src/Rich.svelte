@@ -1,6 +1,7 @@
 <!-- Renders a module string with its inline markup (ADR 0002), as DOM nodes — never as HTML. -->
 <script lang="ts">
-import { type Inline, parseInline, splitParagraphs } from "./markup.ts";
+// Subpath import: the markup parser only, not the schema (which would pull Zod into the player).
+import { type Inline, parseInline, splitParagraphs } from "@ldm/schema/markup";
 
 let { text, paragraphs = false }: { text: string; paragraphs?: boolean } =
   $props();
