@@ -54,11 +54,13 @@ const FIELD: Record<string, string> = {
   text: "answer option",
   feedback: "explanation shown after answering",
   "media.alt": "image description (alt text, read by screen readers)",
+  "image.alt": "image description (alt text, read by screen readers)",
 };
 const BLOCK: Record<string, string> = {
   narrative: "text block",
   accordion: "accordion",
   tabs: "tabs",
+  hotspots: "image with numbered markers",
   question: "question",
   summary: "summary list",
 };
@@ -94,7 +96,7 @@ export function describeLocation(
   const pos = Number(index) + 1;
   if (list === "points") return `${where} — ${kind}: point ${pos}`;
   if (list === "items")
-    return `${where} — ${kind}: panel ${pos} ${field === "title" ? "title" : "content"}`;
+    return `${where} — ${kind}: ${block?.type === "hotspots" ? "marker" : "panel"} ${pos} ${field === "title" ? "title" : "content"}`;
   return `${where} — ${kind}: ${field === "feedback" ? `explanation of option ${pos}, shown after answering` : `option ${pos}`}`;
 }
 

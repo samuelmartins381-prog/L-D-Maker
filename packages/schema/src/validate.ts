@@ -32,6 +32,9 @@ export interface ValidationResult {
   module?: Module;
 }
 
+/** Below this distance (in % of the image), two markers overlap on a phone-width image. */
+const HOTSPOT_MIN_DISTANCE = 7;
+
 function zodIssues(file: string, error: z.ZodError): Issue[] {
   return error.issues.map((i) => ({
     severity: "error",
@@ -61,6 +64,14 @@ function blockKeys(block: Block, at: string): KeyRef[] {
     case "accordion":
     case "tabs":
       add(block.intro, "intro");
+      block.items.forEach((item, i) => {
+        add(item.title, `items[${i}].title`);
+        add(item.body, `items[${i}].body`);
+      });
+      break;
+    case "hotspots":
+      add(block.intro, "intro");
+      add(block.image.alt, "image.alt");
       block.items.forEach((item, i) => {
         add(item.title, `items[${i}].title`);
         add(item.body, `items[${i}].body`);
@@ -155,8 +166,28 @@ function checkSemantics(
               `file not found: ${b.media.src}`,
             );
         }
+        if (b.type === "hotspots") {
+          if (!mediaFiles.has(b.image.src))
+            err(
+              "media-missing",
+              `${at}.image.src`,
+              `file not found: ${b.image.src}`,
+            );
+          b.items.forEach((a, i) => {
+            for (const c of b.items.slice(i + 1)) {
+              if (Math.hypot(a.x - c.x, a.y - c.y) < HOTSPOT_MIN_DISTANCE)
+                warn(
+                  "hotspot-overlap",
+                  `module.yaml: ${at}.items`,
+                  `markers "${a.id}" and "${c.id}" are closer than ${HOTSPOT_MIN_DISTANCE} % and may overlap on a phone`,
+                );
+            }
+          });
+        }
         if (
-          (b.type === "accordion" || b.type === "tabs") &&
+          (b.type === "accordion" ||
+            b.type === "tabs" ||
+            b.type === "hotspots") &&
           new Set(b.items.map((x) => x.id)).size !== b.items.length
         )
           err(

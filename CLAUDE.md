@@ -131,7 +131,9 @@ le texte relu, pas par remplacement aveugle.
 ## Format de module (ADR 0002)
 Dossier = `module.yaml` (structure, aucune chaîne affichée) + `strings/<lang>.json` (catalogues
 plats clé → texte) + `media/`. Sections → écrans → blocs (`narrative`, `accordion`, `tabs`,
-`question` single/multiple, `summary`). Chaque choix de question a son feedback. Chaque objectif
+`hotspots`, `question` single/multiple, `summary`). `hotspots` (ADR 0008) : repères = boutons,
+explication dans un panneau sous l'image, `x`/`y` en % non inversés en RTL ; texte dans les images
+limité à l'invariable (adresses, références). Chaque choix de question a son feedback. Chaque objectif
 doit être évalué par une question notée ; chaque question notée est rattachée à un objectif.
 Après une modification du schéma : `pnpm --filter @ldm/schema json-schema`.
 
@@ -176,6 +178,12 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
   - [x] 3. 11 langues dont CJK (ADR 0007) — démo en fr, en, ar, de, es, it, pt-BR, ru, ja,
         zh-Hans, ko ; banc : 308 pages sans violation ni débordement, Lighthouse 95 ;
         traductions Claude à faire relire par des natifs avant toute livraison
-  - [ ] 4. Nouveaux composants + banque de questions
+  - [ ] 4. Nouveaux composants + banque de questions, dans l'ordre choisi pour l'horlogerie :
+    - [x] a. Image à repères (ADR 0008) — démo « Anatomie d'un message », banc 352 pages OK
+    - [ ] b. Zoom sur image (macros de finitions)
+    - [ ] c. Question « identifie la pièce » (repère à choisir, notée)
+    - [ ] d. Remise en ordre d'étapes (clavier, sans glisser-déposer obligatoire)
+    - [ ] e. Glossaire (termes soulignés + glossaire client transmis aux traducteurs)
+    - [ ] f. Banque de questions, vrai/faux, appariement ; scénario à embranchements selon le public
   - [ ] 5. Lecture des sources (PDF, PPTX, DOCX) — contenu de test de Sam requis
   - [ ] 6. Pipeline complet avec storyboard validé par Sam

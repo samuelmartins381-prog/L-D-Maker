@@ -61,6 +61,18 @@ sections:
             type: narrative
             heading: s2.example.heading
             body: s2.example.body
+      - id: s2-anatomy
+        title: s2.anatomy.title
+        blocks:
+          - id: s2-anatomy-email
+            type: hotspots
+            intro: s2.anatomy.intro
+            image: { src: media/email-anatomy.svg, alt: s2.anatomy.alt }
+            items:
+              - { id: sender, x: 52, y: 23, title: s2.anatomy.sender.title, body: s2.anatomy.sender.body }
+              - { id: subject, x: 66, y: 36, title: s2.anatomy.subject.title, body: s2.anatomy.subject.body }
+              - { id: link, x: 77.5, y: 73, title: s2.anatomy.link.title, body: s2.anatomy.link.body }
+              - { id: attachment, x: 39.5, y: 87.5, title: s2.anatomy.attachment.title, body: s2.anatomy.attachment.body }
       - id: s2-practice
         title: s2.practice.title
         blocks:

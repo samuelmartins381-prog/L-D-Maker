@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520">
+  <!-- Demo illustration drawn for L-D-Maker (no third-party asset). Text is limited to addresses,
+       which stay the same in every language; everything else is drawn as neutral shapes. -->
+  <rect x="10" y="10" width="780" height="500" rx="16" fill="#fffdf9" stroke="#d9d2c7" stroke-width="2"/>
+  <path d="M10 26a16 16 0 0 1 16-16h748a16 16 0 0 1 16 16v30H10z" fill="#efe9df"/>
+  <circle cx="38" cy="33" r="7" fill="#d9a38f"/><circle cx="60" cy="33" r="7" fill="#e3c98f"/><circle cx="82" cy="33" r="7" fill="#a9c6a0"/>
+  <!-- Sender -->
+  <circle cx="62" cy="104" r="22" fill="#cdb9a5"/>
+  <rect x="98" y="86" width="132" height="14" rx="7" fill="#3b3631"/>
+  <text x="98" y="128" font-family="system-ui, sans-serif" font-size="16" fill="#5c5750">&lt;payroll@hr-employee-portal.com&gt;</text>
+  <rect x="650" y="92" width="110" height="10" rx="5" fill="#ddd6cb"/>
+  <line x1="40" y1="152" x2="760" y2="152" stroke="#e3ddd2" stroke-width="2"/>
+  <!-- Subject: alert badge, title bar, clock -->
+  <rect x="40" y="172" width="28" height="28" rx="7" fill="#b4472a"/>
+  <rect x="52" y="178" width="4" height="11" rx="2" fill="#fff"/><circle cx="54" cy="194" r="2.4" fill="#fff"/>
+  <rect x="80" y="179" width="360" height="16" rx="8" fill="#3b3631"/>
+  <circle cx="470" cy="187" r="12" fill="none" stroke="#b4472a" stroke-width="3"/>
+  <path d="M470 179v8l6 4" fill="none" stroke="#b4472a" stroke-width="3" stroke-linecap="round"/>
+  <!-- Body text -->
+  <rect x="40" y="228" width="690" height="10" rx="5" fill="#e6e0d6"/>
+  <rect x="40" y="250" width="640" height="10" rx="5" fill="#e6e0d6"/>
+  <rect x="40" y="272" width="520" height="10" rx="5" fill="#e6e0d6"/>
+  <!-- Button link, pointer and the real address shown on hover -->
+  <rect x="40" y="304" width="200" height="44" rx="22" fill="#2f5aa8"/>
+  <rect x="82" y="321" width="116" height="10" rx="5" fill="#fff"/>
+  <path d="M214 330l0 26 7-6 5 11 5-2-5-11 9-1z" fill="#1d1b18" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+  <rect x="206" y="364" width="372" height="34" rx="6" fill="#1d1b18"/>
+  <text x="220" y="386" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14" fill="#fffdf9">http://payroll.secure-login.co/signin</text>
+  <!-- Attachment -->
+  <rect x="40" y="430" width="232" height="52" rx="10" fill="#efe9df" stroke="#d9d2c7"/>
+  <path d="M70 446v20a8 8 0 0 1-16 0v-22a5 5 0 0 1 10 0v20a2 2 0 0 1-4 0v-18" fill="none" stroke="#5c5750" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="88" y="462" font-family="system-ui, sans-serif" font-size="15" fill="#3b3631">INV-20931.zip</text>
+</svg>

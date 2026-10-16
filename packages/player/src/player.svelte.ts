@@ -27,6 +27,8 @@ export class Player {
   readonly visited = new SvelteSet<string>();
   /** Answers by question id, kept for the whole session (and later restored from the LMS). */
   readonly answers = new SvelteMap<string, AnswerState>();
+  /** Markers already opened, by hotspots block id (kept while the module is open, not sent to the LMS). */
+  readonly explored = new Map<string, SvelteSet<string>>();
 
   readonly current = $derived.by(() => this.screens[this.index] as ScreenRef);
   readonly dir = $derived(directionOf(this.locale));
@@ -59,6 +61,7 @@ export class Player {
     // Every answer exists from the start (choice order fixed once), so rendering never writes state.
     for (const b of this.screens.flatMap((s) => s.screen.blocks)) {
       if (b.type === "question") this.answers.set(b.id, initialAnswer(b));
+      if (b.type === "hotspots") this.explored.set(b.id, new SvelteSet());
     }
     this.goTo(0);
   }

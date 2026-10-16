@@ -51,6 +51,14 @@ const lmsState = (page: Page) =>
   );
 const next = (sco: Frame) => sco.locator("footer.pager .primary").click();
 const heading = (sco: Frame) => sco.locator("h1").innerText();
+/** Moves forward until the screen titled `title`; returns its 0-based index (the SCORM bookmark). */
+async function nextUntil(sco: Frame, title: string): Promise<number> {
+  for (let i = 0; i < 30; i++) {
+    if ((await heading(sco)) === title) return i;
+    await next(sco);
+  }
+  throw new Error(`screen "${title}" not found`);
+}
 
 async function answer(sco: Frame, labels: RegExp[]): Promise<void> {
   const form = sco
@@ -82,7 +90,7 @@ console.log("SCORM 1.2 — session 1 (start, answer half the quiz, leave)");
     assert.deepEqual(s.calls.slice(0, 1), ["LMSInitialize"]);
     assert.equal(s.values["cmi.core.lesson_status"], "incomplete");
   });
-  for (let i = 0; i < 5; i++) await next(sco); // → quiz screen (6th)
+  const quizIndex = await nextUntil(sco, "Vérifiez vos acquis");
   await answer(sco, [/C'est suspect/]);
   await answer(sco, [
     /La demande de mot de passe/,
@@ -93,7 +101,7 @@ console.log("SCORM 1.2 — session 1 (start, answer half the quiz, leave)");
     "saves location, suspend data and interactions as the learner goes",
     async () => {
       const s = await lmsState(page);
-      assert.equal(s.values["cmi.core.lesson_location"], "5");
+      assert.equal(s.values["cmi.core.lesson_location"], String(quizIndex));
       assert.match(s.values["cmi.suspend_data"] ?? "", /^2\|phishing-basics@/);
       assert.equal(s.values["cmi.interactions.0.id"], "q-sender");
       assert.equal(s.values["cmi.interactions.0.result"], "correct");
@@ -180,6 +188,44 @@ console.log("HTML5 standalone — reload resumes from browser storage");
   await page.reload();
   await step("comes back to the same screen after a reload", async () => {
     assert.equal(await page.locator("h1").innerText(), "A worked example");
+  });
+  await page.close();
+}
+
+console.log("Hotspots — markers open one explanation at a time");
+{
+  const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
+  const page = await browser.newPage({ reducedMotion: "reduce" });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(`${web}index.html?lang=en`);
+  const h1 = page.locator("h1");
+  for (
+    let i = 0;
+    i < 30 && (await h1.innerText()) !== "Anatomy of a message";
+    i++
+  )
+    await page.locator("footer.pager .primary").click();
+  const markers = page.locator(".hotspots .marker");
+  const detail = page.locator(".hotspots .detail");
+  await step("names each marker and opens its explanation", async () => {
+    await page.getByRole("button", { name: "The button" }).click();
+    assert.equal(await markers.nth(2).getAttribute("aria-expanded"), "true");
+    assert.match(await detail.innerText(), /secure-login\.co/);
+    assert.match(
+      await page.locator(".hotspots .progress").innerText(),
+      /1 of 4 explored/,
+    );
+  });
+  await step("closes on a second press and keeps it explored", async () => {
+    await markers.nth(2).click();
+    assert.equal(await markers.nth(2).getAttribute("aria-expanded"), "false");
+    assert.match(await detail.innerText(), /Select a numbered marker/);
+    await page.locator("footer.pager .secondary").click();
+    await page.locator("footer.pager .primary").click();
+    assert.match(
+      await page.locator(".hotspots .progress").innerText(),
+      /1 of 4 explored/,
+    );
   });
   await page.close();
 }

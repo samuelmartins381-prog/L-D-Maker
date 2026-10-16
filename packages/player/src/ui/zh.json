@@ -26,5 +26,7 @@
   "finish.passed": "你已达到及格线（{threshold}%）。",
   "finish.failed": "未达到及格线（{threshold}%）。",
   "finish.close": "你可以关闭此窗口。",
-  "question.incorrect.retry": "回答不正确。剩余尝试次数：{count}。请修改答案后再次提交。"
+  "question.incorrect.retry": "回答不正确。剩余尝试次数：{count}。请修改答案后再次提交。",
+  "hotspots.instructions": "选择一个带编号的标记，查看相应说明。",
+  "hotspots.progress": "已查看 {explored}/{total} 处"
 }

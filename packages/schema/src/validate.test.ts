@@ -204,6 +204,38 @@ describe("validateModule", () => {
     ok.mediaFiles = ["media/a.png"];
     expect(validateModule(ok).ok).toBe(true);
   });
+
+  it("checks hotspots: image file, alt and item strings, unique ids, overlapping markers", () => {
+    const src = fixture();
+    const item = (id: string, x: number, y: number) => ({
+      id,
+      x,
+      y,
+      title: "body",
+      body: "body",
+    });
+    src.module.sections[0].screens[0].blocks[0] = {
+      id: "h1",
+      type: "hotspots",
+      image: { src: "media/m.svg", alt: "h.alt" },
+      items: [item("a", 10, 10), item("b", 80, 80)],
+    };
+    expect(codes(src)).toEqual(
+      expect.arrayContaining(["media-missing", "missing-string"]),
+    );
+    src.mediaFiles = ["media/m.svg"];
+    src.strings.fr["h.alt"] = "Vue du mouvement";
+    (src.strings.en as Record<string, string>)["h.alt"] = "Movement view";
+    // The fixture's single scored question always triggers "assessment-tolerance": not checked here.
+    const own = () => codes(src).filter((c) => c !== "assessment-tolerance");
+    expect(own()).toEqual([]);
+
+    const block = src.module.sections[0].screens[0].blocks[0];
+    block.items = [item("a", 10, 10), item("a", 12, 13)];
+    expect(own()).toEqual(["hotspot-overlap", "duplicate-id"]);
+    block.items = [item("a", 10, 10), item("b", 101, 10)];
+    expect(own()).toEqual(["schema"]);
+  });
 });
 
 describe("demo module", () => {

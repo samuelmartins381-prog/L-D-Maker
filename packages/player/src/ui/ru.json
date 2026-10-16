@@ -26,5 +26,7 @@
   "finish.passed": "Вы достигли проходного балла ({threshold} %).",
   "finish.failed": "Проходной балл ({threshold} %) не достигнут.",
   "finish.close": "Это окно можно закрыть.",
-  "question.incorrect.retry": "Это неправильный ответ. Осталось попыток: {count}. Измените ответ и подтвердите снова."
+  "question.incorrect.retry": "Это неправильный ответ. Осталось попыток: {count}. Измените ответ и подтвердите снова.",
+  "hotspots.instructions": "Выберите пронумерованную метку, чтобы увидеть пояснение.",
+  "hotspots.progress": "Изучено: {explored} из {total}"
 }

@@ -18,9 +18,11 @@ export const Locale = z
   .string()
   .regex(LOCALE, "BCP 47 locale expected, e.g. fr, en-GB, zh-Hans");
 
+const MediaSrc = z.string().regex(MEDIA_PATH, "path under media/ expected");
+
 export const Image = z.strictObject({
   kind: z.literal("image"),
-  src: z.string().regex(MEDIA_PATH, "path under media/ expected"),
+  src: MediaSrc,
   /** Required unless the image is purely decorative. */
   alt: StringKey.optional(),
   decorative: z.boolean().default(false),
@@ -63,6 +65,28 @@ export const Tabs = z.strictObject({
   items: z.array(Panel).min(2).max(6),
 });
 
+const Hotspot = z.strictObject({
+  id: Id,
+  /**
+   * Marker position in % of the image width and height, from its top-left corner. Image
+   * coordinates are physical: they are not mirrored in right-to-left languages.
+   */
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+  title: StringKey,
+  body: StringKey,
+});
+
+/** An image with numbered markers, each revealing an explanation (a part, a zone, a detail). */
+export const Hotspots = z.strictObject({
+  ...blockBase,
+  type: z.literal("hotspots"),
+  intro: StringKey.optional(),
+  /** The image carries meaning, so its description is required. */
+  image: z.strictObject({ src: MediaSrc, alt: StringKey }),
+  items: z.array(Hotspot).min(2).max(12),
+});
+
 const Choice = z.strictObject({
   id: Id,
   text: StringKey,
@@ -98,6 +122,7 @@ export const Block = z.discriminatedUnion("type", [
   Narrative,
   Accordion,
   Tabs,
+  Hotspots,
   Question,
   Summary,
 ]);

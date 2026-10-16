@@ -26,5 +26,7 @@
   "finish.passed": "لقد بلغت درجة النجاح ({threshold}٪).",
   "finish.failed": "لم تبلغ درجة النجاح ({threshold}٪).",
   "finish.close": "يمكنك إغلاق هذه النافذة.",
-  "question.incorrect.retry": "هذه ليست الإجابة الصحيحة. المحاولات المتبقية: {count}. عدّل إجابتك، ثم أكّدها."
+  "question.incorrect.retry": "هذه ليست الإجابة الصحيحة. المحاولات المتبقية: {count}. عدّل إجابتك، ثم أكّدها.",
+  "hotspots.instructions": "اختر علامة مرقّمة لعرض شرحها.",
+  "hotspots.progress": "تم استكشاف {explored} من {total}"
 }

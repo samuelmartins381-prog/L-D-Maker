@@ -26,5 +26,7 @@
   "finish.passed": "합격 기준({threshold}%)에 도달했습니다.",
   "finish.failed": "합격 기준({threshold}%)에 도달하지 못했습니다.",
   "finish.close": "이 창을 닫아도 됩니다.",
-  "question.incorrect.retry": "정답이 아닙니다. 남은 시도 횟수: {count}. 답을 바꾼 뒤 다시 제출하세요."
+  "question.incorrect.retry": "정답이 아닙니다. 남은 시도 횟수: {count}. 답을 바꾼 뒤 다시 제출하세요.",
+  "hotspots.instructions": "번호가 매겨진 표시를 선택하면 설명이 나타납니다.",
+  "hotspots.progress": "{total}개 중 {explored}개 확인함"
 }

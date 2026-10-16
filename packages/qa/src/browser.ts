@@ -40,11 +40,14 @@ export async function nextScreen(page: Page): Promise<void> {
   await page.locator("h1").waitFor();
 }
 
-/** Puts a screen in its "interacted" state: every accordion panel open, every question answered to its final state. */
+/** Puts a screen in its "interacted" state: every accordion panel and hotspot opened, every question answered to its final state. */
 export async function interact(page: Page): Promise<void> {
   // The set of closed panels shrinks after each click: always open the first remaining one.
   const closed = page.locator('.accordion button[aria-expanded="false"]');
   while ((await closed.count()) > 0) await closed.first().click();
+  // Hotspots: open every marker in turn (the last one stays open).
+  for (const marker of await page.locator(".hotspots .marker").all())
+    await marker.click();
   for (const form of await page.locator("form.question").all()) {
     for (let attempt = 0; attempt < 8; attempt++) {
       const submit = form.locator('button[type="submit"]');

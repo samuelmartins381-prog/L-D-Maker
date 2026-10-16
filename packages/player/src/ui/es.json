@@ -26,5 +26,7 @@
   "finish.passed": "Ha alcanzado el umbral de aprobación ({threshold} %).",
   "finish.failed": "No se ha alcanzado el umbral de aprobación ({threshold} %).",
   "finish.close": "Puede cerrar esta ventana.",
-  "question.incorrect.retry": "No es la respuesta correcta. Intentos restantes: {count}. Cambie su respuesta y vuelva a validar."
+  "question.incorrect.retry": "No es la respuesta correcta. Intentos restantes: {count}. Cambie su respuesta y vuelva a validar.",
+  "hotspots.instructions": "Seleccione un marcador numerado para ver su explicación.",
+  "hotspots.progress": "{explored} de {total} explorados"
 }

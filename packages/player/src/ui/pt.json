@@ -26,5 +26,7 @@
   "finish.passed": "Você atingiu a nota mínima de aprovação ({threshold}%).",
   "finish.failed": "A nota mínima de aprovação ({threshold}%) não foi atingida.",
   "finish.close": "Você pode fechar esta janela.",
-  "question.incorrect.retry": "Essa não é a resposta correta. Tentativas restantes: {count}. Altere sua resposta e confirme novamente."
+  "question.incorrect.retry": "Essa não é a resposta correta. Tentativas restantes: {count}. Altere sua resposta e confirme novamente.",
+  "hotspots.instructions": "Selecione um marcador numerado para ver a explicação.",
+  "hotspots.progress": "{explored} de {total} explorados"
 }

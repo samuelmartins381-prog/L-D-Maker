@@ -26,5 +26,7 @@
   "finish.passed": "Sie haben die Bestehensgrenze ({threshold} %) erreicht.",
   "finish.failed": "Die Bestehensgrenze ({threshold} %) wurde nicht erreicht.",
   "finish.close": "Sie können dieses Fenster schließen.",
-  "question.incorrect.retry": "Das ist nicht die richtige Antwort. Verbleibende Versuche: {count}. Ändern Sie Ihre Antwort und bestätigen Sie erneut."
+  "question.incorrect.retry": "Das ist nicht die richtige Antwort. Verbleibende Versuche: {count}. Ändern Sie Ihre Antwort und bestätigen Sie erneut.",
+  "hotspots.instructions": "Wählen Sie eine nummerierte Markierung, um ihre Erklärung anzuzeigen.",
+  "hotspots.progress": "{explored} von {total} erkundet"
 }

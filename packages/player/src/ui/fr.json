@@ -26,5 +26,7 @@
   "finish.passed": "Vous avez atteint le seuil de réussite ({threshold} %).",
   "finish.failed": "Le seuil de réussite ({threshold} %) n'est pas atteint.",
   "finish.close": "Vous pouvez fermer cette fenêtre.",
-  "question.incorrect.retry": "Ce n'est pas la bonne réponse. Essais restants : {count}. Modifiez votre réponse, puis validez."
+  "question.incorrect.retry": "Ce n'est pas la bonne réponse. Essais restants : {count}. Modifiez votre réponse, puis validez.",
+  "hotspots.instructions": "Sélectionnez un repère numéroté pour afficher son explication.",
+  "hotspots.progress": "{explored} sur {total} exploré(s)"
 }

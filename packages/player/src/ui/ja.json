@@ -26,5 +26,7 @@
   "finish.passed": "合格ライン（{threshold}%）に達しました。",
   "finish.failed": "合格ライン（{threshold}%）に達しませんでした。",
   "finish.close": "このウィンドウは閉じてかまいません。",
-  "question.incorrect.retry": "正解ではありません。残りの回答回数：{count}。答えを選び直して、もう一度回答してください。"
+  "question.incorrect.retry": "正解ではありません。残りの回答回数：{count}。答えを選び直して、もう一度回答してください。",
+  "hotspots.instructions": "番号付きのマーカーを選ぶと、説明が表示されます。",
+  "hotspots.progress": "{total}か所中{explored}か所を確認済み"
 }

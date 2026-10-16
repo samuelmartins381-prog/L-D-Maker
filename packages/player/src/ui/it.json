@@ -26,5 +26,7 @@
   "finish.passed": "Hai raggiunto la soglia di superamento ({threshold}%).",
   "finish.failed": "La soglia di superamento ({threshold}%) non è stata raggiunta.",
   "finish.close": "Puoi chiudere questa finestra.",
-  "question.incorrect.retry": "Non è la risposta corretta. Tentativi rimasti: {count}. Modifica la risposta, poi conferma."
+  "question.incorrect.retry": "Non è la risposta corretta. Tentativi rimasti: {count}. Modifica la risposta, poi conferma.",
+  "hotspots.instructions": "Selezioni un indicatore numerato per vederne la spiegazione.",
+  "hotspots.progress": "{explored} su {total} esplorati"
 }

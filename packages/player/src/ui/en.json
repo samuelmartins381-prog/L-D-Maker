@@ -26,5 +26,7 @@
   "finish.passed": "You reached the passing score ({threshold}%).",
   "finish.failed": "The passing score ({threshold}%) was not reached.",
   "finish.close": "You can close this window.",
-  "question.incorrect.retry": "Not quite. Attempts left: {count}. Change your answer, then submit."
+  "question.incorrect.retry": "Not quite. Attempts left: {count}. Change your answer, then submit.",
+  "hotspots.instructions": "Select a numbered marker to see its explanation.",
+  "hotspots.progress": "{explored} of {total} explored"
 }

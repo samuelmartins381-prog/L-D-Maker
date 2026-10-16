@@ -292,6 +292,78 @@
                           },
                           "type": {
                             "type": "string",
+                            "const": "hotspots"
+                          },
+                          "intro": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                          },
+                          "image": {
+                            "type": "object",
+                            "properties": {
+                              "src": {
+                                "type": "string",
+                                "pattern": "^media\\/[A-Za-z0-9._\\-/]+$"
+                              },
+                              "alt": {
+                                "type": "string",
+                                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                              }
+                            },
+                            "required": ["src", "alt"],
+                            "additionalProperties": false
+                          },
+                          "items": {
+                            "minItems": 2,
+                            "maxItems": 12,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                                },
+                                "x": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 100
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 100
+                                },
+                                "title": {
+                                  "type": "string",
+                                  "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                                },
+                                "body": {
+                                  "type": "string",
+                                  "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                                }
+                              },
+                              "required": ["id", "x", "y", "title", "body"],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": ["id", "type", "image", "items"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "heading": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                          },
+                          "type": {
+                            "type": "string",
                             "const": "question"
                           },
                           "variant": {

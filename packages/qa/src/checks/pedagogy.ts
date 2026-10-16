@@ -46,7 +46,8 @@ export function manualChecks(locales: readonly string[]): CheckResult[] {
       status: "manual",
       summary: "Check-list par composant, à rejouer quand un composant change",
       details: [
-        "Composants : narratif, accordéon, onglets, question (choix unique et multiple), récapitulatif, sommaire, fin de session",
+        "Composants : narratif, accordéon, onglets, image à repères, question (choix unique et multiple), récapitulatif, sommaire, fin de session",
+        "Image à repères : chaque repère annonce son titre et son état (développé ou réduit) ; l'explication est lue à l'ouverture",
       ],
     },
     {
