@@ -64,7 +64,14 @@ const offset = $derived(
       {#if module.locales.length > 1}
         <label class="locale">
           <span class="visually-hidden">{p.ui("locale.label")}</span>
-          <select bind:value={p.locale}>
+          <select
+            value={p.locale}
+            onchange={async (e) => {
+              const select = e.currentTarget;
+              await p.setLocale(select.value);
+              select.value = p.locale; // a failed load keeps the previous language
+            }}
+          >
             {#each module.locales as locale (locale)}
               <option value={locale} lang={locale}>{languageName(locale)}</option>
             {/each}
@@ -234,7 +241,7 @@ const offset = $derived(
     font-size: var(--text-2xl);
     font-weight: 450;
     line-height: var(--leading-tight);
-    letter-spacing: -0.015em;
+    letter-spacing: var(--tracking-display);
     font-variation-settings: "opsz" 96;
   }
   h1:focus {

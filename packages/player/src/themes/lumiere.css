@@ -23,6 +23,23 @@
   --font-body:
     "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-arabic: "Noto Sans Arabic Variable", "Segoe UI", Tahoma, sans-serif;
+  /* CJK: the device's own fonts (embedding Noto CJK would add ~14 MB per package, ADR 0007).
+     Inter first so Latin words and digits inside CJK text stay consistent with the theme. */
+  --font-ja:
+    "Inter Variable", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", "Noto Sans CJK JP",
+    sans-serif;
+  --font-zh-hans:
+    "Inter Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", "Noto Sans CJK SC", sans-serif;
+  --font-zh-hant:
+    "Inter Variable", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+    "Noto Sans CJK TC", sans-serif;
+  --font-ko:
+    "Inter Variable", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+    "Noto Sans CJK KR", sans-serif;
+  --tracking-display: -0.015em;
+  --tracking-caps: 0.06em;
   --text-sm: 0.875rem;
   --text-base: 1.0625rem;
   --text-lg: 1.25rem;
@@ -49,6 +66,50 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 160ms;
   --duration-base: 320ms;
+}
+
+/* Per-script typography: components only read these tokens, so every block follows the page language. */
+:root:lang(ar) {
+  --font-body: var(--font-arabic);
+  --font-display: var(--font-arabic);
+}
+/* The display serif has no Cyrillic: headings use the text face rather than a random fallback. */
+:root:lang(ru),
+:root:lang(uk),
+:root:lang(bg),
+:root:lang(sr) {
+  --font-display: var(--font-body);
+}
+:root:lang(ja) {
+  --font-body: var(--font-ja);
+  --font-display: var(--font-ja);
+}
+:root:lang(zh) {
+  --font-body: var(--font-zh-hans);
+  --font-display: var(--font-zh-hans);
+}
+:root:lang(zh-Hant),
+:root:lang(zh-TW),
+:root:lang(zh-HK) {
+  --font-body: var(--font-zh-hant);
+  --font-display: var(--font-zh-hant);
+}
+:root:lang(ko) {
+  --font-body: var(--font-ko);
+  --font-display: var(--font-ko);
+}
+/* Letter-spacing and capitals are Latin conventions; CJK also reads better with more leading. */
+:root:lang(ar),
+:root:lang(ja),
+:root:lang(zh),
+:root:lang(ko) {
+  --tracking-display: 0;
+  --tracking-caps: 0;
+}
+:root:lang(ja),
+:root:lang(zh),
+:root:lang(ko) {
+  --leading-body: 1.8;
 }
 
 @media (prefers-reduced-motion: reduce) {

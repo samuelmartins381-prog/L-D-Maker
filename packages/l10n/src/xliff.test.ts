@@ -48,25 +48,25 @@ describe("XLIFF round trip on the demo module", () => {
 describe("importXliff", () => {
   it("adds a new locale to module.yaml, keeps its comments, and warns when the player UI is missing", async () => {
     const dir = demoCopy();
-    const { xml } = await exportModule(dir, { to: "de" });
+    const { xml } = await exportModule(dir, { to: "nl" });
     const translated = xml.replace(
       /<source>(.*?)<\/source>/gs,
-      "<source>$1</source><target>DE $1</target>",
+      "<source>$1</source><target>NL $1</target>",
     );
     const report = await importXliff(dir, translated);
     expect(report.errors).toEqual([]);
     expect(report.addedLocale).toBe(true);
     const yaml = readFileSync(join(dir, "module.yaml"), "utf8");
     expect(yaml).toContain("# Demo module (non-confidential)");
-    expect(yaml).toMatch(/locales:.*de/s);
+    expect(yaml).toMatch(/locales:.*nl/s);
     expect(
       report.warnings.some((w) =>
         w.includes("player interface is not translated"),
       ),
     ).toBe(true);
-    const de = JSON.parse(catalog(dir, "de"));
-    expect(de["s1.welcome.body"]).toMatch(
-      /^DE .*\*\*majorité des cyberattaques\*\*/,
+    const nl = JSON.parse(catalog(dir, "nl"));
+    expect(nl["s1.welcome.body"]).toMatch(
+      /^NL .*\*\*majorité des cyberattaques\*\*/,
     );
   });
 

@@ -16,17 +16,15 @@
   "question.practice": "Practice: this question is not scored.",
   "question.submit": "Submit",
   "question.correct": "Correct",
-  "question.incorrect": "Not quite",
   "question.incorrect.final": "Not quite. Here are the explanations.",
-  "question.attempts.left": "Attempts left: {count}",
   "question.choice.expected": "Expected answer",
   "question.choice.notExpected": "Not part of the answer",
-  "question.retry.hint": "Change your answer, then submit.",
   "finish.title": "Session ended",
   "finish.complete": "You have completed this module.",
   "finish.saved": "Your progress is saved: you can pick up where you left off.",
   "finish.score": "Your score: {score}%",
   "finish.passed": "You reached the passing score ({threshold}%).",
   "finish.failed": "The passing score ({threshold}%) was not reached.",
-  "finish.close": "You can close this window."
+  "finish.close": "You can close this window.",
+  "question.incorrect.retry": "Not quite. Attempts left: {count}. Change your answer, then submit."
 }

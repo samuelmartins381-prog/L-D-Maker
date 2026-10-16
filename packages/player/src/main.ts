@@ -6,6 +6,7 @@ import "./base.css";
 import { mount } from "svelte";
 import App from "./App.svelte";
 import { CONTENT_ELEMENT_ID, type CompiledContent } from "./content.ts";
+import { loadLocalePack } from "./locale-loader.ts";
 import { PLAYER_KEY, Player } from "./player.svelte.ts";
 import { findScorm12Api, Scorm12Tracker } from "./tracking/scorm12.ts";
 import { findScorm2004Api, Scorm2004Tracker } from "./tracking/scorm2004.ts";
@@ -44,14 +45,17 @@ const requested = [
   start.language,
   ...navigator.languages,
 ];
-const player = new Player(content, requested);
+const player = new Player(content, requested, loadLocalePack);
 const session = new Session(player, tracker, start);
 const target = document.getElementById("ldm-app") ?? document.body;
 
-mount(App, {
-  target,
-  context: new Map<symbol, unknown>([
-    [PLAYER_KEY, player],
-    [SESSION_KEY, session],
-  ]),
-});
+// Mount once the starting locale is loaded, so the first paint is in the right language.
+player.localeReady.then(() =>
+  mount(App, {
+    target,
+    context: new Map<symbol, unknown>([
+      [PLAYER_KEY, player],
+      [SESSION_KEY, session],
+    ]),
+  }),
+);

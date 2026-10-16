@@ -184,6 +184,40 @@ console.log("HTML5 standalone — reload resumes from browser storage");
   await page.close();
 }
 
+console.log("Locale packs — loaded on demand, missing pack keeps the language");
+{
+  const web = lms.url("/").replace(/\/__lms.*/, "/out/phishing-basics/web/");
+  const page = await browser.newPage({ reducedMotion: "reduce" });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(`${web}index.html?lang=fr`);
+  await page.locator("h1").waitFor();
+  await step("embeds only the default locale in index.html", async () => {
+    const html = await (await fetch(`${web}index.html`)).text();
+    assert.ok(html.includes("Bienvenue"));
+    assert.ok(!html.includes("Добро пожаловать"));
+  });
+  await step("switches to Japanese from the language menu", async () => {
+    await page.locator("header select").selectOption("ja");
+    await page.locator("h1", { hasText: "はじめに" }).waitFor();
+    assert.equal(await page.locator("html").getAttribute("lang"), "ja");
+    assert.equal(
+      await page.locator("footer.pager .primary").innerText(),
+      "次へ\n→",
+    );
+  });
+  await step(
+    "keeps the current language when a pack fails to load",
+    async () => {
+      await page.route("**/locales/ko.js", (r) => r.abort());
+      await page.locator("header select").selectOption("ko");
+      await page.waitForTimeout(300);
+      assert.equal(await page.locator("html").getAttribute("lang"), "ja");
+      assert.equal(await page.locator("header select").inputValue(), "ja");
+    },
+  );
+  await page.close();
+}
+
 await browser.close();
 await lms.close();
 if (errors.length) {

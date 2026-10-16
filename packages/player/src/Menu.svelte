@@ -120,11 +120,7 @@ function onkeydown(e: KeyboardEvent): void {
     font-weight: 650;
     color: var(--color-ink-muted);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  :global(:lang(ar)) h2 {
-    text-transform: none;
-    letter-spacing: 0;
+    letter-spacing: var(--tracking-caps);
   }
   li button {
     display: flex;

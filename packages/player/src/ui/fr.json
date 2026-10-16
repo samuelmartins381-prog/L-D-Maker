@@ -16,17 +16,15 @@
   "question.practice": "Entraînement : cette question n'est pas notée.",
   "question.submit": "Valider",
   "question.correct": "Bonne réponse",
-  "question.incorrect": "Ce n'est pas la bonne réponse",
   "question.incorrect.final": "Ce n'est pas la bonne réponse. Voici les explications.",
-  "question.attempts.left": "Essais restants : {count}",
   "question.choice.expected": "Réponse attendue",
   "question.choice.notExpected": "Ne fait pas partie de la réponse",
-  "question.retry.hint": "Modifiez votre réponse, puis validez.",
   "finish.title": "Session terminée",
   "finish.complete": "Vous avez terminé ce module.",
   "finish.saved": "Votre progression est enregistrée : vous pourrez reprendre là où vous vous êtes arrêté.",
   "finish.score": "Votre score : {score} %",
   "finish.passed": "Vous avez atteint le seuil de réussite ({threshold} %).",
   "finish.failed": "Le seuil de réussite ({threshold} %) n'est pas atteint.",
-  "finish.close": "Vous pouvez fermer cette fenêtre."
+  "finish.close": "Vous pouvez fermer cette fenêtre.",
+  "question.incorrect.retry": "Ce n'est pas la bonne réponse. Essais restants : {count}. Modifiez votre réponse, puis validez."
 }

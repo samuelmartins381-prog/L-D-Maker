@@ -12,7 +12,8 @@ const viewports = {
   mobile: { width: 390, height: 844 },
   desktop: { width: 1280, height: 800 },
 };
-const locales = ["fr", "en", "ar"];
+// LOCALES=ja,zh-Hans,ko node scripts/screenshots.ts … to capture other languages.
+const locales = process.env.LOCALES?.split(",") ?? ["fr", "en", "ar"];
 
 await mkdir(outDir, { recursive: true });
 const browser = await chromium.launch({
@@ -35,11 +36,12 @@ for (const [name, viewport] of Object.entries(viewports)) {
         m.type() === "error" && errors.push(`${locale}/${name}: ${m.text()}`),
     );
     await page.goto(`file://${resolve(webDir, "index.html")}?lang=${locale}`);
+    await page.locator("h1").waitFor(); // other locales are loaded before the first render
     await page.evaluate(() => document.fonts.ready);
     let current = 0;
     for (const target of screens) {
       while (current < target) {
-        await page.getByRole("button", { name: /Suivant|Next|التالي/ }).click();
+        await page.locator("footer.pager .primary").click();
         current++;
       }
       await page.evaluate(() => document.fonts.ready);

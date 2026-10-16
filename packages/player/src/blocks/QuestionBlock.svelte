@@ -29,7 +29,9 @@ const verdict = $derived(
     : answer.correct === false && final
       ? p.ui("question.incorrect.final")
       : answer.correct === false
-        ? `${p.ui("question.incorrect")}. ${p.ui("question.attempts.left", { count: attemptsLeft(block, answer) })}. ${p.ui("question.retry.hint")}`
+        ? p.ui("question.incorrect.retry", {
+            count: attemptsLeft(block, answer),
+          })
         : "",
 );
 

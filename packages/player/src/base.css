@@ -22,12 +22,25 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-:lang(ar) body,
-body:lang(ar),
-:lang(ar) h1,
-:lang(ar) h2 {
-  font-family: var(--font-arabic);
-  letter-spacing: 0;
+/* Long words (German, Finnish…) hyphenate instead of overflowing; html carries the lang attribute. */
+body {
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+/* Line breaking: Japanese between phrases (Chrome 119+, ignored elsewhere), Korean between words. */
+:lang(ja) {
+  word-break: auto-phrase;
+  line-break: strict;
+}
+:lang(ko) {
+  word-break: keep-all;
+}
+/* CJK scripts have no true italic: emphasis is shown with weight instead of a slanted fake. */
+:lang(ja) em,
+:lang(zh) em,
+:lang(ko) em {
+  font-style: normal;
+  font-weight: 650;
 }
 #ldm-app {
   display: flex;

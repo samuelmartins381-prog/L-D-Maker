@@ -4,7 +4,7 @@ schemaVersion: "0.1"
 id: phishing-basics
 version: 0.1.0
 defaultLocale: fr
-locales: [fr, en, ar]
+locales: [fr, en, ar, de, es, it, pt-BR, ru, ja, zh-Hans, ko]
 
 meta:
   title: meta.title

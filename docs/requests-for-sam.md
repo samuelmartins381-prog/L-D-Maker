@@ -23,9 +23,14 @@ risques (permissions, données).
 5. **Un contenu de test non confidentiel** (PDF, PPTX ou texte, 15–30 min de formation) pour le module de démonstration.
 6. **Inspirations** dans `inspirations/` (captures, liens) : voir `inspirations/README.md`.
 
-7. **Relecture de l'arabe** du module de démo (`examples/phishing-basics/strings/ar.json`) par
-   un natif si tu en as un sous la main. C'est une traduction Claude, non relue. Ce n'est pas
-   bloquant : elle sert à tester le rendu RTL.
+7. **Relecture native des traductions** du module de démo (`examples/phishing-basics/strings/`) :
+   arabe, allemand, espagnol, italien, portugais (Brésil), russe, japonais, chinois simplifié,
+   coréen, ainsi que les textes d'interface du lecteur (`packages/player/src/ui/`). Ce sont des
+   traductions Claude, non relues. Pas bloquant pour le développement : elles servent à tester le
+   rendu (RTL, CJK, cyrillique, longueur des textes). **Avant toute livraison client**, chaque
+   langue doit être relue par un natif. Le banc QA le rappelle (contrôle manuel « Relecture native
+   des traductions »). Si tu n'as qu'un relecteur sous la main, commence par la langue de ta
+   première commande.
 
 ## P2 — plus tard
 8. **Figma MCP** (plugin officiel : `claude plugin install figma@claude-plugins-official`), **seulement si tu fais tes maquettes dans Figma**.

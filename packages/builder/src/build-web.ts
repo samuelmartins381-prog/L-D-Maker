@@ -1,11 +1,17 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { CompiledContent } from "@ldm/player/content";
+import {
+  type CompiledContent,
+  LOCALES_DIR,
+  LOCALES_GLOBAL,
+  type LocalePack,
+} from "@ldm/player/content";
 import {
   type Issue,
   loadModuleSource,
   type Module,
+  type StringCatalog,
   validateModule,
 } from "@ldm/schema";
 
@@ -34,14 +40,17 @@ async function readJson<T>(path: string): Promise<T> {
   return JSON.parse(await readFile(path, "utf8")) as T;
 }
 
-/** Player interface catalogs for the module locales (plus English, the fallback). */
+/**
+ * Player interface catalogs keyed by module locale (plus "en", the fallback). A regional locale
+ * without its own catalog uses its language's (pt-BR → pt.json, zh-Hans → zh.json).
+ */
 async function loadUiCatalogs(
   locales: readonly string[],
-): Promise<CompiledContent["ui"]> {
+): Promise<Record<string, StringCatalog>> {
   const available = new Set(
     (await readdir(UI_DIR)).map((f) => f.replace(/\.json$/, "")),
   );
-  const ui: CompiledContent["ui"] = {};
+  const ui: Record<string, StringCatalog> = {};
   const missing: string[] = [];
   for (const locale of new Set([...locales, "en"])) {
     const lang = locale.split("-")[0] ?? locale;
@@ -51,7 +60,7 @@ async function loadUiCatalogs(
         ? lang
         : undefined;
     if (!file) missing.push(locale);
-    else ui[file] = await readJson(join(UI_DIR, `${file}.json`));
+    else ui[locale] = await readJson(join(UI_DIR, `${file}.json`));
   }
   if (missing.length)
     throw new BuildError(
@@ -121,17 +130,16 @@ export async function buildWeb(
   if (stylesheets.length === 0)
     throw new BuildError("player manifest has no stylesheet");
 
+  // Only the default locale is embedded; the others ship as packs loaded on demand (ADR 0007).
+  const ui = await loadUiCatalogs(module.locales);
+  const def = module.defaultLocale;
+  const stringsOf = (l: string) => source.strings[l] as StringCatalog;
   const content: CompiledContent = {
     format: 1,
     target,
     module,
-    strings: Object.fromEntries(
-      module.locales.map((l) => [
-        l,
-        source.strings[l] as Record<string, string>,
-      ]),
-    ),
-    ui: await loadUiCatalogs(module.locales),
+    strings: { [def]: stringsOf(def) },
+    ui: { [def]: ui[def] as StringCatalog, en: ui.en as StringCatalog },
   };
 
   await rm(outDir, { recursive: true, force: true });
@@ -144,6 +152,19 @@ export async function buildWeb(
     await cp(join(moduleDir, "media"), join(outDir, "media"), {
       recursive: true,
     });
+
+  const packs = module.locales.filter((l) => l !== def);
+  if (packs.length) await mkdir(join(outDir, LOCALES_DIR));
+  for (const l of packs) {
+    const pack: LocalePack = {
+      strings: stringsOf(l),
+      ui: ui[l] as StringCatalog,
+    };
+    await writeFile(
+      join(outDir, LOCALES_DIR, `${l}.js`),
+      `(self.${LOCALES_GLOBAL}=self.${LOCALES_GLOBAL}||{})[${JSON.stringify(l)}]=${embedJson(pack)};\n`,
+    );
+  }
 
   const defaultTitle =
     content.strings[module.defaultLocale]?.[module.meta.title] ?? module.id;

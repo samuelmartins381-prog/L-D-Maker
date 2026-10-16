@@ -76,7 +76,8 @@ clients/, out/            sources clients et modules générés — ignorés par
   dépôt**. Hors de `pnpm check` (réseau, limites de l'essai : 10 inscriptions actives).
 - `pnpm l10n export <module> --to <lang> [--xliff 1.2|2.0]` puis `pnpm l10n import <module> <xlf>` —
   aller-retour de traduction (URL des liens jamais exportées ; lien perdu ⇒ import refusé)
-- `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
+- `[LOCALES=ja,ru] node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures mobile/desktop
+  (FR/EN/AR par défaut)
 
 ## Lecteur (ADR 0003)
 Svelte 5, build IIFE + contenu inséré dans index.html (pas de module ES ni de fetch : `file://`
@@ -92,6 +93,12 @@ en RTL), question = fieldset + radios/cases natives. La logique de question est 
 dans le constructeur du `Player` : **ne jamais écrire d'état dans un `$derived`** (erreur Svelte
 `state_unsafe_mutation`). `scroll-padding` sur `html` garde le focus visible sous les barres
 collantes (WCAG 2.4.11).
+Langues (ADR 0007) : `index.html` n'embarque que la langue par défaut ; les autres sont des
+`locales/<langue>.js` injectés à la demande (`locale-loader.ts`, marche en `file://`). Changer de
+langue = `player.setLocale()` (asynchrone), jamais `player.locale = …`. Typographie par écriture
+dans le thème via `:root:lang(…)` : polices système en CJK (pas de Noto CJK, ~14,5 Mo), Inter pour
+les titres en cyrillique (Fraunces n'a pas de cyrillique), césure automatique. Catalogue
+d'interface régional absent → celui de la langue (pt-BR → `pt.json`).
 
 ## Suivi (ADR 0004)
 Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12`, `scorm2004` et `standalone`,
@@ -157,7 +164,9 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
         Cloud le 2026-10-16 (completed/passed, score 100, reprise OK, 7 interactions)
   - [x] 2. Traduction : export/import XLIFF 1.2 et 2.0 (ADR 0006) — fichiers valides contre les
         schémas OASIS stricts, aller-retour EN/AR identique
-  - [ ] 3. 11 langues dont CJK (polices, expansion du texte)
+  - [x] 3. 11 langues dont CJK (ADR 0007) — démo en fr, en, ar, de, es, it, pt-BR, ru, ja,
+        zh-Hans, ko ; banc : 308 pages sans violation ni débordement, Lighthouse 95 ;
+        traductions Claude à faire relire par des natifs avant toute livraison
   - [ ] 4. Nouveaux composants + banque de questions
   - [ ] 5. Lecture des sources (PDF, PPTX, DOCX) — contenu de test de Sam requis
   - [ ] 6. Pipeline complet avec storyboard validé par Sam
