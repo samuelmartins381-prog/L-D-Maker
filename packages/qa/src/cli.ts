@@ -72,14 +72,19 @@ try {
     join(qaDir, "screens"),
   );
   add(...walkChecks(walk, module.locales));
-  add(
-    ...(await scormChecks(
-      browser,
-      join(outRoot, "scorm12", "index.html"),
-      module,
-      strings[module.defaultLocale] ?? {},
-    )),
-  );
+  for (const [version, dir] of [
+    ["1.2", "scorm12"],
+    ["2004", "scorm2004"],
+  ] as const)
+    add(
+      ...(await scormChecks(
+        browser,
+        join(outRoot, dir, "index.html"),
+        module,
+        strings[module.defaultLocale] ?? {},
+        version,
+      )),
+    );
   if (!values["skip-lighthouse"])
     add(
       ...(await lighthouseChecks(

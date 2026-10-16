@@ -7,7 +7,7 @@ import type { Module, StringCatalog } from "@ldm/schema";
 export interface CompiledContent {
   format: 1;
   /** Delivery target chosen at build time: decides which tracker the player uses. */
-  target: "web" | "scorm12";
+  target: "web" | "scorm12" | "scorm2004";
   module: Module;
   /** Module strings, keyed by locale. */
   strings: Record<string, StringCatalog>;

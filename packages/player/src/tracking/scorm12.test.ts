@@ -46,6 +46,8 @@ const progress = (p: Partial<Progress> = {}): Progress => ({
   allViewed: false,
   assessed: false,
   score: score(),
+  viewedRatio: 0,
+  completion: "all-screens",
   screenIndex: 0,
   sessionSeconds: 0,
   ...p,
@@ -164,6 +166,8 @@ describe("Scorm12Tracker", () => {
       response: [0, 2],
       correctResponse: [0, 1],
       correct: false,
+      responseIds: ["a", "c"],
+      correctResponseIds: ["a", "b"],
       objectiveIds: ["obj-signs"],
       at: new Date(2026, 0, 1, 9, 5, 7),
     });

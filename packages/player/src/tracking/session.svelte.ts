@@ -56,6 +56,8 @@ export class Session {
       allViewed: p.allViewed,
       assessed: p.score.max > 0,
       score: p.score,
+      viewedRatio: p.visited.size / p.screens.length,
+      completion: p.content.module.assessment.completion,
       screenIndex: p.index,
       sessionSeconds: (Date.now() - this.#startedAt) / 1000,
     };
@@ -75,6 +77,11 @@ export class Session {
         id: q.id,
         response: a.selected.map(pos).sort((x, y) => x - y),
         correctResponse: q.choices.flatMap((c, i) => (c.correct ? [i] : [])),
+        // Ids in module order, so the same answer always reads the same in LMS reports.
+        responseIds: q.choices
+          .filter((c) => a.selected.includes(c.id))
+          .map((c) => c.id),
+        correctResponseIds: q.choices.filter((c) => c.correct).map((c) => c.id),
         correct: a.correct === true,
         objectiveIds: q.objectives,
         at: new Date(),

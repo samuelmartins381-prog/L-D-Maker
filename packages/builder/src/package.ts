@@ -41,19 +41,25 @@ const escapeXml = (s: string) =>
       })[c] as string,
   );
 
+const isAssessed = (b: WebBuild) =>
+  b.module.sections.some((s) =>
+    s.screens.some((sc) =>
+      sc.blocks.some((bl) => bl.type === "question" && bl.scored),
+    ),
+  );
+const titleOf = (b: WebBuild) =>
+  escapeXml(b.defaultStrings[b.module.meta.title] ?? b.module.id);
+const fileList = (files: readonly string[]) =>
+  files.map((f) => `      <file href="${escapeXml(f)}"/>`).join("\n");
+
 /** imsmanifest.xml for a single-SCO SCORM 1.2 package (ADL SCORM 1.2 Content Aggregation Model). */
 export function scorm12Manifest(
   build: WebBuild,
   files: readonly string[],
 ): string {
   const { module } = build;
-  const title = escapeXml(build.defaultStrings[module.meta.title] ?? module.id);
-  const hasAssessment = module.sections.some((s) =>
-    s.screens.some((sc) =>
-      sc.blocks.some((b) => b.type === "question" && b.scored),
-    ),
-  );
-  const mastery = hasAssessment
+  const title = titleOf(build);
+  const mastery = isAssessed(build)
     ? `\n        <adlcp:masteryscore>${module.assessment.passingScore}</adlcp:masteryscore>`
     : "";
   const id = `ldm-${module.id}-${module.version}`;
@@ -77,7 +83,59 @@ export function scorm12Manifest(
   </organizations>
   <resources>
     <resource identifier="sco" type="webcontent" adlcp:scormtype="sco" href="index.html">
-${files.map((f) => `      <file href="${escapeXml(f)}"/>`).join("\n")}
+${fileList(files)}
+    </resource>
+  </resources>
+</manifest>
+`;
+}
+
+/**
+ * imsmanifest.xml for a single-SCO SCORM 2004 4th Edition package (CAM book). The passing threshold
+ * is the primary objective's minNormalizedMeasure: the LMS exposes it as cmi.scaled_passing_score.
+ */
+export function scorm2004Manifest(
+  build: WebBuild,
+  files: readonly string[],
+): string {
+  const { module } = build;
+  const title = titleOf(build);
+  const objectives = isAssessed(build)
+    ? `
+          <imsss:objectives>
+            <imsss:primaryObjective objectiveID="primary" satisfiedByMeasure="true">
+              <imsss:minNormalizedMeasure>${(module.assessment.passingScore / 100).toFixed(2)}</imsss:minNormalizedMeasure>
+            </imsss:primaryObjective>
+          </imsss:objectives>`
+    : "";
+  const id = `ldm-${module.id}-${module.version}`;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="${id}" version="${module.version}"
+  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
+  xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"
+  xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"
+  xmlns:imsss="http://www.imsglobal.org/xsd/imsss"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>2004 4th Edition</schemaversion>
+  </metadata>
+  <organizations default="org">
+    <organization identifier="org">
+      <title>${title}</title>
+      <item identifier="item" identifierref="sco" isvisible="true">
+        <title>${title}</title>
+        <imsss:sequencing>${objectives}
+          <imsss:deliveryControls completionSetByContent="true" objectiveSetByContent="true"/>
+        </imsss:sequencing>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="sco" type="webcontent" adlcp:scormType="sco" href="index.html">
+${fileList(files)}
     </resource>
   </resources>
 </manifest>
@@ -103,6 +161,21 @@ export async function packageScorm12(
     scorm12Manifest(build, await listFiles(dir)),
   );
   const zip = join(outRoot, `${baseName(build)}-scorm12.zip`);
+  await zipDir(dir, zip);
+  return { dir, zip, build };
+}
+
+export async function packageScorm2004(
+  moduleDir: string,
+  outRoot: string,
+): Promise<PackageResult> {
+  const dir = join(outRoot, "scorm2004");
+  const build = await buildWeb(moduleDir, dir, { target: "scorm2004" });
+  await writeFile(
+    join(dir, "imsmanifest.xml"),
+    scorm2004Manifest(build, await listFiles(dir)),
+  );
+  const zip = join(outRoot, `${baseName(build)}-scorm2004.zip`);
   await zipDir(dir, zip);
   return { dir, zip, build };
 }

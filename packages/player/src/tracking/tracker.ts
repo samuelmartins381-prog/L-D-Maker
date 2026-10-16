@@ -1,4 +1,4 @@
-// What the player reports, whatever the standard. Adapters: scorm12 (LMS), standalone (browser storage).
+// What the player reports, whatever the standard. Adapters: scorm12, scorm2004 (LMS), standalone (browser storage).
 import type { Score } from "../grading.ts";
 
 export interface Progress {
@@ -7,6 +7,10 @@ export interface Progress {
   /** The module has scored questions. */
   assessed: boolean;
   score: Score;
+  /** Share of screens viewed, 0–1 (SCORM 2004 progress_measure). */
+  viewedRatio: number;
+  /** Module rule: is passing required for the module to count as completed? */
+  completion: "all-screens" | "all-screens-and-passed";
   screenIndex: number;
   /** Learner time in this session, in seconds. */
   sessionSeconds: number;
@@ -14,9 +18,12 @@ export interface Progress {
 
 export interface Interaction {
   id: string;
-  /** Choice positions in the module (0-based), as SCORM 1.2 expects short single-character responses. */
+  /** Choice positions in the module (0-based): SCORM 1.2 only accepts single-character responses. */
   response: number[];
   correctResponse: number[];
+  /** Choice ids, as SCORM 2004 accepts (more readable in LMS reports). */
+  responseIds: string[];
+  correctResponseIds: string[];
   correct: boolean;
   objectiveIds: string[];
   /** When the final answer was given. */
@@ -27,12 +34,12 @@ export interface TrackerStart {
   suspend: string | null;
   /** Passing threshold set by the LMS, 0–100, overriding the module's own when present. */
   masteryScore: number | null;
-  /** Learner's language preference held by the LMS (SCORM 1.2: cmi.student_preference.language). */
+  /** Learner's language preference held by the LMS (cmi.student_preference.language / cmi.learner_preference.language). */
   language: string | null;
 }
 
 export interface Tracker {
-  readonly kind: "scorm12" | "standalone";
+  readonly kind: "scorm12" | "scorm2004" | "standalone";
   start(): TrackerStart;
   save(suspend: string, progress: Progress): void;
   recordInteraction(interaction: Interaction): void;

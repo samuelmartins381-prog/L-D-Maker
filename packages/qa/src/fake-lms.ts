@@ -1,6 +1,6 @@
 // Minimal fake LMS for end-to-end tests: a static HTTP server over the repository and a launch page
-// that hosts the scorm-again SCORM 1.2 API (MIT, test-only) and opens the SCO in an iframe.
-// Every LMSSetValue is logged in window.__lms so tests can assert what the LMS received.
+// that hosts the scorm-again SCORM 1.2 or 2004 API (MIT, test-only) and opens the SCO in an iframe.
+// Every SetValue is logged in window.__lms so tests can assert what the LMS received.
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
@@ -19,20 +19,47 @@ const TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
 };
 
-const launchPage = (sco: string, initial: string) => `<!doctype html>
+export type ScormVersion = "1.2" | "2004";
+
+// Same harness for both versions; only the API object and its method names differ.
+const API = {
+  "1.2": {
+    script: "scorm12.min.js",
+    ctor: "Scorm12API",
+    global: "API",
+    calls: ["LMSInitialize", "LMSCommit", "LMSFinish"],
+    set: "LMSSetValue",
+  },
+  "2004": {
+    script: "scorm2004.min.js",
+    ctor: "Scorm2004API",
+    global: "API_1484_11",
+    calls: ["Initialize", "Commit", "Terminate"],
+    set: "SetValue",
+  },
+} as const;
+
+const launchPage = (sco: string, initial: string, version: ScormVersion) => {
+  const a = API[version];
+  return `<!doctype html>
 <html><head><meta charset="utf-8"><title>Fake LMS</title>
-<script src="/node_modules/scorm-again/dist/scorm12.min.js"></script>
+<script src="/node_modules/scorm-again/dist/${a.script}"></script>
 <script>
   window.__lms = { values: {}, calls: [] };
-  window.API = new Scorm12API({ autocommit: false, logLevel: 5 });
-  window.API.loadFromFlattenedJSON(${initial});
-  for (const name of ["LMSInitialize", "LMSCommit", "LMSFinish"]) window.API.on(name, () => window.__lms.calls.push(name));
-  window.API.on("LMSSetValue.cmi.*", (element, value) => { window.__lms.values[element] = value; });
+  const api = window.${a.global} = new ${a.ctor}({ autocommit: false, logLevel: 5 });
+  api.loadFromFlattenedJSON(${initial});
+  for (const name of ${JSON.stringify(a.calls)}) api.on(name, () => window.__lms.calls.push(name));
+  api.on("${a.set}.cmi.*", (element, value) => { window.__lms.values[element] = value; });
 </script></head>
 <body style="margin:0"><iframe id="sco" src="${sco}" style="border:0;width:100vw;height:100vh"></iframe></body></html>`;
+};
 
 export interface FakeLms {
-  url(sco: string, initial?: Record<string, string>): string;
+  url(
+    sco: string,
+    initial?: Record<string, string>,
+    version?: ScormVersion,
+  ): string;
   close(): Promise<void>;
 }
 
@@ -42,8 +69,10 @@ export async function startFakeLms(): Promise<FakeLms> {
     if (url.pathname === "/__lms") {
       const sco = url.searchParams.get("sco") ?? "";
       const initial = url.searchParams.get("initial") ?? "{}";
+      const version =
+        url.searchParams.get("version") === "2004" ? "2004" : "1.2";
       res.writeHead(200, { "content-type": TYPES[".html"] });
-      res.end(launchPage(sco, JSON.stringify(JSON.parse(initial))));
+      res.end(launchPage(sco, JSON.stringify(JSON.parse(initial)), version));
       return;
     }
     const path = normalize(join(ROOT, decodeURIComponent(url.pathname)));
@@ -61,8 +90,8 @@ export async function startFakeLms(): Promise<FakeLms> {
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const { port } = server.address() as { port: number };
   return {
-    url: (sco, initial = {}) =>
-      `http://127.0.0.1:${port}/__lms?sco=${encodeURIComponent(sco)}&initial=${encodeURIComponent(JSON.stringify(initial))}`,
+    url: (sco, initial = {}, version = "1.2") =>
+      `http://127.0.0.1:${port}/__lms?version=${version}&sco=${encodeURIComponent(sco)}&initial=${encodeURIComponent(JSON.stringify(initial))}`,
     close: () => new Promise((resolve) => server.close(() => resolve())),
   };
 }

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Validates a built SCORM 1.2 package on SCORM Cloud (Rustici), the brief's reference LMS.
 // Credentials come only from SCORM_CLOUD_APP_ID / SCORM_CLOUD_SECRET_KEY (environment secrets).
-// Usage: node packages/qa/src/scorm-cloud.ts <module-folder>   (build the module first)
+// Usage: node packages/qa/src/scorm-cloud.ts <module-folder> [--version 1.2|2004]   (build the module first)
 // Run with NODE_USE_ENV_PROXY=1 when outbound traffic goes through a proxy.
 import { readFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
+import { parseArgs } from "node:util";
 import { loadModuleSource, type Question, validateModule } from "@ldm/schema";
 import {
   type BrowserContext,
@@ -76,9 +77,14 @@ interface Registration {
   activityDetails?: Activity;
 }
 
-const [moduleDir] = process.argv.slice(2);
-if (!moduleDir) {
-  console.error("usage: scorm-cloud.ts <module-folder>");
+const { positionals, values } = parseArgs({
+  allowPositionals: true,
+  options: { version: { type: "string", default: "1.2" } },
+});
+const [moduleDir] = positionals;
+const format = values.version === "2004" ? "scorm2004" : "scorm12";
+if (!moduleDir || !["1.2", "2004"].includes(values.version ?? "")) {
+  console.error("usage: scorm-cloud.ts <module-folder> [--version 1.2|2004]");
   process.exit(2);
 }
 const source = await loadModuleSource(moduleDir);
@@ -87,9 +93,12 @@ if (!module) throw new Error("module is invalid");
 const zip = resolve(
   "out",
   module.id,
-  `${module.id}-${module.version}-scorm12.zip`,
+  `${module.id}-${module.version}-${format}.zip`,
 );
-const courseId = `ldm-${module.id}`;
+// One SCORM Cloud course per format, each import being a new version of it (the trial allows 3
+// courses). SCORM 1.2 keeps the course id used since its first validation.
+const courseId =
+  format === "scorm12" ? `ldm-${module.id}` : `ldm-${module.id}-${format}`;
 const registrationId = `ldm-qa-${Date.now()}`;
 const screens = module.sections.flatMap((s) => s.screens);
 const problems: string[] = [];

@@ -53,7 +53,7 @@ inspirations/             captures, maquettes, liens déposés par Sam
 packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
 packages/player/          lecteur Svelte 5 (IIFE), thèmes CSS, textes d'interface (src/ui/*.json)
-packages/builder/         module validé + lecteur → out/<id>/{web,scorm12}/ + ZIP par format
+packages/builder/         module validé + lecteur → out/<id>/{web,scorm12,scorm2004}/ + ZIP par format
 packages/qa/               banc QA (axe, clavier, Lighthouse, faux LMS) + tests e2e (src/e2e/)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
@@ -65,12 +65,12 @@ clients/, out/            sources clients et modules générés — ignorés par
 - `pnpm check` — lint + typecheck + tests + licences : **doit passer avant chaque commit**
 - `pnpm format` — formatage (Biome)
 - `pnpm validate <dossier-module>` — valide un module (structure, pédagogie, traductions)
-- `pnpm build:player` puis `pnpm build <dossier-module> [--format web|scorm12|all]` — construit
-  `out/<id>/web/` (aperçu, marche en `file://`, `?lang=ar`), `out/<id>/scorm12/` et les ZIP
+- `pnpm build:player` puis `pnpm build <dossier-module> [--format web|scorm12|scorm2004|all]` —
+  construit `out/<id>/web/` (aperçu, marche en `file://`, `?lang=ar`), `scorm12/`, `scorm2004/` et les ZIP
 - `pnpm test:e2e` — scénarios navigateur (suivi SCORM 1.2 sur 2 sessions, reprise HTML5)
 - `pnpm qa <dossier-module> [--skip-lighthouse]` — banc QA sur le module construit → rapport
   `out/<id>/qa/report.html` (autonome, à envoyer tel quel). Échec = code de sortie 1.
-- `pnpm qa:scorm-cloud <dossier-module>` — validation réelle sur SCORM Cloud (2 sessions). Exige
+- `pnpm qa:scorm-cloud <dossier-module> [--version 1.2|2004]` — validation réelle sur SCORM Cloud. Exige
   `SCORM_CLOUD_APP_ID` / `SCORM_CLOUD_SECRET_KEY` en secrets d'environnement, **jamais dans le
   dépôt**. Hors de `pnpm check` (réseau, limites de l'essai : 10 inscriptions actives).
 - `node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures FR/EN/AR mobile/desktop
@@ -91,8 +91,9 @@ dans le constructeur du `Player` : **ne jamais écrire d'état dans un `$derived
 collantes (WCAG 2.4.11).
 
 ## Suivi (ADR 0004)
-Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12` et `standalone`, cible fixée
-au build. Statut 1.2 : completed sans évaluation, passed/failed avec. État de reprise compact
+Interface `Tracker` (`player/src/tracking/`) : adaptateurs `scorm12`, `scorm2004` et `standalone`,
+cible fixée au build. 2004 : complétion et réussite séparées, horodatages `…:ss.ssZ` (le « Z » exige
+une fraction de seconde). Le banc échoue sur toute valeur refusée par le LMS. Statut 1.2 : completed sans évaluation, passed/failed avec. État de reprise compact
 `suspend.ts`, lié à `id@version` du module (changer la version invalide les reprises). Ajouter
 SCORM 2004 / cmi5 / xAPI = un nouvel adaptateur, rien d'autre. Langue : `?lang=` > préférence
 LMS (`cmi.student_preference.language`) > navigateur. SCORM Cloud : SCO en popup par défaut,
@@ -148,4 +149,11 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
         encore sur SCORM Cloud (compte à fournir)
   - [x] 6. Banc QA v1 (ADR 0005) — module de démo : 11 conformes, 0 non conforme, 4 manuels
 - [x] Critère de sortie J1 : validé sur SCORM Cloud le 2026-10-16 (passed, score 100, reprise OK)
-- [ ] J2 — MVP (voir `docs/phase0-research.md` §5.5) : à planifier avec Sam
+- [ ] J2 — MVP, étape par étape :
+  - [x] 1. Export SCORM 2004 4e édition (ADR 0004, addendum) — validé sur faux LMS ; SCORM Cloud à
+        lancer quand la nouvelle clé sera visible (`--version 2004`)
+  - [ ] 2. Traduction : export/import XLIFF
+  - [ ] 3. 11 langues dont CJK (polices, expansion du texte)
+  - [ ] 4. Nouveaux composants + banque de questions
+  - [ ] 5. Lecture des sources (PDF, PPTX, DOCX) — contenu de test de Sam requis
+  - [ ] 6. Pipeline complet avec storyboard validé par Sam

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Usage: ldm-build <module-folder> [--format web|scorm12|all] [--out <dir>]
+// Usage: ldm-build <module-folder> [--format web|scorm12|scorm2004|all] [--out <dir>]
 // Default: all formats into out/<module-id>/ (web/ preview folder + one ZIP per format).
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { loadModuleSource } from "@ldm/schema";
 import { BuildError } from "./build-web.ts";
-import { packageHtml5, packageScorm12 } from "./package.ts";
+import { packageHtml5, packageScorm12, packageScorm2004 } from "./package.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -16,10 +16,15 @@ const { positionals, values } = parseArgs({
 });
 const [moduleDir] = positionals;
 const formats =
-  values.format === "all" ? ["web", "scorm12"] : [values.format ?? ""];
-if (!moduleDir || formats.some((f) => !["web", "scorm12"].includes(f))) {
+  values.format === "all"
+    ? ["web", "scorm12", "scorm2004"]
+    : [values.format ?? ""];
+if (
+  !moduleDir ||
+  formats.some((f) => !["web", "scorm12", "scorm2004"].includes(f))
+) {
   console.error(
-    "usage: ldm-build <module-folder> [--format web|scorm12|all] [--out <dir>]",
+    "usage: ldm-build <module-folder> [--format web|scorm12|scorm2004|all] [--out <dir>]",
   );
   process.exit(2);
 }
@@ -33,7 +38,9 @@ try {
     const result =
       format === "web"
         ? await packageHtml5(moduleDir, outRoot)
-        : await packageScorm12(moduleDir, outRoot);
+        : format === "scorm2004"
+          ? await packageScorm2004(moduleDir, outRoot)
+          : await packageScorm12(moduleDir, outRoot);
     if (format === formats[0])
       for (const w of result.build.warnings)
         console.log(`  ! [${w.code}] ${w.path} — ${w.message}`);

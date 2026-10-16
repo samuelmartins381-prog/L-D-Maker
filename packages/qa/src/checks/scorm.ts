@@ -1,22 +1,120 @@
-// Generic SCORM 1.2 run in the fake LMS, driven by the module data (works for any module):
-// session 1 stops halfway and leaves; session 2 must resume there, then completes with all
+// Generic SCORM run in the fake LMS, driven by the module data (works for any module), for SCORM 1.2
+// and 2004: session 1 stops halfway and leaves; session 2 must resume there, then completes with all
 // correct answers and finishes. Asserts what the LMS received.
 import { relative } from "node:path";
 import type { Module, StringCatalog } from "@ldm/schema";
 import type { Browser, Frame, Page } from "playwright-core";
-import { REPO_ROOT, startFakeLms } from "../fake-lms.ts";
+import { REPO_ROOT, type ScormVersion, startFakeLms } from "../fake-lms.ts";
 import type { CheckResult } from "../types.ts";
 
-type LmsLog = { values: Record<string, string>; calls: string[] };
+type Values = Record<string, string>;
+type LmsLog = { values: Values; calls: string[] };
 const lmsLog = (page: Page) =>
   page.evaluate(() => (window as unknown as { __lms: LmsLog }).__lms);
+
+/** What differs between the two versions, as seen from the LMS. */
+interface Dialect {
+  label: string;
+  init: string;
+  finish: string;
+  /** Data the LMS keeps between sessions, from what the SCO wrote. */
+  resume: (v: Values) => Values;
+  incomplete: (v: Values) => boolean;
+  suspended: (v: Values) => boolean;
+  /** Problems with the final state after a perfect run. */
+  final: (v: Values, assessed: boolean) => string[];
+  closedNormally: (v: Values) => boolean;
+  sessionTime: RegExp;
+  timeKey: string;
+  describe: (v: Values) => string;
+  suspendLimit: number;
+  /** Internal margin under the limit (phase 0 §5.4 for 1.2). */
+  suspendBudget: number;
+}
+
+const DIALECTS: Record<ScormVersion, Dialect> = {
+  "1.2": {
+    label: "SCORM 1.2",
+    init: "LMSInitialize",
+    finish: "LMSFinish",
+    resume: (v) => ({
+      "cmi.core.entry": "resume",
+      "cmi.core.lesson_status": "incomplete",
+      "cmi.suspend_data": v["cmi.suspend_data"] ?? "",
+      "cmi.core.lesson_location": v["cmi.core.lesson_location"] ?? "",
+    }),
+    incomplete: (v) => v["cmi.core.lesson_status"] === "incomplete",
+    suspended: (v) => v["cmi.core.exit"] === "suspend",
+    final: (v, assessed) => {
+      const status = v["cmi.core.lesson_status"];
+      const out: string[] = [];
+      if (assessed) {
+        if (status !== "passed")
+          out.push(`statut final « ${status} » au lieu de « passed »`);
+        if (v["cmi.core.score.raw"] !== "100")
+          out.push(`score « ${v["cmi.core.score.raw"]} » au lieu de 100`);
+      } else if (status !== "completed")
+        out.push(`statut final « ${status} » au lieu de « completed »`);
+      return out;
+    },
+    closedNormally: (v) => v["cmi.core.exit"] === "",
+    sessionTime: /^\d{4}:\d{2}:\d{2}\.\d{2}$/,
+    timeKey: "cmi.core.session_time",
+    describe: (v) =>
+      `statut ${v["cmi.core.lesson_status"]}, score ${v["cmi.core.score.raw"] ?? "—"} %`,
+    suspendLimit: 4096,
+    suspendBudget: 3500,
+  },
+  "2004": {
+    label: "SCORM 2004 4e éd.",
+    init: "Initialize",
+    finish: "Terminate",
+    resume: (v) => ({
+      "cmi.entry": "resume",
+      "cmi.completion_status": "incomplete",
+      "cmi.suspend_data": v["cmi.suspend_data"] ?? "",
+      "cmi.location": v["cmi.location"] ?? "",
+    }),
+    incomplete: (v) => v["cmi.completion_status"] === "incomplete",
+    suspended: (v) => v["cmi.exit"] === "suspend",
+    final: (v, assessed) => {
+      const out: string[] = [];
+      if (v["cmi.completion_status"] !== "completed")
+        out.push(
+          `complétion « ${v["cmi.completion_status"]} » au lieu de « completed »`,
+        );
+      if (assessed) {
+        if (v["cmi.success_status"] !== "passed")
+          out.push(
+            `réussite « ${v["cmi.success_status"]} » au lieu de « passed »`,
+          );
+        if (Number(v["cmi.score.scaled"]) !== 1)
+          out.push(`score normalisé « ${v["cmi.score.scaled"]} » au lieu de 1`);
+      }
+      if (v["cmi.progress_measure"] !== "1.00")
+        out.push(
+          `progression « ${v["cmi.progress_measure"]} » au lieu de 1.00`,
+        );
+      return out;
+    },
+    closedNormally: (v) => v["cmi.exit"] === "normal",
+    sessionTime: /^PT(\d+H)?(\d+M)?\d+(\.\d{1,2})?S$/,
+    timeKey: "cmi.session_time",
+    describe: (v) =>
+      `complétion ${v["cmi.completion_status"]}, réussite ${v["cmi.success_status"]}, score normalisé ${v["cmi.score.scaled"] ?? "—"}`,
+    suspendLimit: 64000,
+    suspendBudget: 60000,
+  },
+};
 
 export async function scormChecks(
   browser: Browser,
   scoIndex: string,
   module: Module,
   strings: StringCatalog,
+  version: ScormVersion = "1.2",
 ): Promise<CheckResult[]> {
+  const d = DIALECTS[version];
   const lms = await startFakeLms();
   const sco = `/${relative(REPO_ROOT, scoIndex)}?lang=${module.defaultLocale}`;
   const screens = module.sections.flatMap((s) => s.screens);
@@ -30,9 +128,14 @@ export async function scormChecks(
     if (!ok) problems.push(message);
   };
 
-  async function session(initial: Record<string, string>) {
+  async function session(initial: Values) {
     const page = await browser.newPage({ reducedMotion: "reduce" });
-    await page.goto(lms.url(sco, initial));
+    // The adapters log every value the LMS rejects ("[scorm12] … failed"): any such message is a defect.
+    page.on("console", (m) => {
+      if (/\[scorm(12|2004)\].*(failed|too long)/.test(m.text()))
+        problems.push(`valeur refusée par le LMS : ${m.text()}`);
+    });
+    await page.goto(lms.url(sco, initial, version));
     await page.frameLocator("#sco").locator("h1").waitFor();
     // The LMS page URL also contains "index.html" (as a query parameter): target the iframe itself.
     const frame = (await (await page.$("#sco"))?.contentFrame()) as Frame;
@@ -57,12 +160,9 @@ export async function scormChecks(
     // Session 1: halfway, then the learner leaves.
     const s1 = await session({});
     let log = await lmsLog(s1.page);
+    expect(log.calls[0] === d.init, `${d.init} n'est pas le premier appel`);
     expect(
-      log.calls[0] === "LMSInitialize",
-      "LMSInitialize n'est pas le premier appel",
-    );
-    expect(
-      log.values["cmi.core.lesson_status"] === "incomplete",
+      d.incomplete(log.values),
       "le statut initial n'est pas « incomplete »",
     );
     for (let i = 0; i < half; i++) {
@@ -74,19 +174,14 @@ export async function scormChecks(
     );
     log = await lmsLog(s1.page);
     expect(
-      log.calls.at(-1) === "LMSFinish",
-      "pas de LMSFinish quand l'apprenant quitte",
+      log.calls.at(-1) === d.finish,
+      `pas de ${d.finish} quand l'apprenant quitte`,
     );
     expect(
-      log.values["cmi.core.exit"] === "suspend",
-      "cmi.core.exit n'est pas « suspend » pour une session interrompue",
+      d.suspended(log.values),
+      "la sortie n'est pas « suspend » pour une session interrompue",
     );
-    const saved = {
-      "cmi.core.entry": "resume",
-      "cmi.core.lesson_status": "incomplete",
-      "cmi.suspend_data": log.values["cmi.suspend_data"] ?? "",
-      "cmi.core.lesson_location": log.values["cmi.core.lesson_location"] ?? "",
-    };
+    const saved = d.resume(log.values);
     await s1.page.close();
 
     // Session 2: resume, answer every question correctly, finish.
@@ -96,7 +191,7 @@ export async function scormChecks(
       (await s2.frame.locator("h1").innerText()) === expectedTitle,
       `la reprise ne ramène pas à l'écran ${half + 1} (« ${expectedTitle} »)`,
     );
-    let maxSuspend = saved["cmi.suspend_data"].length;
+    let maxSuspend = saved["cmi.suspend_data"]?.length ?? 0;
     for (let i = half; i < screens.length; i++) {
       await answerScreen(s2.frame, i);
       maxSuspend = Math.max(
@@ -106,46 +201,30 @@ export async function scormChecks(
       await next(s2.frame); // the last click is the Finish button
     }
     log = await lmsLog(s2.page);
-    const status = log.values["cmi.core.lesson_status"];
+    problems.push(...d.final(log.values, assessed));
+    expect(
+      d.closedNormally(log.values),
+      "la sortie n'est pas une fin normale une fois le module terminé",
+    );
+    expect(
+      log.calls.at(-1) === d.finish,
+      `le bouton Terminer n'appelle pas ${d.finish}`,
+    );
+    expect(
+      d.sessionTime.test(log.values[d.timeKey] ?? ""),
+      `${d.timeKey} mal formé (« ${log.values[d.timeKey]} »)`,
+    );
     const interactions = Object.keys(log.values).filter((k) =>
       /^cmi\.interactions\.\d+\.id$/.test(k),
     ).length;
-    if (assessed) {
-      expect(
-        status === "passed",
-        `statut final « ${status} » au lieu de « passed »`,
-      );
-      expect(
-        log.values["cmi.core.score.raw"] === "100",
-        `score « ${log.values["cmi.core.score.raw"]} » au lieu de 100 (toutes les réponses justes)`,
-      );
-    } else
-      expect(
-        status === "completed",
-        `statut final « ${status} » au lieu de « completed »`,
-      );
-    expect(
-      log.values["cmi.core.exit"] === "",
-      "cmi.core.exit devrait être vide une fois le module terminé",
-    );
-    expect(
-      log.calls.at(-1) === "LMSFinish",
-      "le bouton Terminer n'appelle pas LMSFinish",
-    );
-    expect(
-      /^\d{4}:\d{2}:\d{2}\.\d{2}$/.test(
-        log.values["cmi.core.session_time"] ?? "",
-      ),
-      "cmi.core.session_time mal formé",
-    );
     facts.push(
-      `Statut final : ${status}${assessed ? `, score ${log.values["cmi.core.score.raw"]} %` : ""}`,
+      `État final : ${d.describe(log.values)}`,
       `Interactions envoyées (session 2) : ${interactions}`,
-      `Données de reprise : ${maxSuspend} caractères au maximum (limite SCORM 1.2 : 4 096 ; seuil interne : 3 500)`,
+      `Données de reprise : ${maxSuspend} caractères au maximum (limite ${d.label} : ${d.suspendLimit.toLocaleString("fr-FR")} ; seuil interne : ${d.suspendBudget.toLocaleString("fr-FR")})`,
     );
     expect(
-      maxSuspend <= 3500,
-      `données de reprise trop longues (${maxSuspend} > 3 500)`,
+      maxSuspend <= d.suspendBudget,
+      `données de reprise trop longues (${maxSuspend} > ${d.suspendBudget})`,
     );
     await s2.page.close();
   } catch (e) {
@@ -162,8 +241,8 @@ export async function scormChecks(
 
   return [
     {
-      id: "scorm12-tracking",
-      title: "Suivi SCORM 1.2 (faux LMS)",
+      id: `scorm${version.replace(".", "")}-tracking`,
+      title: `Suivi ${d.label} (faux LMS)`,
       criterion:
         "Initialisation, statut, score, temps, interactions, reprise de session, fin de session",
       status: problems.length ? "fail" : "pass",

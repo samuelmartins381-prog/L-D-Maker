@@ -1,4 +1,6 @@
 // SCORM 1.2 run-time adapter (content side). Spec: ADL SCORM 1.2 Run-Time Environment, §3.
+
+import { findApi } from "./find-api.ts";
 import {
   type Interaction,
   lessonStatus,
@@ -20,44 +22,13 @@ export interface Scorm12Api {
 }
 
 const MAX_SUSPEND = 4096;
-const MAX_HOPS = 10;
 
-function apiIn(win: Window): Scorm12Api | null {
-  try {
-    const api = (win as unknown as { API?: Scorm12Api }).API;
-    return api && typeof api.LMSInitialize === "function" ? api : null;
-  } catch {
-    // Cross-origin frame (e.g. SAP SuccessFactors header, KBA 2808684): skip it and keep climbing.
-    return null;
-  }
-}
+const isScorm12Api = (x: unknown): x is Scorm12Api =>
+  !!x && typeof (x as Scorm12Api).LMSInitialize === "function";
 
 /** Looks for window.API in this window, its parents, then the opener and its parents. */
-export function findScorm12Api(start: Window = window): Scorm12Api | null {
-  const climb = (from: Window | null): Scorm12Api | null => {
-    let win = from;
-    for (let hops = 0; win && hops <= MAX_HOPS; hops++) {
-      const api = apiIn(win);
-      if (api) return api;
-      let parent: Window | null = null;
-      try {
-        parent = win.parent;
-      } catch {
-        parent = null;
-      }
-      if (!parent || parent === win) break;
-      win = parent;
-    }
-    return null;
-  };
-  let opener: Window | null = null;
-  try {
-    opener = start.top?.opener ?? start.opener ?? null;
-  } catch {
-    opener = null;
-  }
-  return climb(start) ?? climb(opener);
-}
+export const findScorm12Api = (start: Window = window): Scorm12Api | null =>
+  findApi("API", isScorm12Api, start);
 
 const letter = (i: number) =>
   i < 26 ? String.fromCharCode(97 + i) : String(i - 26);

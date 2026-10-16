@@ -55,3 +55,20 @@ autre domaine interrompt la recherche de l'API.
 - ADL, *SCORM 1.2 Run-Time Environment* (cmi.core.*, cmi.interactions.*, CMITimespan)
 - [SAP KBA 2808684](https://userapps.support.sap.com/sap/support/knowledge/en/2808684), [2531411](https://userapps.support.sap.com/sap/support/knowledge/en/2531411)
 - [scorm-again](https://github.com/jcputney/scorm-again), [pipwerks SCORM wrapper](https://pipwerks.com/scorm-javascript-wrapper-updates/)
+
+## Addendum — 2026-10-16 : SCORM 2004 4e édition (J2, étape 1)
+- Adaptateur `scorm2004` : **complétion et réussite séparées**. `completion_status` vaut
+  completed quand tous les écrans sont vus, ou seulement une fois réussi si le module l'exige ;
+  `success_status` vaut passed/failed une fois l'évaluation terminée, sinon unknown. Envoie aussi
+  `score.scaled` (0–1), `progress_measure` (part des écrans vus), `session_time` en durée ISO 8601,
+  `exit` « suspend » ou « normal », et les interactions avec les identifiants de choix séparés par `[,]`.
+- Seuil : `imsss:minNormalizedMeasure` de l'objectif principal (`satisfiedByMeasure="true"`),
+  lu par le lecteur via `cmi.scaled_passing_score`. Pas d'autre règle de séquençage : un seul SCO,
+  navigation gérée par le lecteur.
+- Piège évité grâce au banc : le format `time` n'accepte le fuseau (« Z ») qu'**après une fraction
+  de seconde** (`…T09:05:07.45Z` et non `…T09:05:07Z`). Le banc signale désormais toute valeur
+  refusée par le LMS.
+- Docebo ne gère que la 3e édition et pas le séquençage (phase 0 §2.2) : pour Docebo, livrer en
+  SCORM 1.2 en attendant un profil LMS dédié.
+- Validation SCORM Cloud en 2004 : `pnpm qa:scorm-cloud <module> --version 2004`, à lancer dès que
+  la nouvelle clé est disponible dans une session.

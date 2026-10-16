@@ -8,6 +8,7 @@ import App from "./App.svelte";
 import { CONTENT_ELEMENT_ID, type CompiledContent } from "./content.ts";
 import { PLAYER_KEY, Player } from "./player.svelte.ts";
 import { findScorm12Api, Scorm12Tracker } from "./tracking/scorm12.ts";
+import { findScorm2004Api, Scorm2004Tracker } from "./tracking/scorm2004.ts";
 import { SESSION_KEY, Session } from "./tracking/session.svelte.ts";
 import { StandaloneTracker } from "./tracking/standalone.ts";
 import type { Tracker } from "./tracking/tracker.ts";
@@ -18,6 +19,13 @@ const content = JSON.parse(raw) as CompiledContent;
 const { module } = content;
 
 function createTracker(): Tracker {
+  if (content.target === "scorm2004") {
+    const api = findScorm2004Api();
+    if (api) return new Scorm2004Tracker(api);
+    console.warn(
+      "[ldm] SCORM 2004 API not found: running standalone (preview outside an LMS)",
+    );
+  }
   if (content.target === "scorm12") {
     const api = findScorm12Api();
     if (api) return new Scorm12Tracker(api);
