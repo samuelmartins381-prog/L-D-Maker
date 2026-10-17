@@ -5,7 +5,7 @@ schemaVersion: "0.1"
 id: mouvement-mecanique
 version: 0.1.0
 defaultLocale: fr
-locales: [fr]
+locales: [fr, en, de, it, ja, zh-Hans]
 
 meta:
   title: meta.title
