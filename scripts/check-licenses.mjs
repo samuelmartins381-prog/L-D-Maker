@@ -11,6 +11,8 @@ const PROD_ALLOWED = new Set([
   "0BSD",
   "OFL-1.1",
   "MIT OR Apache-2.0",
+  // Public-domain dedication (fast-sha256, through @anthropic-ai/sdk): no obligation at all.
+  "Unlicense",
 ]);
 // Dev tooling is never shipped, so weak copyleft (e.g. axe-core, MPL-2.0) is acceptable.
 const DEV_ALLOWED = new Set([

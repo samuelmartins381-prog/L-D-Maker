@@ -32,6 +32,10 @@ API Anthropic.
 - **Tests** : réponses enregistrées (aucun réseau dans `pnpm check`) ; un test réel facultatif,
   avec la clé en secret d'environnement.
 
+## Licences
+`@anthropic-ai/sdk` (MIT), avec `fast-sha256` (Unlicense, domaine public) ajouté à la liste
+stricte de `scripts/check-licenses.mjs`. Rien de cela n'entre dans un module livré.
+
 ## Conséquences
 - Confidentialité : les contenus des marques ne vont que chez Anthropic, comme aujourd'hui. Les
   conditions commerciales de l'API excluent l'entraînement sur les données des clients ; la durée

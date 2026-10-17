@@ -2,21 +2,25 @@
 // Generation pipeline (ADR 0013): source → storyboard (Sam's gate) → module → packages.
 //   ldm-gen init <dir> --title <t> --audience <a> [--minutes 20] [--locale fr] [--locales fr,en]
 //   ldm-gen ingest <dir>          read sources/ into ingest/ (anchored Markdown)
+//   ldm-gen generate <dir> [--model m] [--estimate]   Claude writes storyboard.yaml (ANTHROPIC_API_KEY)
 //   ldm-gen storyboard <dir>      check storyboard.yaml, write review/storyboard.html
 //   ldm-gen approve <dir> [--by Sam]   record Sam's approval (only on Sam's explicit go)
 //   ldm-gen check <dir>           module/ valid and conform to the approved storyboard
 //   ldm-gen build <dir>           check, then build every format and run the QA bench
 //   ldm-gen status <dir>
 import { spawnSync } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
-import { basename, dirname, resolve } from "node:path";
+import { mkdir } from "node:fs/promises";
+import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadModuleSource, validateModule } from "@ldm/schema";
 import { conformToStoryboard } from "./conform.ts";
+import { anthropicClient } from "./engine/llm.ts";
+import { DEFAULT_MODEL, MODELS, type ModelId } from "./engine/pricing.ts";
+import { estimateStoryboard, generateStoryboard } from "./engine/storyboard.ts";
 import { ingestProject, loadIngest, slugify } from "./ingest.ts";
 import { loadProject, paths, saveProject } from "./project.ts";
-import { renderReviewPage } from "./review.ts";
+import { refreshReview } from "./review.ts";
 import { projectStatus } from "./status.ts";
 import { assertApproved, loadStoryboard } from "./storyboard.ts";
 
@@ -30,12 +34,14 @@ const { positionals, values } = parseArgs({
     locale: { type: "string", default: "fr" },
     locales: { type: "string" },
     by: { type: "string", default: "Sam" },
+    model: { type: "string" },
+    estimate: { type: "boolean", default: false },
   },
 });
 const [command, dir] = positionals;
 const usage = (): never => {
   console.error(
-    "usage: ldm-gen <init|ingest|storyboard|approve|check|build|status> <dir>\n  init: --title <t> --audience <a> [--minutes 20] [--locale fr] [--locales fr,en]",
+    "usage: ldm-gen <init|ingest|generate|storyboard|approve|check|build|status> <dir>\n  init: --title <t> --audience <a> [--minutes 20] [--locale fr] [--locales fr,en]",
   );
   process.exit(2);
 };
@@ -48,34 +54,12 @@ const fail = (message: string): never => {
 
 /** Checks storyboard.yaml and writes the review page; returns false on errors. */
 async function storyboard(): Promise<boolean> {
-  const p = await loadProject(project);
-  const { storyboard: sb, issues, hash } = await loadStoryboard(project);
+  const { storyboard: sb, issues } = await refreshReview(project);
   for (const i of issues)
     console.log(
       `${i.severity === "error" ? "✗" : "!"} ${i.where} : ${i.message}`,
     );
-  const ingest = await loadIngest(project);
-  if (!sb || !ingest) return false;
-  const approval = p.approvals.storyboard;
-  const status = !approval
-    ? "pending"
-    : approval.hash === hash
-      ? "approved"
-      : "changed";
-  const page = paths(project).review;
-  await mkdir(dirname(page), { recursive: true });
-  await writeFile(
-    page,
-    await renderReviewPage({
-      dir: project,
-      project: p,
-      storyboard: sb,
-      ingest,
-      issues,
-      hash,
-      status,
-    }),
-  );
+  if (!sb || !(await loadIngest(project))) return false;
   const errors = issues.filter((i) => i.severity === "error").length;
   console.log(
     `${errors ? "✗" : "✓"} storyboard : ${errors} erreur(s), ${issues.length - errors} point(s) à vérifier → ${dir}/review/storyboard.html`,
@@ -132,6 +116,40 @@ try {
     console.log(
       `  Total : ${index.words} mots, ~${index.readingMinutes} min de lecture`,
     );
+  } else if (command === "generate") {
+    const key =
+      process.env.ANTHROPIC_API_KEY ||
+      fail("ANTHROPIC_API_KEY manquante (secret d'environnement)");
+    const model = (values.model ?? DEFAULT_MODEL) as ModelId;
+    if (!(model in MODELS)) fail(`modèle inconnu : ${model}`);
+    const client = anthropicClient(key);
+    const est = await estimateStoryboard(project, { client, model });
+    console.log(
+      `≈ ${est.inputTokens} jetons envoyés ; coût estimé ${est.lowUsd.toFixed(2)} à ${est.highUsd.toFixed(2)} $ (${model})`,
+    );
+    if (!values.estimate) {
+      let shown = 0;
+      const r = await generateStoryboard(project, {
+        client,
+        model,
+        onProgress: (e) => {
+          if (e.stage === "writing" && e.chars - shown > 2000) {
+            shown = e.chars;
+            process.stdout.write(
+              `\r  réponse ${e.round} : ${e.chars} caractères`,
+            );
+          } else if (e.stage === "checking") {
+            shown = 0;
+            process.stdout.write(`\n  vérification de la réponse ${e.round}\n`);
+          }
+        },
+      });
+      const errors = r.issues.filter((i) => i.severity === "error").length;
+      console.log(
+        `${errors ? "✗" : "✓"} storyboard écrit en ${r.rounds} réponse(s) : ${errors} erreur(s), ${r.issues.length - errors} point(s) à vérifier ; coût réel ${r.costUsd.toFixed(2)} $`,
+      );
+      await storyboard();
+    }
   } else if (command === "storyboard") {
     if (!(await storyboard())) process.exit(1);
   } else if (command === "approve") {

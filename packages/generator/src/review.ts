@@ -1,13 +1,17 @@
 // Review page of a storyboard, for Sam (ADR 0013): self-contained HTML, readable on a phone, in the
 // colours of the player theme. Shows what will be built, screen by screen, with the source passages
 // behind each block, the checks and the questions Sam is asked to settle.
-import type { IngestIndex } from "./ingest.ts";
-import type { Project } from "./project.ts";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
+import { type IngestIndex, loadIngest } from "./ingest.ts";
+import { loadProject, type Project, paths } from "./project.ts";
 import {
   excerpt,
+  loadStoryboard,
   type PlannedBlock,
   type Storyboard,
   type StoryboardIssue,
+  type StoryboardResult,
 } from "./storyboard.ts";
 
 const esc = (s: string) =>
@@ -269,4 +273,33 @@ ${await renderReviewBody(input)}
 </body>
 </html>
 `;
+}
+
+/** Checks storyboard.yaml and rewrites review/storyboard.html; the page is skipped when unreadable. */
+export async function refreshReview(dir: string): Promise<StoryboardResult> {
+  const project = await loadProject(dir);
+  const result = await loadStoryboard(dir);
+  const ingest = await loadIngest(dir);
+  if (!result.storyboard || !ingest) return result;
+  const approval = project.approvals.storyboard;
+  const status: ReviewStatus = !approval
+    ? "pending"
+    : approval.hash === result.hash
+      ? "approved"
+      : "changed";
+  const page = paths(dir).review;
+  await mkdir(dirname(page), { recursive: true });
+  await writeFile(
+    page,
+    await renderReviewPage({
+      dir,
+      project,
+      storyboard: result.storyboard,
+      ingest,
+      issues: result.issues,
+      hash: result.hash,
+      status,
+    }),
+  );
+  return result;
 }
