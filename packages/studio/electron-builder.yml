@@ -1,0 +1,36 @@
+# Studio installers (ADR 0014). Unsigned until Sam provides signing (docs/requests-for-sam.md).
+appId: com.ldmaker.studio
+productName: L-D-Maker Studio
+copyright: Sam
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**
+  - package.json
+artifactName: LDM-Studio-${version}-${os}-${arch}.${ext}
+asar: true
+# pdf.js is loaded from node_modules at run time (see generator/readers/pdf.ts).
+asarUnpack:
+  - node_modules/pdfjs-dist/**
+mac:
+  category: public.app-category.education
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  # No Apple Developer identity yet: ad-hoc signature ("-"), required for Apple silicon to run it.
+  identity: "-"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  # No code-signing certificate yet; also avoids needing Wine when built on Linux.
+  signAndEditExecutable: false
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+linux:
+  executableName: ldm-studio
+  target: [dir]
+publish: null

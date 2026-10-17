@@ -1,0 +1,45 @@
+# Builds the Studio installers on their own systems (ADR 0014): macOS (.dmg, Apple silicon and
+# Intel) and Windows (.exe). Run it from the Actions tab ("Run workflow") or by pushing a tag
+# studio-v*. The installers are attached to the run for 30 days.
+name: Studio installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["studio-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: --mac
+            files: packages/studio/release/*.dmg
+          - os: windows-latest
+            target: --win
+            files: packages/studio/release/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ldm/studio build
+      - run: pnpm --filter @ldm/studio exec electron-builder ${{ matrix.target }}
+        env:
+          # No signing certificate yet (docs/requests-for-sam.md).
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-${{ runner.os }}
+          path: ${{ matrix.files }}
+          retention-days: 30
+          if-no-files-found: error

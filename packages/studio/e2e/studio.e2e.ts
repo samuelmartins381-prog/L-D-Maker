@@ -2,6 +2,7 @@
 // launch to a created project whose sources were read, checks every screen with axe, and checks
 // the lock between two users. Screenshots go to out/studio-e2e/.
 //   node packages/studio/e2e/studio.e2e.ts   (after `pnpm --filter @ldm/studio build`)
+//   LDM_STUDIO_EXECUTABLE=<packaged app binary> node …   (the same test on an installed build)
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -88,9 +89,10 @@ async function axe(page: Page, label: string): Promise<void> {
   console.log(`  ✓ ${label}: 0 axe violation`);
 }
 
+const packaged = process.env.LDM_STUDIO_EXECUTABLE;
 const app = await _electron.launch({
-  executablePath: electronPath,
-  args: [STUDIO, "--no-sandbox"],
+  executablePath: packaged ?? electronPath,
+  args: packaged ? ["--no-sandbox"] : [STUDIO, "--no-sandbox"],
   env: { ...process.env, LDM_STUDIO_USER_DATA: userData },
 });
 const errors: string[] = [];

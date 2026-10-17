@@ -13,3 +13,4 @@ coverage/
 clients/
 out/
 .svelte-check/
+packages/studio/release/
