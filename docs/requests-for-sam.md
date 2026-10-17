@@ -20,7 +20,9 @@ risques (permissions, données).
      validation SCORM 2004 réussie).
    - Optionnel : activer « Allow Delete API calls » dans les détails de l'application, pour que
      le banc efface ses inscriptions de test (l'essai en limite 10 actives).
-5. **Un contenu de test non confidentiel** (PDF, PPTX ou texte, 15–30 min de formation) pour le module de démonstration.
+5. ~~Un contenu de test non confidentiel~~ — inventé par Claude à ta demande (2026-10-17) :
+   `projects/mouvement-mecanique/`. Un vrai contenu (non confidentiel) reste utile pour éprouver la
+   lecture de documents réels.
 6. **Inspirations** dans `inspirations/` (captures, liens) : voir `inspirations/README.md`.
 
 7. **Relecture native des traductions** du module de démo (`examples/phishing-basics/strings/`) :
@@ -40,3 +42,17 @@ risques (permissions, données).
 9. **Playwright MCP** (Microsoft, Apache-2.0), optionnel : inspection interactive des modules pendant la conception. Les tests automatisés n'en ont pas besoin.
 10. **Accès sandbox à un LMS client** (Cornerstone, SuccessFactors, Docebo, 360Learning…) dès qu'une commande le permet : ce sera notre troisième LMS de test.
 11. **Higgsfield** (déjà connecté) : je ne l'utilise pas sans ton accord explicite, à cause du contenu client possible dans les prompts et des droits commerciaux des visuels à vérifier.
+
+## Services payants (Sam, 2026-10-17 : « je te fournirai toutes les clés, abonnements… »)
+Règles inchangées : chaque service est proposé ici **au moment où il devient utile** (quoi,
+pourquoi, coût, alternative gratuite, données envoyées). Les clés passent par les secrets
+d'environnement, **jamais dans le chat ni dans le dépôt**. Un service qui reçoit du contenu
+client demande ton accord explicite (hypothèse n° 2 ci-dessus).
+
+Pistes déjà identifiées, rien à faire pour l'instant :
+- **Clé API Anthropic** : automatiser le pipeline hors session (génération en lot, nuit). Le
+  contenu reste chez Claude, donc compatible avec la règle de confidentialité.
+- **SCORM Cloud payant** : seulement si la limite de 10 inscriptions actives gêne le banc.
+- **Synthèse vocale** (narration audio multilingue) : contenu client envoyé au fournisseur,
+  accord requis ; licence commerciale des voix à vérifier.
+- **Hébergement d'un LMS de test** (Moodle) : environ quelques euros par mois, sans contenu client.

@@ -14,7 +14,9 @@ Brief complet : `docs/brief.md`.
 - LMS de destination inconnus, potentiellement tous → tous les formats d'export + profils LMS.
 - Utilisateur unique : Sam, pour des commandes clients (usage commercial → licences permissives
   pour tout code embarqué dans les modules, voir ADR 0001).
-- Dépôt GitHub privé. Budget outils : pas de limite fixée, à proposer au cas par cas.
+- Dépôt GitHub privé. Budget outils : pas de limite fixée, à proposer au cas par cas. Sam fournira
+  à terme les clés et abonnements payants nécessaires (2026-10-17) : demande argumentée dans
+  `docs/requests-for-sam.md`, clés en secrets d'environnement uniquement.
 - Hypothèses à confirmer : contenus clients traités par Claude mais par aucun autre service tiers
   sans accord ; pas de contrainte IT client connue (navigateurs récents).
 - Rise n'est pas un LMS : livrer au LMS du client, ou HTML5 via Code Block (sans suivi).
