@@ -252,4 +252,7 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
           faire avec la clé de Sam ; passe en option, ADR 0017) ; 3. écran storyboard ; 4. aperçu et
           retouches du module ; 5. profils LMS (Watch Live/Teach on Mars…) et fichier HTML unique ;
           6. installateurs signés
+    - [x] Premier module complet de bout en bout (2026-10-17) : `projects/mouvement-mecanique/module`,
+          6 langues (fr, en, de, it, ja, zh-Hans), banc 264 pages OK, SCORM Cloud 1.2 réussi ;
+          schéma `scripts/demo-sources/draw_movement.py` ; aperçu publié pour Sam (Artifact)
     - [ ] Atelier Claude Code (ADR 0017) : skill `generate-module`, accès aux dossiers de projet
