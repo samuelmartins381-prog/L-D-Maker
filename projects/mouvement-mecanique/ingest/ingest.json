@@ -1,0 +1,168 @@
+{
+  "sources": [
+    {
+      "file": "argumentaire.pptx",
+      "kind": "pptx",
+      "hash": "b3cd00972125dfae56b55dcdb3aa69ceb1172beb74513dd5ac108a819fdd54f8",
+      "markdown": "argumentaire.pptx.md",
+      "anchors": [
+        {
+          "id": "argumentaire.pptx#slide-1",
+          "label": "Expliquer le mouvement mécanique à un client"
+        },
+        {
+          "id": "argumentaire.pptx#slide-2",
+          "label": "Le principe en une phrase"
+        },
+        {
+          "id": "argumentaire.pptx#slide-3",
+          "label": "Les cinq fonctions"
+        },
+        {
+          "id": "argumentaire.pptx#slide-4",
+          "label": "La méthode en trois temps"
+        },
+        {
+          "id": "argumentaire.pptx#slide-5",
+          "label": "Faire observer"
+        },
+        {
+          "id": "argumentaire.pptx#slide-6",
+          "label": "Objection : « moins précis qu'un quartz »"
+        },
+        {
+          "id": "argumentaire.pptx#slide-7",
+          "label": "Objection : « elle s'est arrêtée »"
+        },
+        {
+          "id": "argumentaire.pptx#slide-8",
+          "label": "Objection : « c'est fragile »"
+        },
+        {
+          "id": "argumentaire.pptx#slide-9",
+          "label": "À la remise de la montre"
+        },
+        {
+          "id": "argumentaire.pptx#slide-10",
+          "label": "À retenir"
+        }
+      ],
+      "words": 340,
+      "media": [
+        "media/argumentaire/image1.png"
+      ]
+    },
+    {
+      "file": "guide-mouvement.pdf",
+      "kind": "pdf",
+      "hash": "1ad36d4e2df5f3d524fd6e1ba531dfabfe7e21668e5a107a827f2205ebb209b4",
+      "markdown": "guide-mouvement.pdf.md",
+      "anchors": [
+        {
+          "id": "guide-mouvement.pdf#p1",
+          "label": "Le mouvement mécanique — Guide du conseiller"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-le-mouvement-mecanique-guide-du-conseiller",
+          "label": "Le mouvement mécanique — Guide du conseiller"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-1-une-petite-machine-sans-pile",
+          "label": "1. Une petite machine sans pile"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-2-l-energie-le-barillet",
+          "label": "2. L'énergie : le barillet"
+        },
+        {
+          "id": "guide-mouvement.pdf#p2",
+          "label": "Sur une montre à remontage manuel, on arme le ressort en tournant la couronne. S"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-3-la-transmission-le-rouage",
+          "label": "3. La transmission : le rouage"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-4-la-distribution-l-echappement",
+          "label": "4. La distribution : l'échappement"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-5-la-regulation-le-balancier-spiral",
+          "label": "5. La régulation : le balancier-spiral"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-6-l-affichage",
+          "label": "6. L'affichage"
+        },
+        {
+          "id": "guide-mouvement.pdf#p3",
+          "label": "7. Précision : ce qu'il faut savoir"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-7-precision-ce-qu-il-faut-savoir",
+          "label": "7. Précision : ce qu'il faut savoir"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-8-les-ennemis-de-la-montre",
+          "label": "8. Les ennemis de la montre"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-9-l-entretien",
+          "label": "9. L'entretien"
+        },
+        {
+          "id": "guide-mouvement.pdf#h-10-idees-recues-frequentes",
+          "label": "10. Idées reçues fréquentes"
+        }
+      ],
+      "words": 979,
+      "media": [
+        "media/guide-mouvement/img-000.png"
+      ]
+    },
+    {
+      "file": "notes-terrain.docx",
+      "kind": "docx",
+      "hash": "fc79917852f3c45965c9b2ef3f59e5d620513dcc5fd66b8f9f8ac2f22739659f",
+      "markdown": "notes-terrain.docx.md",
+      "anchors": [
+        {
+          "id": "notes-terrain.docx#h-combien-de-temps-tient-elle-si-je-ne-la-porte-pas",
+          "label": "Combien de temps tient-elle si je ne la porte pas ?"
+        },
+        {
+          "id": "notes-terrain.docx#h-faut-il-la-remonter-tous-les-jours",
+          "label": "Faut-il la remonter tous les jours ?"
+        },
+        {
+          "id": "notes-terrain.docx#h-pourquoi-l-aiguille-des-secondes-glisse-t-elle",
+          "label": "Pourquoi l'aiguille des secondes glisse-t-elle ?"
+        },
+        {
+          "id": "notes-terrain.docx#h-que-veut-dire-28-800-alternances-par-heure",
+          "label": "Que veut dire « 28 800 alternances par heure » ?"
+        },
+        {
+          "id": "notes-terrain.docx#h-que-signifie-chronometre",
+          "label": "Que signifie « chronomètre » ?"
+        },
+        {
+          "id": "notes-terrain.docx#h-ma-montre-avance-de-30-secondes-par-jour-depuis-que-je-la-pose-sur-mon-ordinateur-portable",
+          "label": "Ma montre avance de 30 secondes par jour depuis que je la pose sur mon ordinateu"
+        },
+        {
+          "id": "notes-terrain.docx#h-puis-je-nager-avec",
+          "label": "Puis-je nager avec ?"
+        },
+        {
+          "id": "notes-terrain.docx#h-elle-s-est-arretee-dans-le-tiroir-elle-est-cassee",
+          "label": "Elle s'est arrêtée dans le tiroir : elle est cassée ?"
+        }
+      ],
+      "words": 236,
+      "media": []
+    }
+  ],
+  "words": 1555,
+  "readingMinutes": 8
+}

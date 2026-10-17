@@ -1,0 +1,19 @@
+schemaVersion: "0.1"
+id: mouvement-mecanique
+title: "Le mouvement mécanique : comprendre et l'expliquer"
+audience: Conseillers de vente en boutique horlogère (hypothèse de démonstration)
+durationMinutes: 20
+defaultLocale: fr
+locales:
+  - fr
+  - en
+  - de
+  - it
+  - es
+  - pt-BR
+  - ru
+  - ar
+  - ja
+  - zh-Hans
+  - ko
+approvals: {}

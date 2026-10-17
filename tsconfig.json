@@ -23,6 +23,9 @@
     },
     {
       "path": "packages/l10n"
+    },
+    {
+      "path": "packages/generator"
     }
   ]
 }

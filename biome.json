@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!examples/*/media"]
+    "includes": ["**", "!examples/*/media", "!projects/*/ingest"]
   },
   "formatter": {
     "enabled": true,
