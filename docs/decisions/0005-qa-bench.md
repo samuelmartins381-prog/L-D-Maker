@@ -44,3 +44,16 @@ clavier dont un focus masqué), puis le lecteur a été restauré.
 - [axe-core](https://github.com/dequelabs/axe-core), [Lighthouse](https://github.com/GoogleChrome/lighthouse)
 - [WCAG 2.2 — 2.4.11 Focus Not Obscured (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html)
 - [WAI-ARIA APG — Tabs (roving tabindex)](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
+
+## Addendum du 2026-10-17 — mesure réelle de la performance
+Lighthouse passe du mode simulé (Lantern) au ralentissement **appliqué au navigateur** (`throttlingMethod:
+"devtools"`). Le profil est le même : mobile, 4G lente, processeur ×4. On prend la **médiane de 3 passages**
+pour le score, le LCP, le CLS et le TBT, et les seuils sont inchangés.
+
+Pourquoi : avec le premier écran pré-rendu (ADR 0012), le mode simulé comptait le script du lecteur parmi les
+dépendances du LCP. Il estimait 2,4 s pour une page mesurée à 0,75 s dans les mêmes conditions.
+
+Mesure réelle sur le module de démo : LCP 1,99 à 2,07 s (la latence par requête de ce mode est plus sévère que
+celle de notre propre sonde), score 97 à 98.
+
+Décision validée par Sam le 2026-10-17.

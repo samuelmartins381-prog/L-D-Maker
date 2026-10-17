@@ -1,8 +1,17 @@
-// Lighthouse on the first screen, mobile emulation with simulated slow 4G (Lighthouse defaults).
+// Lighthouse on the first screen: mobile emulation, slow 4G and 4x CPU slowdown (Lighthouse defaults),
+// applied to the browser ("devtools" throttling) and measured, median of RUNS runs. The default
+// simulated mode (Lantern) estimates LCP from a dependency graph that counts the player script, which
+// the prerendered first screen does not need: it reported ~2.4 s for a page measured at ~0.75 s under
+// the same conditions (ADR 0012). Same thresholds; decision approved by Sam on 2026-10-17.
 import { launch } from "chrome-launcher";
 import lighthouse from "lighthouse";
 import { CHROMIUM_PATH } from "../browser.ts";
 import type { CheckResult } from "../types.ts";
+
+const RUNS = 3;
+
+const median = (values: number[]) =>
+  [...values].sort((x, y) => x - y)[Math.floor(values.length / 2)] as number;
 
 export const LIGHTHOUSE_BUDGET = {
   performance: 90,
@@ -19,24 +28,37 @@ export async function lighthouseChecks(url: string): Promise<CheckResult[]> {
     chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"],
   });
   try {
-    const run = await lighthouse(url, {
-      port: chrome.port,
-      logLevel: "error",
-      output: "json",
-      onlyCategories: ["performance", "accessibility", "best-practices"],
-    });
-    if (!run) throw new Error("Lighthouse returned no result");
+    const lhrs: NonNullable<Awaited<ReturnType<typeof lighthouse>>>["lhr"][] =
+      [];
+    for (let i = 0; i < RUNS; i++) {
+      const run = await lighthouse(url, {
+        port: chrome.port,
+        logLevel: "error",
+        output: "json",
+        onlyCategories: ["performance", "accessibility", "best-practices"],
+        throttlingMethod: "devtools",
+      });
+      if (!run) throw new Error("Lighthouse returned no result");
+      lhrs.push(run.lhr);
+    }
+    const run = { lhr: lhrs[0] as (typeof lhrs)[number] };
     const { categories, audits } = run.lhr;
     const score = (k: string) => Math.round((categories[k]?.score ?? 0) * 100);
     const num = (k: string) => audits[k]?.numericValue ?? Number.NaN;
+    // Timing metrics vary between runs: median. Accessibility and weight do not.
+    const med = (k: string) =>
+      median(lhrs.map((l) => l.audits[k]?.numericValue ?? Number.NaN));
     const b = LIGHTHOUSE_BUDGET;
-    const perf = score("performance");
+    const perf = median(
+      lhrs.map((l) => Math.round((l.categories.performance?.score ?? 0) * 100)),
+    );
     const a11y = score("accessibility");
-    const lcp = num("largest-contentful-paint");
-    const cls = num("cumulative-layout-shift");
-    const tbt = num("total-blocking-time");
+    const lcp = med("largest-contentful-paint");
+    const cls = med("cumulative-layout-shift");
+    const tbt = med("total-blocking-time");
     const bytes = num("total-byte-weight");
     const metrics = [
+      `Mesuré (ralentissement appliqué), médiane de ${RUNS} passages`,
       `LCP ${Math.round(lcp)} ms (≤ ${b.lcpMs})`,
       `CLS ${cls.toFixed(3)} (≤ ${b.cls})`,
       `TBT ${Math.round(tbt)} ms (≤ ${b.tbtMs})`,
@@ -56,7 +78,7 @@ export async function lighthouseChecks(url: string): Promise<CheckResult[]> {
       {
         id: "lighthouse-performance",
         title: "Performance mobile (Lighthouse)",
-        criterion: `Score ≥ ${b.performance}, LCP ≤ 2,5 s, CLS ≤ 0,1, TBT ≤ 200 ms (4G simulée, mobile)`,
+        criterion: `Score ≥ ${b.performance}, LCP ≤ 2,5 s, CLS ≤ 0,1, TBT ≤ 200 ms (mobile, 4G lente et processeur ×4 appliqués au navigateur)`,
         status:
           perf >= b.performance &&
           lcp <= b.lcpMs &&

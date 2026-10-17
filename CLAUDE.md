@@ -126,7 +126,8 @@ réglage « Allow Delete API calls » de l'application.
 ## Banc QA (ADR 0005)
 Chaque écran × langue × mobile/desktop × état (affiché, après interaction) : axe 0 violation,
 parcours Tab (focus visible, jamais masqué : test `elementFromPoint`), débordement, mouvement
-réduit, erreurs. Plus le suivi SCORM générique (faux LMS), Lighthouse et le poids. Tout nouveau
+réduit, erreurs. Plus le suivi SCORM générique (faux LMS), Lighthouse (ralentissement **appliqué**,
+médiane de 3, depuis le 2026-10-17 : le mode simulé surestimait le LCP) et le poids. Tout nouveau
 composant doit passer le banc ; un faux positif se corrige dans le banc **en le justifiant**
 (ex. roving tabindex APG), jamais en baissant un seuil.
 Piège d'outillage : Biome reformate les fichiers ; après un `pnpm format`, modifier avec Edit sur
