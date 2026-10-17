@@ -530,6 +530,18 @@ async function create() {
     overflow-wrap: anywhere;
   }
 
+  /* Long file names wrap; the size and the Remove button never do. */
+  .files li > span:first-child {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .files li .btn,
+  .files li .size {
+    flex: none;
+    white-space: nowrap;
+  }
+
   .inline {
     display: inline-flex;
     align-items: center;

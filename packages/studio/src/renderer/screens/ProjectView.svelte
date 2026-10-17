@@ -372,6 +372,18 @@ const kb = (bytes: number) => Math.max(1, Math.round(bytes / 1024));
     overflow-wrap: anywhere;
   }
 
+  /* Long file names wrap; the size and the Remove button never do. */
+  .files li > span:first-child {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .files li .btn,
+  .files li .size {
+    flex: none;
+    white-space: nowrap;
+  }
+
   .size {
     margin-inline-start: auto;
     font-size: var(--text-sm);
