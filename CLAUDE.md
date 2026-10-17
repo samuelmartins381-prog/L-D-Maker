@@ -30,6 +30,18 @@ Brief complet : `docs/brief.md`.
     client ne va jamais dans le dépôt.
   - **Public :** à confirmer (vente en boutique, service après-vente, grand public).
 
+## Vision produit (Sam, 2026-10-17)
+- Finalité : Sam s'associe avec Kylian (ancien de la FHH) pour vendre du training et des modules
+  aux marques horlogères. Brief de marque reçu → module livrable très vite. À terme, outil payant.
+- Interface **simple en apparence, complexe au fond** : Sam saisit ses choix (sources, format de
+  sortie / LMS cible, design, animations, types de tests et de questions) et obtient le module.
+- Toute source (PDF, PPTX…) doit marcher ; le générateur **demande le format de sortie** (SCORM,
+  fichier HTML unique, site à héberger…). Livraison surtout sur le LMS des marques → profils
+  pour les LMS principaux.
+- **Sam doit pouvoir modifier** tout ce que Claude produit (exigence centrale).
+- Plus tard : designs, skills, plugins, inspirations et règles communes (« ce que je ne veux pas
+  voir ») fournis par Sam, une fois l'architecture prête.
+
 ## Rôles
 - Claude pilote : recherche → recommandation argumentée → décision (ou attente de Sam si la
   décision lui appartient).
