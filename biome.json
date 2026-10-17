@@ -7,7 +7,12 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!examples/*/media", "!projects/*/ingest"]
+    "includes": [
+      "**",
+      "!examples/*/media",
+      "!projects/*/module/media",
+      "!projects/*/ingest"
+    ]
   },
   "formatter": {
     "enabled": true,
