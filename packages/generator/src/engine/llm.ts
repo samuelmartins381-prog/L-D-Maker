@@ -103,3 +103,30 @@ export function anthropicClient(apiKey: string): LlmClient {
     },
   };
 }
+
+/** Replays recorded answers in order, without network (tests, Studio end-to-end test). */
+export function replayClient(
+  answers: string[],
+  inputTokens = 20_000,
+): LlmClient {
+  const queue = [...answers];
+  return {
+    async countTokens() {
+      return inputTokens;
+    },
+    async complete(_call, onProgress) {
+      const text =
+        queue.length > 1 ? (queue.shift() as string) : (queue[0] ?? "{}");
+      onProgress?.(text.length);
+      return {
+        text,
+        content: [{ type: "text", text }],
+        stopReason: "end_turn",
+        usage: {
+          input_tokens: inputTokens,
+          output_tokens: Math.ceil(text.length / 4),
+        },
+      };
+    },
+  };
+}

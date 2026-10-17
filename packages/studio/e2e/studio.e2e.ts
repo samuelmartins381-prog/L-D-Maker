@@ -5,7 +5,13 @@
 //   LDM_STUDIO_EXECUTABLE=<packaged app binary> node …   (the same test on an installed build)
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -45,6 +51,24 @@ const AXE = readFileSync(
 const userData = mkdtempSync(join(tmpdir(), "ldm-studio-user-"));
 const projectsDir = mkdtempSync(join(tmpdir(), "ldm-studio-projects-"));
 mkdirSync(SHOTS, { recursive: true });
+// Claude is replaced by a recorded answer: the hand-written demo storyboard, at this test's
+// passing score (75 %), as the API would return it (without schemaVersion and module).
+const yamlLib = createRequire(join(ROOT, "packages/generator/package.json"))(
+  "yaml",
+) as { parse: (s: string) => Record<string, unknown> };
+const {
+  schemaVersion: _v,
+  module: _m,
+  ...draft
+} = yamlLib.parse(
+  readFileSync(
+    join(ROOT, "projects/mouvement-mecanique/storyboard.yaml"),
+    "utf8",
+  ),
+);
+draft.assessment = { passingScore: 75 };
+const fakeAnswer = join(userData, "fake-storyboard.json");
+writeFileSync(fakeAnswer, JSON.stringify(draft));
 // First launch with the folder already chosen (the native folder dialog cannot be driven).
 writeFileSync(
   join(userData, "settings.json"),
@@ -93,7 +117,11 @@ const packaged = process.env.LDM_STUDIO_EXECUTABLE;
 const app = await _electron.launch({
   executablePath: packaged ?? electronPath,
   args: packaged ? ["--no-sandbox"] : [STUDIO, "--no-sandbox"],
-  env: { ...process.env, LDM_STUDIO_USER_DATA: userData },
+  env: {
+    ...process.env,
+    LDM_STUDIO_USER_DATA: userData,
+    LDM_STUDIO_FAKE_LLM: fakeAnswer,
+  },
 });
 const errors: string[] = [];
 try {
@@ -261,9 +289,33 @@ try {
   await page.getByText(/3 source\(s\) read/).waitFor();
   await axe(page, "15-project-dark-en");
 
+  // Generation: price first, consent, progress, result; nothing written before consent.
+  await page.getByRole("button", { name: "Generate the storyboard" }).click();
+  await page.getByText(/20,000 tokens.*\$0\.24 to/).waitFor();
+  assert.ok(
+    !existsSync(join(projectsDir, "le-mouvement-mecanique/storyboard.yaml")),
+  );
+  await axe(page, "16-generate-confirm-dark-en");
+  await page.getByRole("button", { name: "Start generating" }).click();
+  await page
+    .getByText(/Storyboard ready in 1 answer\(s\): 0 error\(s\)/)
+    .waitFor({ timeout: 60_000 });
+  await page
+    .getByText("The storyboard is waiting for your approval.")
+    .waitFor();
+  assert.ok(
+    existsSync(
+      join(projectsDir, "le-mouvement-mecanique/review/storyboard.html"),
+    ),
+  );
+  await axe(page, "17-generated-dark-en");
+  console.log(
+    "  ✓ generation: estimate, consent, storyboard written and checked",
+  );
+
   assert.deepEqual(errors, [], "no runtime error");
   console.log(
-    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings",
+    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings → generation",
   );
 } finally {
   await app.close();

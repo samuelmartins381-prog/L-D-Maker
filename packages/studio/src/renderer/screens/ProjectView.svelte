@@ -7,6 +7,7 @@ import {
   stageOf,
   unwrap,
 } from "../store.svelte.ts";
+import GenerateStoryboard from "./GenerateStoryboard.svelte";
 
 const p = $derived(app.project);
 let reading = $state(false);
@@ -141,6 +142,9 @@ const kb = (bytes: number) => Math.max(1, Math.round(bytes / 1024));
       <section class="card next" aria-labelledby="next-title">
         <h2 id="next-title" class="eyebrow">{t("project.next")}</h2>
         <p>{tk(nextKey)}</p>
+        {#if p.state.ingest.state === "done" && p.state.approval.state !== "done"}
+          <GenerateStoryboard project={p} again={p.state.storyboard.state !== "missing"} />
+        {/if}
         {#if p.state.storyboard.state !== "missing"}
           <p>
             <button

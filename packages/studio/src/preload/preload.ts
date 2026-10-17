@@ -1,6 +1,6 @@
 // The only bridge between the sandboxed interface and the main process (ADR 0014).
 import { contextBridge, ipcRenderer, webUtils } from "electron";
-import type { StudioApi } from "../shared/api.ts";
+import type { GenerationProgress, StudioApi } from "../shared/api.ts";
 
 const call =
   (name: string) =>
@@ -23,6 +23,13 @@ const api: StudioApi = {
   removeSource: call("removeSource"),
   ingest: call("ingest"),
   openPath: call("openPath"),
+  estimateStoryboard: call("estimateStoryboard"),
+  generateStoryboard: call("generateStoryboard"),
+  onGenerationProgress: (listener) => {
+    const handler = (_e: unknown, p: GenerationProgress) => listener(p);
+    ipcRenderer.on("ldm:generationProgress", handler);
+    return () => ipcRenderer.off("ldm:generationProgress", handler);
+  },
 } as StudioApi;
 
 contextBridge.exposeInMainWorld("ldm", api);

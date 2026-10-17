@@ -42,6 +42,8 @@ export interface Settings {
   hasApiKey: boolean;
   /** false when the system offers no keychain (the key cannot be stored safely). */
   canStoreKey: boolean;
+  /** Generation possible: a key is stored (or a test double is configured). */
+  canGenerate: boolean;
   locale: StudioLocale;
 }
 
@@ -94,6 +96,26 @@ export interface NewProject {
   sources: string[];
 }
 
+export interface GenerationEstimate {
+  model: string;
+  inputTokens: number;
+  lowUsd: number;
+  highUsd: number;
+}
+
+export interface GenerationSummary {
+  rounds: number;
+  errors: number;
+  warnings: number;
+  costUsd: number;
+}
+
+/** Progress of a generation, pushed by the main process. */
+export type GenerationProgress =
+  | { stage: "writing"; round: number; chars: number }
+  | { stage: "checking"; round: number }
+  | { stage: "done" };
+
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export interface StudioApi {
@@ -116,6 +138,12 @@ export interface StudioApi {
   /** Reads the sources again (after adding or changing some). */
   ingest(dir: string): Promise<Result<ProjectDetail>>;
   openPath(path: string): Promise<void>;
+  /** Price range of generating the storyboard (counts what would be sent). */
+  estimateStoryboard(dir: string): Promise<Result<GenerationEstimate>>;
+  /** Claude writes storyboard.yaml from the sources, the brief and the choices. */
+  generateStoryboard(dir: string): Promise<Result<GenerationSummary>>;
+  /** Subscribes to generation progress; returns the unsubscribe function. */
+  onGenerationProgress(listener: (p: GenerationProgress) => void): () => void;
 }
 
 declare global {

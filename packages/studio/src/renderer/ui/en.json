@@ -157,7 +157,7 @@
   "project.next": "Next step",
   "project.next.sources": "Add the brand's documents, then have them read.",
   "project.next.ingest": "Have the sources read.",
-  "project.next.storyboard": "Generate the storyboard with Claude: coming in Studio step 2 (generation engine).",
+  "project.next.storyboard": "Claude reads your sources and proposes the storyboard: objectives, screens, questions, each tied to its source.",
   "project.next.approval": "The storyboard is waiting for your approval.",
   "project.next.module": "Writing the module comes in Studio step 4.",
   "project.openReview": "Open the storyboard review page",
@@ -182,5 +182,17 @@
   "settings.apiKeySave": "Save the key",
   "settings.apiKeyRemove": "Delete the key",
   "settings.apiKeyNoKeychain": "This system offers no secure keychain: the key cannot be stored.",
-  "settings.saved": "Saved."
+  "settings.saved": "Saved.",
+  "generate.noKey": "To generate, add your Anthropic API key in Settings.",
+  "generate.start": "Generate the storyboard",
+  "generate.again": "Generate the storyboard again",
+  "generate.estimating": "Working out the cost…",
+  "generate.estimate": "Claude will read your sources ({tokens} tokens) and propose a storyboard. Estimated cost: {low} to {high}.",
+  "generate.privacy": "The sources and the brief are sent to Anthropic (Claude), and to no other service.",
+  "generate.replaces": "The current storyboard will be replaced; it is kept next to it (storyboard.previous.yaml).",
+  "generate.confirm": "Start generating",
+  "generate.starting": "Sending the sources to Claude…",
+  "generate.writing": "Claude is writing (answer {round}, {chars} characters)…",
+  "generate.checking": "Checking answer {round}…",
+  "generate.done": "Storyboard ready in {rounds} answer(s): {errors} error(s), {warnings} point(s) to check. Cost: {cost}."
 }

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import type { NewProject, Result, StudioLocale } from "../shared/api.ts";
+import { estimate, generate } from "./generation.ts";
 import {
   acquireLock,
   addSources,
@@ -108,6 +109,14 @@ function registerIpc(win: BrowserWindow): void {
     removeSource(dir, file, await me()),
   );
   handle("ingest", async (dir: string) => ingest(dir, await me()));
+  handle("estimateStoryboard", async (dir: string) =>
+    estimate(dir, await root()),
+  );
+  handle("generateStoryboard", async (dir: string) =>
+    generate(dir, await root(), await me(), (p) =>
+      win.webContents.send("ldm:generationProgress", p),
+    ),
+  );
   ipcMain.handle("ldm:openPath", async (_e, path: string) => {
     await shell.openPath(path);
   });

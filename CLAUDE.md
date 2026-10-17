@@ -233,6 +233,7 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
           (en attente de validation de Sam : 5 questions ouvertes)
     - [x] Lecteurs de sources en JavaScript (pdf.js, OOXML maison) : plus de Python ni pandoc
     - [ ] Studio (plan du 2026-10-17, ADR 0014 à 0016) : 1. socle Electron + nouveau projet
-          (fait le 2026-10-17, en attente du retour de Sam sur Mac/Windows) ;
-          2. moteur API ; 3. écran storyboard ; 4. éditeur de module ; 5. profils LMS (Watch
+          (fait le 2026-10-17, testé par Sam sur Mac) ;
+          2. moteur API (fait : `engine/`, `pnpm gen generate`, bouton du Studio ; essai réel à
+          faire avec la clé de Sam) ; 3. écran storyboard ; 4. éditeur de module ; 5. profils LMS (Watch
           Live/Teach on Mars…) et fichier HTML unique ; 6. installateurs signés

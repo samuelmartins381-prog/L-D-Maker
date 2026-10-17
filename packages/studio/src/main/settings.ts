@@ -54,6 +54,12 @@ export async function getSettings(): Promise<Settings> {
       () => false,
     ),
     canStoreKey: canStoreKey(),
+    canGenerate:
+      Boolean(process.env.LDM_STUDIO_FAKE_LLM) ||
+      (await readFile(keyFile()).then(
+        () => true,
+        () => false,
+      )),
     locale:
       s.locale && STUDIO_LOCALES.includes(s.locale)
         ? s.locale

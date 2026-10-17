@@ -25,6 +25,21 @@ Le Studio est l'application de bureau du générateur (ADR 0014). Il tourne sur 
 - **Clé API Anthropic** (Paramètres) : à ajouter quand le moteur de génération arrivera (étape 2).
   Elle est chiffrée par le trousseau de ton ordinateur et ne va jamais dans le dossier partagé.
 
+## Générer le storyboard (étape 2)
+1. **Paramètres → Clé API Anthropic** : colle ta clé (elle commence par `sk-ant-`). Elle est
+   chiffrée par le trousseau de ton ordinateur.
+2. Dans un projet dont les sources sont lues, **Générer le storyboard** : le Studio affiche d'abord
+   le coût estimé (calculé sur la taille exacte de ce qui sera envoyé), puis attend ton accord.
+3. Claude rédige, puis chaque réponse passe les contrôles automatiques (traçabilité, alignement
+   objectifs ↔ questions, règles pédagogiques). Les problèmes trouvés lui sont renvoyés, trois
+   réponses au plus. Le coût réel s'affiche à la fin et est noté dans `generation-log.jsonl`.
+4. **Ouvrir la page de revue du storyboard** pour le lire. Régénérer remplace le storyboard ;
+   l'ancien est gardé dans `storyboard.previous.yaml`.
+
+**Règles communes** : un fichier `regles-maison.md` placé à la racine du dossier des projets est
+transmis à Claude pour chaque génération (par exemple « jamais de quiz vrai/faux », « toujours un
+cas client par section »). Écris-les librement, en français.
+
 ## Travailler à deux
 Quand l'un de vous ouvre un projet, le Studio pose un verrou (`.ldm-lock`) : l'autre le voit
 « Ouvert par … » et ne peut que le consulter, pour éviter que vos modifications se croisent. Le
@@ -40,7 +55,8 @@ projet que l'autre vient de modifier.
   fichier HTML unique, site), le design, les animations, l'évaluation et le ton.
 - Lire les sources : nombre de mots et passages repérés (la base de la traçabilité).
 - Suivre l'avancement de chaque projet.
+- Générer le storyboard avec Claude (coût affiché avant et après).
 
-À venir, dans l'ordre : génération du storyboard par Claude (étape 2), relecture et validation
+À venir, dans l'ordre : relecture et validation
 du storyboard dans le Studio (3), rédaction, éditeur et aperçu (4), exports par LMS (5),
 installateurs signés et mises à jour automatiques (6).

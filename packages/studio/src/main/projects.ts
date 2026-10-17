@@ -87,7 +87,7 @@ export function releaseLockSync(dir: string, me: string): void {
   }
 }
 
-async function assertEditable(dir: string, me: string): Promise<void> {
+export async function assertEditable(dir: string, me: string): Promise<void> {
   const other = await foreignLock(dir, me);
   if (other) throw new StudioError(`locked by ${other.by} since ${other.at}`);
 }
