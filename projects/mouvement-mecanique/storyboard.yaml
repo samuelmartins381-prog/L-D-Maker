@@ -1,0 +1,432 @@
+# Storyboard — écrit par Claude à partir de ingest/ (conception à rebours), à valider par Sam.
+schemaVersion: "0.1"
+module:
+  id: mouvement-mecanique
+  title: "Le mouvement mécanique : comprendre et l'expliquer"
+  audience: Conseillers de vente en boutique horlogère (hypothèse de démonstration)
+  durationMinutes: 20
+  defaultLocale: fr
+
+objectives:
+  - id: obj-functions
+    bloom: understand
+    text: Expliquer le rôle des cinq fonctions du mouvement mécanique, de l'énergie à l'affichage.
+    sourceRefs:
+      - guide-mouvement.pdf#h-1-une-petite-machine-sans-pile
+      - argumentaire.pptx#slide-3
+  - id: obj-care
+    bloom: apply
+    text: Relier une situation rapportée par un client (montre arrêtée, qui avance, usage) au fonctionnement du mouvement, et donner le bon conseil.
+    sourceRefs:
+      - guide-mouvement.pdf#h-8-les-ennemis-de-la-montre
+      - guide-mouvement.pdf#h-10-idees-recues-frequentes
+  - id: obj-explain
+    bloom: apply
+    text: Répondre à une objection de client avec la méthode écouter, montrer, relier.
+    sourceRefs:
+      - argumentaire.pptx#slide-4
+      - argumentaire.pptx#slide-6
+
+assessment:
+  passingScore: 80
+
+sections:
+  - id: s-principe
+    title: Le principe
+    screens:
+      - id: welcome
+        title: Une machine sans pile
+        minutes: 1
+        blocks:
+          - id: welcome-hook
+            type: narrative
+            intent: Accrocher avec la question la plus fréquente des clients et poser la promesse du module.
+            content: >-
+              Un client retourne une montre et demande : « Comment ça marche, sans pile ? ». Réponse en une
+              phrase : un petit moteur à ressort, régulé par un balancier qui bat plusieurs fois par seconde.
+              À la fin du module, vous saurez l'expliquer et répondre aux objections courantes.
+            objectives: [obj-functions]
+            sourceRefs:
+              - argumentaire.pptx#slide-2
+              - guide-mouvement.pdf#h-1-une-petite-machine-sans-pile
+          - id: welcome-goals
+            type: summary
+            intent: Annoncer les trois objectifs (clarté des intentions d'apprentissage).
+            content: Les trois objectifs du module, formulés pour le conseiller.
+            objectives: [obj-functions, obj-care, obj-explain]
+
+  - id: s-fonctions
+    title: Les cinq fonctions
+    screens:
+      - id: five-functions
+        title: De l'énergie à l'affichage
+        minutes: 3
+        blocks:
+          - id: five-functions-map
+            type: hotspots
+            intent: Donner une image mentale du mouvement (double codage) en explorant les cinq organes sur un schéma.
+            content: >-
+              Cinq repères sur le schéma : barillet (l'énergie, le ressort moteur), rouage (la transmission,
+              roue de centre et roue de secondes), échappement (la distribution par petites impulsions, le
+              tic-tac), balancier-spiral (la régulation, le cœur de la montre), aiguilles (l'affichage, via la
+              minuterie).
+            objectives: [obj-functions]
+            media: Schéma du mouvement redessiné en SVG sans texte, d'après la figure du guide et de la diapositive 3.
+            sourceRefs:
+              - guide-mouvement.pdf#h-2-l-energie-le-barillet
+              - guide-mouvement.pdf#h-3-la-transmission-le-rouage
+              - guide-mouvement.pdf#h-4-la-distribution-l-echappement
+              - guide-mouvement.pdf#h-5-la-regulation-le-balancier-spiral
+              - guide-mouvement.pdf#h-6-l-affichage
+          - id: energy-path
+            type: narrative
+            role: worked-example
+            intent: Exemple travaillé avant l'entraînement — suivre l'énergie pas à pas, comme on l'expliquerait.
+            content: >-
+              Exemple commenté : la couronne (ou le rotor) arme le ressort dans le barillet ; en se détendant,
+              il fait tourner le rouage ; l'échappement libère cette énergie dent après dent et pousse le
+              balancier ; le balancier-spiral oscille à rythme constant et donne la mesure ; la minuterie
+              entraîne les aiguilles. Chaque étape est reliée à ce que le client peut voir ou entendre.
+            objectives: [obj-functions]
+            sourceRefs:
+              - guide-mouvement.pdf#h-1-une-petite-machine-sans-pile
+              - guide-mouvement.pdf#h-2-l-energie-le-barillet
+              - guide-mouvement.pdf#h-4-la-distribution-l-echappement
+      - id: heart
+        title: Le cœur de la montre
+        minutes: 2
+        blocks:
+          - id: heart-tabs
+            type: tabs
+            intent: Approfondir la régulation, source des questions de clients sur la fréquence et la précision.
+            content: >-
+              Trois onglets : « Fréquence » (28 800 alternances par heure = 4 hertz = 8 alternances par
+              seconde ; 21 600 et 36 000 existent ; plus haut = plus stable mais plus d'énergie et d'usure),
+              « La trotteuse qui glisse » (8 petits pas par seconde contre 1 saut pour un quartz),
+              « Précision » (quelques secondes par jour ; chronomètre : −4 à +6 s par jour ; quartz : environ
+              15 s par mois ; position, température, magnétisme, armage).
+            objectives: [obj-functions, obj-explain]
+            sourceRefs:
+              - guide-mouvement.pdf#h-5-la-regulation-le-balancier-spiral
+              - guide-mouvement.pdf#h-7-precision-ce-qu-il-faut-savoir
+              - notes-terrain.docx#h-que-veut-dire-28-800-alternances-par-heure
+              - notes-terrain.docx#h-que-signifie-chronometre
+          - id: practice-order
+            type: question
+            variant: sequence
+            scored: false
+            intent: Entraînement à la récupération juste après l'exemple travaillé (ordre des fonctions).
+            content: Remettez dans l'ordre les cinq fonctions, du ressort aux aiguilles.
+            objectives: [obj-functions]
+            sourceRefs:
+              - guide-mouvement.pdf#h-1-une-petite-machine-sans-pile
+            choices:
+              - text: L'énergie (barillet)
+              - text: La transmission (rouage)
+              - text: La distribution (échappement)
+              - text: La régulation (balancier-spiral)
+              - text: L'affichage (aiguilles)
+
+  - id: s-quotidien
+    title: Au quotidien
+    screens:
+      - id: daily-life
+        title: Vivre avec une mécanique
+        minutes: 2.5
+        blocks:
+          - id: daily-accordion
+            type: accordion
+            intent: Relier chaque situation client à un organe du mouvement (transfert vers le conseil).
+            content: >-
+              Cinq panneaux : réserve de marche et remontage (manuel, automatique, 38 à 50 h, porter ou
+              remonter) ; magnétisme (spiral aimanté, avance de dizaines de secondes, démagnétisation en
+              quelques minutes) ; chocs (antichoc pour le quotidien, pas une chute) ; eau (joints qui
+              vieillissent, couronne repoussée ou vissée) ; entretien (révision tous les 5 à 7 ans).
+            objectives: [obj-care]
+            sourceRefs:
+              - guide-mouvement.pdf#p2
+              - guide-mouvement.pdf#h-8-les-ennemis-de-la-montre
+              - guide-mouvement.pdf#h-9-l-entretien
+              - notes-terrain.docx#h-puis-je-nager-avec
+      - id: misconceptions
+        title: Idées reçues
+        minutes: 2
+        blocks:
+          - id: misconceptions-tabs
+            type: tabs
+            intent: Déconstruire les idées reçues que le conseiller entendra (et que les distracteurs utiliseront).
+            content: >-
+              Quatre onglets : « Une automatique se remonte même posée » (non, elle se remonte quand on la
+              porte), « Une montre arrêtée est en panne » (le plus souvent désarmée), « Plus de rubis, meilleure
+              montre » (non, cela dépend de la construction), « Le magnétisme, c'est fini » (non, les aimants se
+              sont multipliés). Plus le conseil de la date entre 21 h et 3 h.
+            objectives: [obj-care]
+            sourceRefs:
+              - guide-mouvement.pdf#h-10-idees-recues-frequentes
+              - notes-terrain.docx#h-elle-s-est-arretee-dans-le-tiroir-elle-est-cassee
+          - id: practice-chronometer
+            type: question
+            variant: single
+            scored: false
+            intent: Entraînement sur une confusion fréquente avant l'évaluation.
+            content: Un client lit « chronomètre » sur un cadran. Que signifie ce mot ?
+            objectives: [obj-functions]
+            sourceRefs:
+              - guide-mouvement.pdf#h-7-precision-ce-qu-il-faut-savoir
+              - guide-mouvement.pdf#h-6-l-affichage
+            choices:
+              - text: Le mouvement a réussi des tests officiels de précision (−4 à +6 secondes par jour en moyenne).
+                correct: true
+              - text: La montre possède une fonction pour chronométrer.
+                correct: false
+                misconception: Confondre chronomètre (précision certifiée) et chronographe (complication).
+              - text: La montre est garantie précise à la seconde près.
+                correct: false
+                misconception: Croire qu'une mécanique certifiée ne dérive pas.
+
+  - id: s-expliquer
+    title: L'expliquer au client
+    screens:
+      - id: method
+        title: Écouter, montrer, relier
+        minutes: 2.5
+        blocks:
+          - id: method-dialogue
+            type: narrative
+            role: worked-example
+            intent: Exemple travaillé de la méthode, sur l'objection la plus fréquente, avant de s'exercer.
+            content: >-
+              Dialogue commenté avec une cliente qui trouve une mécanique « moins précise qu'un quartz ».
+              Écouter : reformuler sa question. Montrer : retourner la montre, faire observer le balancier.
+              Relier : reconnaître que le quartz est plus précis, expliquer le savoir-faire, l'absence de pile
+              et la réparabilité, puis recadrer (quelques secondes par jour suffisent au quotidien).
+            objectives: [obj-explain]
+            sourceRefs:
+              - argumentaire.pptx#slide-4
+              - argumentaire.pptx#slide-5
+              - argumentaire.pptx#slide-6
+      - id: objections
+        title: Trois objections
+        minutes: 2
+        blocks:
+          - id: objections-accordion
+            type: accordion
+            intent: Donner une réponse type pour chaque objection, réutilisable en boutique.
+            content: >-
+              « Moins précis qu'un quartz » (reconnaître, expliquer, recadrer) ; « Elle s'est arrêtée »
+              (réserve épuisée, porter ou remonter) ; « C'est fragile » (antichoc, étanchéité vérifiée, éviter
+              les aimants). Plus les conseils à la remise : remonter avant le premier port, date hors
+              21 h-3 h, révision tous les 5 à 7 ans.
+            objectives: [obj-explain, obj-care]
+            sourceRefs:
+              - argumentaire.pptx#slide-6
+              - argumentaire.pptx#slide-7
+              - argumentaire.pptx#slide-8
+              - argumentaire.pptx#slide-9
+
+  - id: s-evaluation
+    title: Évaluation
+    screens:
+      - id: quiz-functions
+        title: Les fonctions
+        minutes: 1.5
+        blocks:
+          - id: q-heart
+            type: question
+            variant: hotspot
+            intent: Reconnaître sur le schéma l'organe qui mesure le temps (identification visuelle).
+            content: Sur ce schéma, quel organe donne la mesure du temps ?
+            objectives: [obj-functions]
+            media: Même schéma SVG, sans légende ; cinq repères sur les cinq organes.
+            sourceRefs:
+              - guide-mouvement.pdf#h-5-la-regulation-le-balancier-spiral
+            choices:
+              - text: Le balancier-spiral
+                correct: true
+              - text: Le barillet
+                correct: false
+                misconception: Croire que le ressort, qui donne l'énergie, donne aussi le rythme.
+              - text: L'échappement
+                correct: false
+                misconception: Croire que l'organe qui fait « tic-tac » est celui qui compte le temps.
+              - text: Le rouage
+                correct: false
+                misconception: Croire que les roues dentées mesurent le temps par leur vitesse.
+              - text: Les aiguilles
+                correct: false
+                misconception: Confondre l'affichage du temps et sa mesure.
+          - id: q-frequency
+            type: question
+            variant: single
+            intent: Interpréter une donnée technique qu'un client lit sur une fiche produit.
+            content: Un client lit « 28 800 alternances par heure ». Que lui dites-vous ?
+            objectives: [obj-functions]
+            sourceRefs:
+              - guide-mouvement.pdf#h-5-la-regulation-le-balancier-spiral
+              - notes-terrain.docx#h-que-veut-dire-28-800-alternances-par-heure
+            choices:
+              - text: C'est le rythme du balancier, 8 alternances par seconde, soit 4 hertz.
+                correct: true
+              - text: C'est la réserve de marche exprimée en secondes.
+                correct: false
+                misconception: Confondre la fréquence du balancier et l'autonomie du ressort.
+              - text: Plus ce chiffre est élevé, meilleure est la montre, sans contrepartie.
+                correct: false
+                misconception: Ignorer qu'une fréquence plus haute demande plus d'énergie et use davantage.
+          - id: q-seconds
+            type: question
+            variant: single
+            intent: Expliquer un phénomène visible avec le fonctionnement interne.
+            content: Pourquoi la trotteuse d'une mécanique semble-t-elle glisser, alors que celle d'un quartz saute ?
+            objectives: [obj-functions]
+            sourceRefs:
+              - guide-mouvement.pdf#h-5-la-regulation-le-balancier-spiral
+              - notes-terrain.docx#h-pourquoi-l-aiguille-des-secondes-glisse-t-elle
+            choices:
+              - text: Elle avance par petits pas, au rythme du balancier (8 par seconde à 4 hertz).
+                correct: true
+              - text: Elle est entraînée en continu par le ressort, sans aucun à-coup.
+                correct: false
+                misconception: Croire que le mouvement de l'aiguille est continu.
+              - text: Parce qu'une mécanique est plus précise qu'un quartz.
+                correct: false
+                misconception: Associer fluidité de l'aiguille et précision.
+      - id: quiz-situations
+        title: Les situations
+        minutes: 1.5
+        blocks:
+          - id: q-stopped
+            type: question
+            variant: single
+            intent: Diagnostiquer une situation client dans un contexte différent de la FAQ (transfert).
+            content: Une cliente revient d'un long week-end ; sa montre automatique, laissée sur la table de nuit, s'est arrêtée. Que lui conseillez-vous ?
+            objectives: [obj-care]
+            sourceRefs:
+              - guide-mouvement.pdf#h-10-idees-recues-frequentes
+              - notes-terrain.docx#h-elle-s-est-arretee-dans-le-tiroir-elle-est-cassee
+            choices:
+              - text: Elle est simplement désarmée ; la remonter ou la porter, puis la remettre à l'heure.
+                correct: true
+              - text: L'envoyer en réparation, un arrêt signale une panne.
+                correct: false
+                misconception: « Une montre arrêtée est en panne. »
+              - text: Attendre, une automatique se remonte toute seule, même posée.
+                correct: false
+                misconception: « Une automatique se remonte même posée. »
+          - id: q-magnetism
+            type: question
+            variant: single
+            intent: Relier un symptôme (avance) à sa cause (magnétisme), dans un contexte nouveau (transfert).
+            content: Un client dit que sa montre avance de 40 secondes par jour depuis qu'il la pose chaque soir sur son enceinte connectée. Que lui répondez-vous ?
+            objectives: [obj-care]
+            sourceRefs:
+              - guide-mouvement.pdf#h-8-les-ennemis-de-la-montre
+              - notes-terrain.docx#h-ma-montre-avance-de-30-secondes-par-jour-depuis-que-je-la-pose-sur-mon-ordinateur-portable
+            choices:
+              - text: C'est probablement du magnétisme ; une démagnétisation chez l'horloger règle le problème.
+                correct: true
+              - text: C'est normal, une mécanique dérive toujours de cet ordre.
+                correct: false
+                misconception: Confondre la dérive normale (quelques secondes) et un défaut (des dizaines).
+              - text: Il a trop remonté sa montre, le ressort est endommagé.
+                correct: false
+                misconception: Croire qu'on abîme une montre en la remontant trop (un dispositif l'évite).
+          - id: q-handover
+            type: question
+            variant: multiple
+            intent: Choisir les bons conseils à la remise d'une montre.
+            content: Quels conseils donnez-vous à la remise d'une montre mécanique ?
+            objectives: [obj-care]
+            sourceRefs:
+              - argumentaire.pptx#slide-9
+              - guide-mouvement.pdf#h-9-l-entretien
+            choices:
+              - text: La remonter avant de la porter la première fois.
+                correct: true
+              - text: Éviter de corriger la date entre 21 h et 3 h.
+                correct: true
+              - text: Prévoir une révision tous les cinq à sept ans.
+                correct: true
+              - text: Ne la faire réviser qu'en cas de panne.
+                correct: false
+                misconception: Ignorer que les huiles vieillissent même sans panne.
+              - text: La ranger dans un étui à fermoir magnétique, pour bien la protéger.
+                correct: false
+                misconception: Ignorer le magnétisme des fermoirs aimantés.
+      - id: quiz-explain
+        title: L'explication au client
+        minutes: 1.5
+        blocks:
+          - id: q-objection
+            type: question
+            variant: single
+            intent: Choisir la réponse qui applique la méthode à l'objection « quartz ».
+            content: Un client objecte qu'une mécanique est moins précise qu'un quartz. Quelle réponse choisissez-vous ?
+            objectives: [obj-explain]
+            sourceRefs:
+              - argumentaire.pptx#slide-6
+              - guide-mouvement.pdf#h-7-precision-ce-qu-il-faut-savoir
+            choices:
+              - text: "« C'est vrai. Ce qu'elle offre, c'est un savoir-faire durable, réparable, sans pile. »"
+                correct: true
+              - text: "« Bien réglée, une mécanique est aussi précise qu'un quartz, vous savez. »"
+                correct: false
+                misconception: Nier l'écart de précision (−4/+6 s par jour contre environ 15 s par mois).
+              - text: "« Regardez plutôt ce cadran : le design fait toute la différence. »"
+                correct: false
+                misconception: Esquiver l'objection au lieu d'y répondre.
+          - id: q-method-order
+            type: question
+            variant: sequence
+            intent: Appliquer la méthode à un échange concret, action par action (pas le rappel de son titre).
+            content: >-
+              Un client trouve une mécanique « moins précise qu'un quartz ». Remettez dans l'ordre les cinq
+              actions du conseiller.
+            objectives: [obj-explain]
+            sourceRefs:
+              - argumentaire.pptx#slide-4
+              - argumentaire.pptx#slide-5
+              - argumentaire.pptx#slide-6
+            choices:
+              - text: Reformuler sa question pour vérifier ce qui l'inquiète
+              - text: Retourner la montre et lui faire observer le balancier
+              - text: Reconnaître que le quartz est plus précis
+              - text: Expliquer le savoir-faire, l'absence de pile et la réparabilité
+              - text: Recadrer sur l'usage quotidien, où quelques secondes par jour suffisent
+          - id: q-jewels
+            type: question
+            variant: single
+            intent: Répondre à une idée reçue de client sur les rubis.
+            content: « Celle-ci a plus de rubis, elle est donc meilleure ? » Que répondez-vous ?
+            objectives: [obj-explain]
+            sourceRefs:
+              - guide-mouvement.pdf#h-3-la-transmission-le-rouage
+              - guide-mouvement.pdf#h-10-idees-recues-frequentes
+            choices:
+              - text: Le nombre de rubis dépend de la construction et des fonctions ; ce n'est pas en soi un gage de qualité.
+                correct: true
+              - text: Oui, chaque rubis ajoute de la précision.
+                correct: false
+                misconception: « Plus de rubis, meilleure montre. »
+              - text: Les rubis sont purement décoratifs.
+                correct: false
+                misconception: Ignorer leur rôle de paliers contre les frottements.
+      - id: recap
+        title: À retenir
+        minutes: 1
+        blocks:
+          - id: recap-points
+            type: summary
+            role: self-regulation
+            intent: Consolider et donner une routine d'autorégulation à réutiliser en boutique.
+            content: >-
+              Cinq fonctions, une phrase simple, une démonstration visuelle. Routine avant de répondre à un
+              client : de quelle fonction parle-t-il ? que puis-je lui montrer ? quel bénéfice pour lui ?
+            objectives: [obj-functions, obj-care, obj-explain]
+
+openQuestions:
+  - Le public visé est-il bien les conseillers de vente en boutique ? Pour le service après-vente ou le grand public, le ton et le troisième objectif changeraient.
+  - "Durée : un module de 20 minutes, ou plutôt trois capsules de 6 à 7 minutes (micro-learning) ?"
+  - "Seuil de réussite : 80 %, soit une erreur tolérée sur 9 questions notées. Est-ce le bon niveau d'exigence ?"
+  - "Ton : vouvoiement, et une cliente fictive dans le dialogue d'exemple. Est-ce que ça te convient ?"
+  - "Limite : « répondre à une objection » n'est évalué que par des réponses à choisir. Une simulation de conversation (jalon J3) le mesurerait vraiment. On la prévoit pour ce module ?"

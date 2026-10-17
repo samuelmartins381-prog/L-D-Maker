@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Storyboard Le mouvement mécanique</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400..700&display=swap">
+<style>
+/* Layout: one reading column; screens as numbered cards in course order. Player theme colours. */
+:root {
+  --bg: #f7f4ee; --surface: #fffdf9; --ink: #1d1b18; --muted: #5c5750; --line: #e3ddd2;
+  --accent: #8a4b2a; --accent-soft: #f1e4da; --ok: #2d6a45; --ok-soft: #e3efe6;
+  --warn: #8a5a00; --warn-soft: #f7ecd4; --err: #a3362b; --err-soft: #f6e3df;
+  --display: "Fraunces", Georgia, serif; --body: "Inter", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #171513; --surface: #201d1a; --ink: #f1ece4; --muted: #b3aba0; --line: #37322c;
+  --accent: #e0a37f; --accent-soft: #3a2a20; --ok: #8fd0a6; --ok-soft: #1f3327;
+  --warn: #e6c27a; --warn-soft: #3a3020; --err: #f0a198; --err-soft: #3d2420; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #171513; --surface: #201d1a; --ink: #f1ece4; --muted: #b3aba0; --line: #37322c;
+  --accent: #e0a37f; --accent-soft: #3a2a20; --ok: #8fd0a6; --ok-soft: #1f3327;
+  --warn: #e6c27a; --warn-soft: #3a3020; --err: #f0a198; --err-soft: #3d2420; color-scheme: dark }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); }
+.page { max-width: 46rem; margin: 0 auto; padding-block: 2rem 4rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 2.5rem; }
+h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; }
+.eyebrow { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.meta { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; color: var(--muted); font-size: .92rem; }
+.pill { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .8rem; font-weight: 600; }
+.pill.pending { background: var(--warn-soft); color: var(--warn); }
+.pill.approved { background: var(--ok-soft); color: var(--ok); }
+.pill.changed { background: var(--err-soft); color: var(--err); }
+header { display: grid; gap: .8rem; }
+section { display: grid; gap: 1rem; }
+.ask { background: var(--accent-soft); border-radius: 10px; padding: 1.2rem 1.4rem; display: grid; gap: .6rem; }
+.ask ol { margin: 0; padding-inline-start: 1.2rem; display: grid; gap: .4rem; }
+.objectives { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.objectives li { display: grid; grid-template-columns: auto 1fr; gap: .2rem .8rem; align-items: baseline; }
+.tag { font-size: .75rem; font-weight: 600; letter-spacing: .04em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: .05rem .4rem; white-space: nowrap; }
+.issues { margin: 0; padding: 0; list-style: none; display: grid; gap: .4rem; font-size: .92rem; }
+.issues li { padding: .5rem .8rem; border-radius: 6px; }
+.issues .error { background: var(--err-soft); color: var(--err); }
+.issues .warning { background: var(--warn-soft); color: var(--warn); }
+.okline { color: var(--ok); font-weight: 600; }
+.screens { counter-reset: screen; display: grid; gap: 1.2rem; }
+.screen { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.2rem 1.3rem; display: grid; gap: 1rem; min-width: 0; }
+.screen-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .3rem 1rem; align-items: baseline; }
+.screen-head h3::before { counter-increment: screen; content: counter(screen) ". "; color: var(--accent); }
+.minutes { color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
+.block { border-top: 1px solid var(--line); padding-top: .9rem; display: grid; gap: .45rem; }
+.block-head { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.kind { font-weight: 650; }
+.role { background: var(--accent-soft); color: var(--accent); }
+.label { color: var(--muted); font-size: .85rem; font-weight: 600; margin-inline-end: .3rem; }
+.choices { margin: .2rem 0 0; padding: 0; list-style: none; display: grid; gap: .35rem; font-size: .95rem; }
+.choices li { display: grid; grid-template-columns: 1.4rem 1fr; gap: .4rem; }
+.choices .mark { font-weight: 700; }
+.choices .ok { color: var(--ok); }
+.choices .no { color: var(--err); }
+.choices .seq { color: var(--muted); font-variant-numeric: tabular-nums; }
+.miscon { display: block; color: var(--muted); font-size: .88rem; }
+details { font-size: .9rem; }
+summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+blockquote { margin: .5rem 0 0; padding: .5rem .9rem; border-inline-start: 3px solid var(--line); color: var(--muted); }
+blockquote cite { display: block; font-style: normal; font-size: .8rem; font-weight: 600; color: var(--ink); margin-bottom: .2rem; }
+footer { color: var(--muted); font-size: .8rem; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+code { font-size: .85em; }
+</style>
+<div class="page">
+<header>
+  <p class="eyebrow">Storyboard · mouvement-mecanique</p>
+  <h1>Le mouvement mécanique : comprendre et l'expliquer</h1>
+  <div class="meta"><span>Conseillers de vente en boutique horlogère (hypothèse de démonstration)</span><span>≈ 20,5 min prévues (cible 20 min)</span><span>11 écrans · 9 questions notées · seuil 80 %</span></div>
+  <p><span class="pill pending">À valider par Sam</span></p>
+</header>
+<section class="ask"><h2>Ce que je te demande de trancher</h2><ol><li>Le public visé est-il bien les conseillers de vente en boutique ? Pour le service après-vente ou le grand public, le ton et le troisième objectif changeraient.</li><li>Durée : un module de 20 minutes, ou plutôt trois capsules de 6 à 7 minutes (micro-learning) ?</li><li>Seuil de réussite : 80 %, soit une erreur tolérée sur 9 questions notées. Est-ce le bon niveau d'exigence ?</li><li>Ton : vouvoiement, et une cliente fictive dans le dialogue d'exemple. Est-ce que ça te convient ?</li><li>Limite : « répondre à une objection » n'est évalué que par des réponses à choisir. Une simulation de conversation (jalon J3) le mesurerait vraiment. On la prévoit pour ce module ?</li></ol></section>
+<section>
+  <h2>Objectifs</h2>
+  <ul class="objectives"><li><span class="tag">Comprendre</span><span><strong>obj-functions</strong> — Expliquer le rôle des cinq fonctions du mouvement mécanique, de l'énergie à l'affichage.</span></li><li><span class="tag">Appliquer</span><span><strong>obj-care</strong> — Relier une situation rapportée par un client (montre arrêtée, qui avance, usage) au fonctionnement du mouvement, et donner le bon conseil.</span></li><li><span class="tag">Appliquer</span><span><strong>obj-explain</strong> — Répondre à une objection de client avec la méthode écouter, montrer, relier.</span></li></ul>
+</section>
+<section>
+  <h2>Contrôles automatiques</h2>
+  <p class="okline">Tous les contrôles passent (pédagogie, sources, durée).</p>
+</section>
+<div class="screens">
+<section>
+  <h2>Le principe</h2>
+  <article class="screen">
+    <div class="screen-head"><h3>Une machine sans pile</h3><span class="minutes">≈ 1 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Texte</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Accrocher avec la question la plus fréquente des clients et poser la promesse du module.</p>
+  <p><span class="label">Contenu</span>Un client retourne une montre et demande : « Comment ça marche, sans pile ? ». Réponse en une phrase : un petit moteur à ressort, régulé par un balancier qui bat plusieurs fois par seconde. À la fin du module, vous saurez l'expliquer et répondre aux objections courantes.</p>
+  
+  
+  <details><summary>Sources (2)</summary><blockquote><cite>argumentaire.pptx — Le principe en une phrase</cite>Le principe en une phrase Une montre mécanique est un petit moteur à ressort, régulé par un balancier qui bat plusieurs fois par seconde. Pas de pile : seulement de la mécanique. Notes: Diapositive 2 — notes de l'animateur.</blockquote><blockquote><cite>guide-mouvement.pdf — 1. Une petite machine sans pile</cite>1. Une petite machine sans pile Une montre mécanique fonctionne sans pile ni électronique. C'est une machine miniature qui stocke de l'énergie dans un ressort, la libère par petites quantités parfaitement régulières, compte ces battements et les traduit en heures, minutes et secondes. Pour l'expliquer simplement, on distingue cinq fonctions, toujours dans…</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Récapitulatif</span><span class="tag">obj-functions</span><span class="tag">obj-care</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Annoncer les trois objectifs (clarté des intentions d'apprentissage).</p>
+  <p><span class="label">Contenu</span>Les trois objectifs du module, formulés pour le conseiller.</p>
+  
+  
+  
+</div>
+  </article>
+</section>
+<section>
+  <h2>Les cinq fonctions</h2>
+  <article class="screen">
+    <div class="screen-head"><h3>De l'énergie à l'affichage</h3><span class="minutes">≈ 3 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Image à repères</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Donner une image mentale du mouvement (double codage) en explorant les cinq organes sur un schéma.</p>
+  <p><span class="label">Contenu</span>Cinq repères sur le schéma : barillet (l'énergie, le ressort moteur), rouage (la transmission, roue de centre et roue de secondes), échappement (la distribution par petites impulsions, le tic-tac), balancier-spiral (la régulation, le cœur de la montre), aiguilles (l'affichage, via la minuterie).</p>
+  <p><span class="label">Visuel</span>Schéma du mouvement redessiné en SVG sans texte, d'après la figure du guide et de la diapositive 3.</p>
+  
+  <details><summary>Sources (5)</summary><blockquote><cite>guide-mouvement.pdf — 2. L'énergie : le barillet</cite>2. L'énergie : le barillet L'énergie est stockée dans un long ressort enroulé, le ressort moteur, logé dans un tambour denté appelé barillet. Remonter la montre, c'est armer ce ressort. En se détendant, il fait tourner le barillet, qui entraîne tout le mouvement.</blockquote><blockquote><cite>guide-mouvement.pdf — 3. La transmission : le rouage</cite>3. La transmission : le rouage Le rouage est une suite de roues dentées qui transmet l'énergie du barillet jusqu'à l'échappement. Chaque roue tourne à une vitesse précise : la roue de centre fait un tour par heure et porte l'aiguille des minutes ; la roue de secondes fait un tour par minute. Les axes des roues tournent dans des rubis synthétiques. Ces…</blockquote><blockquote><cite>guide-mouvement.pdf — 4. La distribution : l'échappement</cite>4. La distribution : l'échappement L'échappement libère l'énergie du rouage par petites impulsions. Le plus répandu est l'échappement à ancre suisse : la roue d'échappement est bloquée puis libérée, dent après dent, par une ancre qui bascule de gauche à droite. À chaque bascule, l'ancre donne une petite impulsion au balancier. C'est ce mécanisme qui produit…</blockquote><blockquote><cite>guide-mouvement.pdf — 5. La régulation : le balancier-spiral</cite>5. La régulation : le balancier-spiral Le balancier-spiral est le cœur de la montre. Le balancier est un anneau qui oscille d'un côté puis de l'autre, ramené par un ressort très fin, le spiral. Ses oscillations ont une durée constante : c'est lui qui donne la mesure du temps. Sa fréquence s'exprime en alternances par heure ou en hertz. 28 800 alternances…</blockquote><blockquote><cite>guide-mouvement.pdf — 6. L'affichage</cite>6. L'affichage Un petit train de roues, la minuterie, divise par douze la vitesse de l'aiguille des minutes pour entraîner l'aiguille des heures. Les fonctions supplémentaires, comme la date ou le chronographe, sont appelées des complications.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Texte</span><span class="tag role">Exemple travaillé</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Exemple travaillé avant l'entraînement — suivre l'énergie pas à pas, comme on l'expliquerait.</p>
+  <p><span class="label">Contenu</span>Exemple commenté : la couronne (ou le rotor) arme le ressort dans le barillet ; en se détendant, il fait tourner le rouage ; l'échappement libère cette énergie dent après dent et pousse le balancier ; le balancier-spiral oscille à rythme constant et donne la mesure ; la minuterie entraîne les aiguilles. Chaque étape est reliée à ce que le client peut voir ou entendre.</p>
+  
+  
+  <details><summary>Sources (3)</summary><blockquote><cite>guide-mouvement.pdf — 1. Une petite machine sans pile</cite>1. Une petite machine sans pile Une montre mécanique fonctionne sans pile ni électronique. C'est une machine miniature qui stocke de l'énergie dans un ressort, la libère par petites quantités parfaitement régulières, compte ces battements et les traduit en heures, minutes et secondes. Pour l'expliquer simplement, on distingue cinq fonctions, toujours dans…</blockquote><blockquote><cite>guide-mouvement.pdf — 2. L'énergie : le barillet</cite>2. L'énergie : le barillet L'énergie est stockée dans un long ressort enroulé, le ressort moteur, logé dans un tambour denté appelé barillet. Remonter la montre, c'est armer ce ressort. En se détendant, il fait tourner le barillet, qui entraîne tout le mouvement.</blockquote><blockquote><cite>guide-mouvement.pdf — 4. La distribution : l'échappement</cite>4. La distribution : l'échappement L'échappement libère l'énergie du rouage par petites impulsions. Le plus répandu est l'échappement à ancre suisse : la roue d'échappement est bloquée puis libérée, dent après dent, par une ancre qui bascule de gauche à droite. À chaque bascule, l'ancre donne une petite impulsion au balancier. C'est ce mécanisme qui produit…</blockquote></details>
+</div>
+  </article>
+<article class="screen">
+    <div class="screen-head"><h3>Le cœur de la montre</h3><span class="minutes">≈ 2 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Onglets</span><span class="tag">obj-functions</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Approfondir la régulation, source des questions de clients sur la fréquence et la précision.</p>
+  <p><span class="label">Contenu</span>Trois onglets : « Fréquence » (28 800 alternances par heure = 4 hertz = 8 alternances par seconde ; 21 600 et 36 000 existent ; plus haut = plus stable mais plus d'énergie et d'usure), « La trotteuse qui glisse » (8 petits pas par seconde contre 1 saut pour un quartz), « Précision » (quelques secondes par jour ; chronomètre : −4 à +6 s par jour ; quartz : environ 15 s par mois ; position, température, magnétisme, armage).</p>
+  
+  
+  <details><summary>Sources (4)</summary><blockquote><cite>guide-mouvement.pdf — 5. La régulation : le balancier-spiral</cite>5. La régulation : le balancier-spiral Le balancier-spiral est le cœur de la montre. Le balancier est un anneau qui oscille d'un côté puis de l'autre, ramené par un ressort très fin, le spiral. Ses oscillations ont une durée constante : c'est lui qui donne la mesure du temps. Sa fréquence s'exprime en alternances par heure ou en hertz. 28 800 alternances…</blockquote><blockquote><cite>guide-mouvement.pdf — 7. Précision : ce qu'il faut savoir</cite>7. Précision : ce qu'il faut savoir Une montre mécanique avance ou retarde de quelques secondes par jour. Le titre de chronomètre est attribué après des tests officiels de plusieurs jours : la marche moyenne journalière doit rester entre −4 et +6 secondes. Une montre à quartz courante dérive, elle, d'environ 15 secondes par mois. La différence vient de…</blockquote><blockquote><cite>notes-terrain.docx — Que veut dire « 28 800 alternances par heure » ?</cite>Que veut dire « 28 800 alternances par heure » ? C'est la vitesse du balancier : 8 alternances par seconde, soit 4 hertz.</blockquote><blockquote><cite>notes-terrain.docx — Que signifie « chronomètre » ?</cite>Que signifie « chronomètre » ? Que le mouvement a réussi des tests officiels de précision : entre −4 et +6 secondes par jour en moyenne.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question remise en ordre · entraînement</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Entraînement à la récupération juste après l'exemple travaillé (ordre des fonctions).</p>
+  <p><span class="label">Contenu</span>Remettez dans l'ordre les cinq fonctions, du ressort aux aiguilles.</p>
+  
+  <ul class="choices"><li><span class="mark seq">1.</span><span>L'énergie (barillet)</span></li><li><span class="mark seq">2.</span><span>La transmission (rouage)</span></li><li><span class="mark seq">3.</span><span>La distribution (échappement)</span></li><li><span class="mark seq">4.</span><span>La régulation (balancier-spiral)</span></li><li><span class="mark seq">5.</span><span>L'affichage (aiguilles)</span></li></ul>
+  <details><summary>Sources (1)</summary><blockquote><cite>guide-mouvement.pdf — 1. Une petite machine sans pile</cite>1. Une petite machine sans pile Une montre mécanique fonctionne sans pile ni électronique. C'est une machine miniature qui stocke de l'énergie dans un ressort, la libère par petites quantités parfaitement régulières, compte ces battements et les traduit en heures, minutes et secondes. Pour l'expliquer simplement, on distingue cinq fonctions, toujours dans…</blockquote></details>
+</div>
+  </article>
+</section>
+<section>
+  <h2>Au quotidien</h2>
+  <article class="screen">
+    <div class="screen-head"><h3>Vivre avec une mécanique</h3><span class="minutes">≈ 2,5 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Accordéon</span><span class="tag">obj-care</span></div>
+  <p><span class="label">Pourquoi</span>Relier chaque situation client à un organe du mouvement (transfert vers le conseil).</p>
+  <p><span class="label">Contenu</span>Cinq panneaux : réserve de marche et remontage (manuel, automatique, 38 à 50 h, porter ou remonter) ; magnétisme (spiral aimanté, avance de dizaines de secondes, démagnétisation en quelques minutes) ; chocs (antichoc pour le quotidien, pas une chute) ; eau (joints qui vieillissent, couronne repoussée ou vissée) ; entretien (révision tous les 5 à 7 ans).</p>
+  
+  
+  <details><summary>Sources (4)</summary><blockquote><cite>guide-mouvement.pdf — Sur une montre à remontage manuel, on arme le ressort en tournant la couronne. S</cite>Sur une montre à remontage manuel, on arme le ressort en tournant la couronne. Sur une montre automatique, une masse oscillante, le rotor, tourne au gré des mouvements du poignet et remonte le ressort. Un dispositif de glissement évite d'armer le ressort au-delà de sa limite. La réserve de marche est la durée pendant laquelle la montre fonctionne une fois…</blockquote><blockquote><cite>guide-mouvement.pdf — 8. Les ennemis de la montre</cite>8. Les ennemis de la montre Le magnétisme : un spiral aimanté colle légèrement sur lui-même et la montre peut se mettre à avancer fortement, de plusieurs dizaines de secondes par jour. Haut-parleurs, fermoirs magnétiques de sacs ou tablettes peuvent en être la cause. Une démagnétisation chez l'horloger règle le problème en quelques minutes. Les chocs : un…</blockquote><blockquote><cite>guide-mouvement.pdf — 9. L'entretien</cite>9. L'entretien Les huiles du mouvement vieillissent. Une révision complète est généralement recommandée tous les cinq à sept ans, selon la marque et l'usage : démontage, nettoyage, lubrification, remplacement des joints et réglage.</blockquote><blockquote><cite>notes-terrain.docx — Puis-je nager avec ?</cite>Puis-je nager avec ? Seulement si son étanchéité le permet et si les joints ont été vérifiés récemment ; couronne repoussée ou vissée.</blockquote></details>
+</div>
+  </article>
+<article class="screen">
+    <div class="screen-head"><h3>Idées reçues</h3><span class="minutes">≈ 2 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Onglets</span><span class="tag">obj-care</span></div>
+  <p><span class="label">Pourquoi</span>Déconstruire les idées reçues que le conseiller entendra (et que les distracteurs utiliseront).</p>
+  <p><span class="label">Contenu</span>Quatre onglets : « Une automatique se remonte même posée » (non, elle se remonte quand on la porte), « Une montre arrêtée est en panne » (le plus souvent désarmée), « Plus de rubis, meilleure montre » (non, cela dépend de la construction), « Le magnétisme, c'est fini » (non, les aimants se sont multipliés). Plus le conseil de la date entre 21 h et 3 h.</p>
+  
+  
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 10. Idées reçues fréquentes</cite>10. Idées reçues fréquentes « Une automatique se remonte toute seule, même posée. » Non : elle se remonte quand on la porte. Posée, elle s'arrête au bout de sa réserve de marche. « Une montre arrêtée est en panne. » Le plus souvent, son ressort est simplement désarmé : il suffit de la porter ou de la remonter. « Plus de rubis, meilleure montre. » Non : le…</blockquote><blockquote><cite>notes-terrain.docx — Elle s'est arrêtée dans le tiroir : elle est cassée ?</cite>Elle s'est arrêtée dans le tiroir : elle est cassée ? Non, elle est simplement désarmée. On la remonte, puis on la remet à l'heure.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · entraînement</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Entraînement sur une confusion fréquente avant l'évaluation.</p>
+  <p><span class="label">Contenu</span>Un client lit « chronomètre » sur un cadran. Que signifie ce mot ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Le mouvement a réussi des tests officiels de précision (−4 à +6 secondes par jour en moyenne).</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>La montre possède une fonction pour chronométrer.<span class="miscon">Idée reçue visée : Confondre chronomètre (précision certifiée) et chronographe (complication).</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>La montre est garantie précise à la seconde près.<span class="miscon">Idée reçue visée : Croire qu'une mécanique certifiée ne dérive pas.</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 7. Précision : ce qu'il faut savoir</cite>7. Précision : ce qu'il faut savoir Une montre mécanique avance ou retarde de quelques secondes par jour. Le titre de chronomètre est attribué après des tests officiels de plusieurs jours : la marche moyenne journalière doit rester entre −4 et +6 secondes. Une montre à quartz courante dérive, elle, d'environ 15 secondes par mois. La différence vient de…</blockquote><blockquote><cite>guide-mouvement.pdf — 6. L'affichage</cite>6. L'affichage Un petit train de roues, la minuterie, divise par douze la vitesse de l'aiguille des minutes pour entraîner l'aiguille des heures. Les fonctions supplémentaires, comme la date ou le chronographe, sont appelées des complications.</blockquote></details>
+</div>
+  </article>
+</section>
+<section>
+  <h2>L'expliquer au client</h2>
+  <article class="screen">
+    <div class="screen-head"><h3>Écouter, montrer, relier</h3><span class="minutes">≈ 2,5 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Texte</span><span class="tag role">Exemple travaillé</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Exemple travaillé de la méthode, sur l'objection la plus fréquente, avant de s'exercer.</p>
+  <p><span class="label">Contenu</span>Dialogue commenté avec une cliente qui trouve une mécanique « moins précise qu'un quartz ». Écouter : reformuler sa question. Montrer : retourner la montre, faire observer le balancier. Relier : reconnaître que le quartz est plus précis, expliquer le savoir-faire, l'absence de pile et la réparabilité, puis recadrer (quelques secondes par jour suffisent au quotidien).</p>
+  
+  
+  <details><summary>Sources (3)</summary><blockquote><cite>argumentaire.pptx — La méthode en trois temps</cite>La méthode en trois temps Écouter : partir de la question du client. Montrer : retourner la montre, faire observer le balancier qui oscille. Relier : du mécanisme au bénéfice (savoir-faire, durabilité, transmission). Notes: Diapositive 4 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — Faire observer</cite>Faire observer Fond transparent : le balancier qui bat, la masse oscillante qui tourne. Laisser le client tenir la montre et écouter le tic-tac. Notes: Diapositive 5 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — Objection : « moins précis qu'un quartz »</cite>Objection : « moins précis qu'un quartz » Reconnaître : oui, le quartz est plus précis. Expliquer : la mécanique, c'est un savoir-faire, sans pile, réparable pendant des décennies. Recadrer : quelques secondes par jour suffisent largement au quotidien. Notes: Diapositive 6 — notes de l'animateur.</blockquote></details>
+</div>
+  </article>
+<article class="screen">
+    <div class="screen-head"><h3>Trois objections</h3><span class="minutes">≈ 2 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Accordéon</span><span class="tag">obj-explain</span><span class="tag">obj-care</span></div>
+  <p><span class="label">Pourquoi</span>Donner une réponse type pour chaque objection, réutilisable en boutique.</p>
+  <p><span class="label">Contenu</span>« Moins précis qu'un quartz » (reconnaître, expliquer, recadrer) ; « Elle s'est arrêtée » (réserve épuisée, porter ou remonter) ; « C'est fragile » (antichoc, étanchéité vérifiée, éviter les aimants). Plus les conseils à la remise : remonter avant le premier port, date hors 21 h-3 h, révision tous les 5 à 7 ans.</p>
+  
+  
+  <details><summary>Sources (4)</summary><blockquote><cite>argumentaire.pptx — Objection : « moins précis qu'un quartz »</cite>Objection : « moins précis qu'un quartz » Reconnaître : oui, le quartz est plus précis. Expliquer : la mécanique, c'est un savoir-faire, sans pile, réparable pendant des décennies. Recadrer : quelques secondes par jour suffisent largement au quotidien. Notes: Diapositive 6 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — Objection : « elle s'est arrêtée »</cite>Objection : « elle s'est arrêtée » Ce n'est pas une panne : la réserve de marche est épuisée. Porter la montre ou la remonter, puis la remettre à l'heure. Notes: Diapositive 7 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — Objection : « c'est fragile »</cite>Objection : « c'est fragile » Un antichoc protège le balancier des chocs du quotidien. Étanchéité vérifiée à chaque révision. Éviter les aimants : haut-parleurs, fermoirs magnétiques. Notes: Diapositive 8 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — À la remise de la montre</cite>À la remise de la montre Remonter avant le premier port. Ne pas corriger la date entre 21 h et 3 h. Révision tous les cinq à sept ans, selon la marque. Notes: Diapositive 9 — notes de l'animateur.</blockquote></details>
+</div>
+  </article>
+</section>
+<section>
+  <h2>Évaluation</h2>
+  <article class="screen">
+    <div class="screen-head"><h3>Les fonctions</h3><span class="minutes">≈ 1,5 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Question sur image · notée</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Reconnaître sur le schéma l'organe qui mesure le temps (identification visuelle).</p>
+  <p><span class="label">Contenu</span>Sur ce schéma, quel organe donne la mesure du temps ?</p>
+  <p><span class="label">Visuel</span>Même schéma SVG, sans légende ; cinq repères sur les cinq organes.</p>
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Le balancier-spiral</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Le barillet<span class="miscon">Idée reçue visée : Croire que le ressort, qui donne l'énergie, donne aussi le rythme.</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>L'échappement<span class="miscon">Idée reçue visée : Croire que l'organe qui fait « tic-tac » est celui qui compte le temps.</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Le rouage<span class="miscon">Idée reçue visée : Croire que les roues dentées mesurent le temps par leur vitesse.</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Les aiguilles<span class="miscon">Idée reçue visée : Confondre l'affichage du temps et sa mesure.</span></span></li></ul>
+  <details><summary>Sources (1)</summary><blockquote><cite>guide-mouvement.pdf — 5. La régulation : le balancier-spiral</cite>5. La régulation : le balancier-spiral Le balancier-spiral est le cœur de la montre. Le balancier est un anneau qui oscille d'un côté puis de l'autre, ramené par un ressort très fin, le spiral. Ses oscillations ont une durée constante : c'est lui qui donne la mesure du temps. Sa fréquence s'exprime en alternances par heure ou en hertz. 28 800 alternances…</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · notée</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Interpréter une donnée technique qu'un client lit sur une fiche produit.</p>
+  <p><span class="label">Contenu</span>Un client lit « 28 800 alternances par heure ». Que lui dites-vous ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>C'est le rythme du balancier, 8 alternances par seconde, soit 4 hertz.</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>C'est la réserve de marche exprimée en secondes.<span class="miscon">Idée reçue visée : Confondre la fréquence du balancier et l'autonomie du ressort.</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Plus ce chiffre est élevé, meilleure est la montre, sans contrepartie.<span class="miscon">Idée reçue visée : Ignorer qu'une fréquence plus haute demande plus d'énergie et use davantage.</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 5. La régulation : le balancier-spiral</cite>5. La régulation : le balancier-spiral Le balancier-spiral est le cœur de la montre. Le balancier est un anneau qui oscille d'un côté puis de l'autre, ramené par un ressort très fin, le spiral. Ses oscillations ont une durée constante : c'est lui qui donne la mesure du temps. Sa fréquence s'exprime en alternances par heure ou en hertz. 28 800 alternances…</blockquote><blockquote><cite>notes-terrain.docx — Que veut dire « 28 800 alternances par heure » ?</cite>Que veut dire « 28 800 alternances par heure » ? C'est la vitesse du balancier : 8 alternances par seconde, soit 4 hertz.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · notée</span><span class="tag">obj-functions</span></div>
+  <p><span class="label">Pourquoi</span>Expliquer un phénomène visible avec le fonctionnement interne.</p>
+  <p><span class="label">Contenu</span>Pourquoi la trotteuse d'une mécanique semble-t-elle glisser, alors que celle d'un quartz saute ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Elle avance par petits pas, au rythme du balancier (8 par seconde à 4 hertz).</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Elle est entraînée en continu par le ressort, sans aucun à-coup.<span class="miscon">Idée reçue visée : Croire que le mouvement de l'aiguille est continu.</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Parce qu'une mécanique est plus précise qu'un quartz.<span class="miscon">Idée reçue visée : Associer fluidité de l'aiguille et précision.</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 5. La régulation : le balancier-spiral</cite>5. La régulation : le balancier-spiral Le balancier-spiral est le cœur de la montre. Le balancier est un anneau qui oscille d'un côté puis de l'autre, ramené par un ressort très fin, le spiral. Ses oscillations ont une durée constante : c'est lui qui donne la mesure du temps. Sa fréquence s'exprime en alternances par heure ou en hertz. 28 800 alternances…</blockquote><blockquote><cite>notes-terrain.docx — Pourquoi l'aiguille des secondes glisse-t-elle ?</cite>Pourquoi l'aiguille des secondes glisse-t-elle ? Parce que le balancier bat plusieurs fois par seconde : l'aiguille avance par petits pas, 8 par seconde à 4 hertz.</blockquote></details>
+</div>
+  </article>
+<article class="screen">
+    <div class="screen-head"><h3>Les situations</h3><span class="minutes">≈ 1,5 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · notée</span><span class="tag">obj-care</span></div>
+  <p><span class="label">Pourquoi</span>Diagnostiquer une situation client dans un contexte différent de la FAQ (transfert).</p>
+  <p><span class="label">Contenu</span>Une cliente revient d'un long week-end ; sa montre automatique, laissée sur la table de nuit, s'est arrêtée. Que lui conseillez-vous ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Elle est simplement désarmée ; la remonter ou la porter, puis la remettre à l'heure.</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>L'envoyer en réparation, un arrêt signale une panne.<span class="miscon">Idée reçue visée : « Une montre arrêtée est en panne. »</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Attendre, une automatique se remonte toute seule, même posée.<span class="miscon">Idée reçue visée : « Une automatique se remonte même posée. »</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 10. Idées reçues fréquentes</cite>10. Idées reçues fréquentes « Une automatique se remonte toute seule, même posée. » Non : elle se remonte quand on la porte. Posée, elle s'arrête au bout de sa réserve de marche. « Une montre arrêtée est en panne. » Le plus souvent, son ressort est simplement désarmé : il suffit de la porter ou de la remonter. « Plus de rubis, meilleure montre. » Non : le…</blockquote><blockquote><cite>notes-terrain.docx — Elle s'est arrêtée dans le tiroir : elle est cassée ?</cite>Elle s'est arrêtée dans le tiroir : elle est cassée ? Non, elle est simplement désarmée. On la remonte, puis on la remet à l'heure.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · notée</span><span class="tag">obj-care</span></div>
+  <p><span class="label">Pourquoi</span>Relier un symptôme (avance) à sa cause (magnétisme), dans un contexte nouveau (transfert).</p>
+  <p><span class="label">Contenu</span>Un client dit que sa montre avance de 40 secondes par jour depuis qu'il la pose chaque soir sur son enceinte connectée. Que lui répondez-vous ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>C'est probablement du magnétisme ; une démagnétisation chez l'horloger règle le problème.</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>C'est normal, une mécanique dérive toujours de cet ordre.<span class="miscon">Idée reçue visée : Confondre la dérive normale (quelques secondes) et un défaut (des dizaines).</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Il a trop remonté sa montre, le ressort est endommagé.<span class="miscon">Idée reçue visée : Croire qu'on abîme une montre en la remontant trop (un dispositif l'évite).</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 8. Les ennemis de la montre</cite>8. Les ennemis de la montre Le magnétisme : un spiral aimanté colle légèrement sur lui-même et la montre peut se mettre à avancer fortement, de plusieurs dizaines de secondes par jour. Haut-parleurs, fermoirs magnétiques de sacs ou tablettes peuvent en être la cause. Une démagnétisation chez l'horloger règle le problème en quelques minutes. Les chocs : un…</blockquote><blockquote><cite>notes-terrain.docx — Ma montre avance de 30 secondes par jour depuis que je la pose sur mon ordinateu</cite>Ma montre avance de 30 secondes par jour depuis que je la pose sur mon ordinateur portable. C'est très probablement du magnétisme. Une démagnétisation chez l'horloger règle le problème en quelques minutes.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question choix multiple · notée</span><span class="tag">obj-care</span></div>
+  <p><span class="label">Pourquoi</span>Choisir les bons conseils à la remise d'une montre.</p>
+  <p><span class="label">Contenu</span>Quels conseils donnez-vous à la remise d'une montre mécanique ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>La remonter avant de la porter la première fois.</span></li><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Éviter de corriger la date entre 21 h et 3 h.</span></li><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Prévoir une révision tous les cinq à sept ans.</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Ne la faire réviser qu'en cas de panne.<span class="miscon">Idée reçue visée : Ignorer que les huiles vieillissent même sans panne.</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>La ranger dans un étui à fermoir magnétique, pour bien la protéger.<span class="miscon">Idée reçue visée : Ignorer le magnétisme des fermoirs aimantés.</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>argumentaire.pptx — À la remise de la montre</cite>À la remise de la montre Remonter avant le premier port. Ne pas corriger la date entre 21 h et 3 h. Révision tous les cinq à sept ans, selon la marque. Notes: Diapositive 9 — notes de l'animateur.</blockquote><blockquote><cite>guide-mouvement.pdf — 9. L'entretien</cite>9. L'entretien Les huiles du mouvement vieillissent. Une révision complète est généralement recommandée tous les cinq à sept ans, selon la marque et l'usage : démontage, nettoyage, lubrification, remplacement des joints et réglage.</blockquote></details>
+</div>
+  </article>
+<article class="screen">
+    <div class="screen-head"><h3>L'explication au client</h3><span class="minutes">≈ 1,5 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · notée</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Choisir la réponse qui applique la méthode à l'objection « quartz ».</p>
+  <p><span class="label">Contenu</span>Un client objecte qu'une mécanique est moins précise qu'un quartz. Quelle réponse choisissez-vous ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>« C'est vrai. Ce qu'elle offre, c'est un savoir-faire durable, réparable, sans pile. »</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>« Bien réglée, une mécanique est aussi précise qu'un quartz, vous savez. »<span class="miscon">Idée reçue visée : Nier l'écart de précision (−4/+6 s par jour contre environ 15 s par mois).</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>« Regardez plutôt ce cadran : le design fait toute la différence. »<span class="miscon">Idée reçue visée : Esquiver l'objection au lieu d'y répondre.</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>argumentaire.pptx — Objection : « moins précis qu'un quartz »</cite>Objection : « moins précis qu'un quartz » Reconnaître : oui, le quartz est plus précis. Expliquer : la mécanique, c'est un savoir-faire, sans pile, réparable pendant des décennies. Recadrer : quelques secondes par jour suffisent largement au quotidien. Notes: Diapositive 6 — notes de l'animateur.</blockquote><blockquote><cite>guide-mouvement.pdf — 7. Précision : ce qu'il faut savoir</cite>7. Précision : ce qu'il faut savoir Une montre mécanique avance ou retarde de quelques secondes par jour. Le titre de chronomètre est attribué après des tests officiels de plusieurs jours : la marche moyenne journalière doit rester entre −4 et +6 secondes. Une montre à quartz courante dérive, elle, d'environ 15 secondes par mois. La différence vient de…</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question remise en ordre · notée</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Appliquer la méthode à un échange concret, action par action (pas le rappel de son titre).</p>
+  <p><span class="label">Contenu</span>Un client trouve une mécanique « moins précise qu'un quartz ». Remettez dans l'ordre les cinq actions du conseiller.</p>
+  
+  <ul class="choices"><li><span class="mark seq">1.</span><span>Reformuler sa question pour vérifier ce qui l'inquiète</span></li><li><span class="mark seq">2.</span><span>Retourner la montre et lui faire observer le balancier</span></li><li><span class="mark seq">3.</span><span>Reconnaître que le quartz est plus précis</span></li><li><span class="mark seq">4.</span><span>Expliquer le savoir-faire, l'absence de pile et la réparabilité</span></li><li><span class="mark seq">5.</span><span>Recadrer sur l'usage quotidien, où quelques secondes par jour suffisent</span></li></ul>
+  <details><summary>Sources (3)</summary><blockquote><cite>argumentaire.pptx — La méthode en trois temps</cite>La méthode en trois temps Écouter : partir de la question du client. Montrer : retourner la montre, faire observer le balancier qui oscille. Relier : du mécanisme au bénéfice (savoir-faire, durabilité, transmission). Notes: Diapositive 4 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — Faire observer</cite>Faire observer Fond transparent : le balancier qui bat, la masse oscillante qui tourne. Laisser le client tenir la montre et écouter le tic-tac. Notes: Diapositive 5 — notes de l'animateur.</blockquote><blockquote><cite>argumentaire.pptx — Objection : « moins précis qu'un quartz »</cite>Objection : « moins précis qu'un quartz » Reconnaître : oui, le quartz est plus précis. Expliquer : la mécanique, c'est un savoir-faire, sans pile, réparable pendant des décennies. Recadrer : quelques secondes par jour suffisent largement au quotidien. Notes: Diapositive 6 — notes de l'animateur.</blockquote></details>
+</div>
+<div class="block">
+  <div class="block-head"><span class="kind">Question choix unique · notée</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Répondre à une idée reçue de client sur les rubis.</p>
+  <p><span class="label">Contenu</span>« Celle-ci a plus de rubis, elle est donc meilleure ? » Que répondez-vous ?</p>
+  
+  <ul class="choices"><li><span class="mark ok" aria-hidden="true">✓</span><span><span class="vh">Bonne réponse : </span>Le nombre de rubis dépend de la construction et des fonctions ; ce n'est pas en soi un gage de qualité.</span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Oui, chaque rubis ajoute de la précision.<span class="miscon">Idée reçue visée : « Plus de rubis, meilleure montre. »</span></span></li><li><span class="mark no" aria-hidden="true">✗</span><span><span class="vh">Distracteur : </span>Les rubis sont purement décoratifs.<span class="miscon">Idée reçue visée : Ignorer leur rôle de paliers contre les frottements.</span></span></li></ul>
+  <details><summary>Sources (2)</summary><blockquote><cite>guide-mouvement.pdf — 3. La transmission : le rouage</cite>3. La transmission : le rouage Le rouage est une suite de roues dentées qui transmet l'énergie du barillet jusqu'à l'échappement. Chaque roue tourne à une vitesse précise : la roue de centre fait un tour par heure et porte l'aiguille des minutes ; la roue de secondes fait un tour par minute. Les axes des roues tournent dans des rubis synthétiques. Ces…</blockquote><blockquote><cite>guide-mouvement.pdf — 10. Idées reçues fréquentes</cite>10. Idées reçues fréquentes « Une automatique se remonte toute seule, même posée. » Non : elle se remonte quand on la porte. Posée, elle s'arrête au bout de sa réserve de marche. « Une montre arrêtée est en panne. » Le plus souvent, son ressort est simplement désarmé : il suffit de la porter ou de la remonter. « Plus de rubis, meilleure montre. » Non : le…</blockquote></details>
+</div>
+  </article>
+<article class="screen">
+    <div class="screen-head"><h3>À retenir</h3><span class="minutes">≈ 1 min</span></div>
+    <div class="block">
+  <div class="block-head"><span class="kind">Récapitulatif</span><span class="tag role">Autorégulation</span><span class="tag">obj-functions</span><span class="tag">obj-care</span><span class="tag">obj-explain</span></div>
+  <p><span class="label">Pourquoi</span>Consolider et donner une routine d'autorégulation à réutiliser en boutique.</p>
+  <p><span class="label">Contenu</span>Cinq fonctions, une phrase simple, une démonstration visuelle. Routine avant de répondre à un client : de quelle fonction parle-t-il ? que puis-je lui montrer ? quel bénéfice pour lui ?</p>
+  
+  
+  
+</div>
+  </article>
+</section>
+</div>
+<footer>Empreinte du storyboard : <code>a2869f041a83</code> · sources : argumentaire.pptx, guide-mouvement.pdf, notes-terrain.docx</footer>
+</div>
+</body>
+</html>

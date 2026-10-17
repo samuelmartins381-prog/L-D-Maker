@@ -122,6 +122,7 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 blockquote { margin: .5rem 0 0; padding: .5rem .9rem; border-inline-start: 3px solid var(--line); color: var(--muted); }
 blockquote cite { display: block; font-style: normal; font-size: .8rem; font-weight: 600; color: var(--ink); margin-bottom: .2rem; }
 footer { color: var(--muted); font-size: .8rem; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 code { font-size: .85em; }
 `;
 
@@ -136,12 +137,17 @@ async function renderBlock(
             b.variant === "sequence"
               ? `<span class="mark seq">${i + 1}.</span>`
               : c.correct
-                ? `<span class="mark ok" aria-label="Bonne réponse">✓</span>`
-                : `<span class="mark no" aria-label="Distracteur">✗</span>`;
+                ? `<span class="mark ok" aria-hidden="true">✓</span>`
+                : `<span class="mark no" aria-hidden="true">✗</span>`;
+          // The mark is visual only: screen readers get the same information as text.
+          const said =
+            b.variant === "sequence"
+              ? ""
+              : `<span class="vh">${c.correct ? "Bonne réponse : " : "Distracteur : "}</span>`;
           const miscon = c.misconception
             ? `<span class="miscon">Idée reçue visée : ${esc(c.misconception)}</span>`
             : "";
-          return `<li>${mark}<span>${esc(c.text)}${miscon}</span></li>`;
+          return `<li>${mark}<span>${said}${esc(c.text)}${miscon}</span></li>`;
         })
         .join("")}</ul>`
     : "";
@@ -175,6 +181,8 @@ export async function renderReviewBody(input: ReviewInput): Promise<string> {
   const { storyboard: sb, project, issues, status } = input;
   const screens = sb.sections.flatMap((s) => s.screens);
   const minutes = screens.reduce((n, s) => n + s.minutes, 0);
+  const num = (n: number) =>
+    new Intl.NumberFormat(sb.module.defaultLocale).format(n);
   const scored = screens
     .flatMap((s) => s.blocks)
     .filter((b) => b.type === "question" && b.scored !== false).length;
@@ -193,7 +201,7 @@ export async function renderReviewBody(input: ReviewInput): Promise<string> {
     await Promise.all(
       s.screens.map(
         async (sc) => `<article class="screen">
-    <div class="screen-head"><h3>${esc(sc.title)}</h3><span class="minutes">≈ ${sc.minutes} min</span></div>
+    <div class="screen-head"><h3>${esc(sc.title)}</h3><span class="minutes">≈ ${num(sc.minutes)} min</span></div>
     ${(await Promise.all(sc.blocks.map((b) => renderBlock(b, input)))).join("\n")}
   </article>`,
       ),
@@ -211,7 +219,7 @@ export async function renderReviewBody(input: ReviewInput): Promise<string> {
 <header>
   <p class="eyebrow">Storyboard · ${esc(project.id)}</p>
   <h1>${esc(sb.module.title)}</h1>
-  <div class="meta"><span>${esc(sb.module.audience)}</span><span>≈ ${minutes} min prévues (cible ${sb.module.durationMinutes} min)</span><span>${screens.length} écrans · ${scored} questions notées · seuil ${sb.assessment.passingScore} %</span></div>
+  <div class="meta"><span>${esc(sb.module.audience)}</span><span>≈ ${num(minutes)} min prévues (cible ${sb.module.durationMinutes} min)</span><span>${screens.length} écrans · ${scored} questions notées · seuil ${sb.assessment.passingScore} %</span></div>
   <p><span class="pill ${status}">${statusText}</span></p>
 </header>
 ${
