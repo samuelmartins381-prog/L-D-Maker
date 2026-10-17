@@ -1,0 +1,256 @@
+# yaml-language-server: $schema=../../../packages/schema/module.schema.json
+# Demo module written by Claude from the storyboard (projects/mouvement-mecanique/storyboard.yaml).
+# Invented, non-confidential content: general watchmaking facts, no brand, no real calibre.
+schemaVersion: "0.1"
+id: mouvement-mecanique
+version: 0.1.0
+defaultLocale: fr
+locales: [fr]
+
+meta:
+  title: meta.title
+  description: meta.description
+  durationMinutes: 20
+
+objectives:
+  - id: obj-functions
+    bloom: understand
+    text: obj.functions
+  - id: obj-care
+    bloom: apply
+    text: obj.care
+  - id: obj-explain
+    bloom: apply
+    text: obj.explain
+
+assessment:
+  passingScore: 80
+  completion: all-screens-and-passed
+
+sections:
+  - id: s-principe
+    title: s-principe.title
+    screens:
+      - id: welcome
+        title: welcome.title
+        blocks:
+          - id: welcome-hook
+            type: narrative
+            heading: welcome.hook.heading
+            body: welcome.hook.body
+          - id: welcome-goals
+            type: summary
+            heading: welcome.goals.heading
+            points: [obj.functions, obj.care, obj.explain]
+
+  - id: s-fonctions
+    title: s-fonctions.title
+    screens:
+      - id: five-functions
+        title: five-functions.title
+        blocks:
+          - id: five-functions-map
+            type: hotspots
+            intro: five-functions.map.intro
+            image: { src: media/movement.svg, alt: five-functions.map.alt }
+            items:
+              - { id: barrel, x: 13.7, y: 51.9, title: fn.barrel.title, body: fn.barrel.body }
+              - { id: train, x: 37, y: 34.6, title: fn.train.title, body: fn.train.body }
+              - { id: escapement, x: 74.8, y: 50.6, title: fn.escapement.title, body: fn.escapement.body }
+              - { id: balance, x: 87, y: 23.5, title: fn.balance.title, body: fn.balance.body }
+              - { id: display, x: 31.5, y: 84, title: fn.display.title, body: fn.display.body }
+          - id: energy-path
+            type: narrative
+            heading: energy-path.heading
+            body: energy-path.body
+      - id: heart
+        title: heart.title
+        blocks:
+          - id: heart-tabs
+            type: tabs
+            intro: heart.intro
+            items:
+              - { id: frequency, title: heart.frequency.title, body: heart.frequency.body }
+              - { id: seconds, title: heart.seconds.title, body: heart.seconds.body }
+              - { id: precision, title: heart.precision.title, body: heart.precision.body }
+          - id: practice-order
+            type: question
+            variant: sequence
+            scored: false
+            attempts: 2
+            prompt: practice-order.prompt
+            objectives: [obj-functions]
+            choices:
+              - { id: energy, text: practice-order.energy, feedback: practice-order.energy.fb }
+              - { id: transmission, text: practice-order.transmission, feedback: practice-order.transmission.fb }
+              - { id: distribution, text: practice-order.distribution, feedback: practice-order.distribution.fb }
+              - { id: regulation, text: practice-order.regulation, feedback: practice-order.regulation.fb }
+              - { id: display, text: practice-order.display, feedback: practice-order.display.fb }
+
+  - id: s-quotidien
+    title: s-quotidien.title
+    screens:
+      - id: daily-life
+        title: daily-life.title
+        blocks:
+          - id: daily-accordion
+            type: accordion
+            intro: daily.intro
+            items:
+              - { id: winding, title: daily.winding.title, body: daily.winding.body }
+              - { id: magnetism, title: daily.magnetism.title, body: daily.magnetism.body }
+              - { id: shocks, title: daily.shocks.title, body: daily.shocks.body }
+              - { id: water, title: daily.water.title, body: daily.water.body }
+              - { id: service, title: daily.service.title, body: daily.service.body }
+      - id: misconceptions
+        title: misconceptions.title
+        blocks:
+          - id: misconceptions-tabs
+            type: tabs
+            intro: misconceptions.intro
+            items:
+              - { id: auto, title: myth.auto.title, body: myth.auto.body }
+              - { id: stopped, title: myth.stopped.title, body: myth.stopped.body }
+              - { id: jewels, title: myth.jewels.title, body: myth.jewels.body }
+              - { id: magnets, title: myth.magnets.title, body: myth.magnets.body }
+          - id: practice-chronometer
+            type: question
+            variant: single
+            scored: false
+            attempts: 2
+            prompt: practice-chrono.prompt
+            objectives: [obj-functions]
+            choices:
+              - { id: certified, text: practice-chrono.certified, correct: true, feedback: practice-chrono.certified.fb }
+              - { id: stopwatch, text: practice-chrono.stopwatch, correct: false, feedback: practice-chrono.stopwatch.fb }
+              - { id: perfect, text: practice-chrono.perfect, correct: false, feedback: practice-chrono.perfect.fb }
+
+  - id: s-expliquer
+    title: s-expliquer.title
+    screens:
+      - id: method
+        title: method.title
+        blocks:
+          - id: method-dialogue
+            type: narrative
+            heading: method.heading
+            body: method.body
+      - id: objections
+        title: objections.title
+        blocks:
+          - id: objections-accordion
+            type: accordion
+            intro: objections.intro
+            items:
+              - { id: quartz, title: objection.quartz.title, body: objection.quartz.body }
+              - { id: stopped, title: objection.stopped.title, body: objection.stopped.body }
+              - { id: fragile, title: objection.fragile.title, body: objection.fragile.body }
+              - { id: handover, title: objection.handover.title, body: objection.handover.body }
+
+  - id: s-evaluation
+    title: s-evaluation.title
+    screens:
+      - id: quiz-functions
+        title: quiz-functions.title
+        blocks:
+          - id: q-heart
+            type: question
+            variant: hotspot
+            prompt: q-heart.prompt
+            image: { src: media/movement.svg, alt: q-heart.alt }
+            objectives: [obj-functions]
+            choices:
+              - { id: balance, x: 87, y: 23.5, text: q-heart.balance, correct: true, feedback: q-heart.balance.fb }
+              - { id: barrel, x: 13.7, y: 51.9, text: q-heart.barrel, correct: false, feedback: q-heart.barrel.fb }
+              - { id: escapement, x: 74.8, y: 50.6, text: q-heart.escapement, correct: false, feedback: q-heart.escapement.fb }
+              - { id: train, x: 37, y: 34.6, text: q-heart.train, correct: false, feedback: q-heart.train.fb }
+              - { id: hands, x: 31.5, y: 84, text: q-heart.hands, correct: false, feedback: q-heart.hands.fb }
+          - id: q-frequency
+            type: question
+            variant: single
+            prompt: q-frequency.prompt
+            objectives: [obj-functions]
+            choices:
+              - { id: rhythm, text: q-frequency.rhythm, correct: true, feedback: q-frequency.rhythm.fb }
+              - { id: reserve, text: q-frequency.reserve, correct: false, feedback: q-frequency.reserve.fb }
+              - { id: higher, text: q-frequency.higher, correct: false, feedback: q-frequency.higher.fb }
+          - id: q-seconds
+            type: question
+            variant: single
+            prompt: q-seconds.prompt
+            objectives: [obj-functions]
+            choices:
+              - { id: steps, text: q-seconds.steps, correct: true, feedback: q-seconds.steps.fb }
+              - { id: continuous, text: q-seconds.continuous, correct: false, feedback: q-seconds.continuous.fb }
+              - { id: precise, text: q-seconds.precise, correct: false, feedback: q-seconds.precise.fb }
+      - id: quiz-situations
+        title: quiz-situations.title
+        blocks:
+          - id: q-stopped
+            type: question
+            variant: single
+            prompt: q-stopped.prompt
+            objectives: [obj-care]
+            choices:
+              - { id: unwound, text: q-stopped.unwound, correct: true, feedback: q-stopped.unwound.fb }
+              - { id: repair, text: q-stopped.repair, correct: false, feedback: q-stopped.repair.fb }
+              - { id: wait, text: q-stopped.wait, correct: false, feedback: q-stopped.wait.fb }
+          - id: q-magnetism
+            type: question
+            variant: single
+            prompt: q-magnetism.prompt
+            objectives: [obj-care]
+            choices:
+              - { id: magnetism, text: q-magnetism.magnetism, correct: true, feedback: q-magnetism.magnetism.fb }
+              - { id: normal, text: q-magnetism.normal, correct: false, feedback: q-magnetism.normal.fb }
+              - { id: overwound, text: q-magnetism.overwound, correct: false, feedback: q-magnetism.overwound.fb }
+          - id: q-handover
+            type: question
+            variant: multiple
+            prompt: q-handover.prompt
+            objectives: [obj-care]
+            choices:
+              - { id: wind, text: q-handover.wind, correct: true, feedback: q-handover.wind.fb }
+              - { id: date, text: q-handover.date, correct: true, feedback: q-handover.date.fb }
+              - { id: service, text: q-handover.service, correct: true, feedback: q-handover.service.fb }
+              - { id: only-broken, text: q-handover.only-broken, correct: false, feedback: q-handover.only-broken.fb }
+              - { id: magnetic-case, text: q-handover.magnetic-case, correct: false, feedback: q-handover.magnetic-case.fb }
+      - id: quiz-explain
+        title: quiz-explain.title
+        blocks:
+          - id: q-objection
+            type: question
+            variant: single
+            prompt: q-objection.prompt
+            objectives: [obj-explain]
+            choices:
+              - { id: acknowledge, text: q-objection.acknowledge, correct: true, feedback: q-objection.acknowledge.fb }
+              - { id: deny, text: q-objection.deny, correct: false, feedback: q-objection.deny.fb }
+              - { id: dodge, text: q-objection.dodge, correct: false, feedback: q-objection.dodge.fb }
+          - id: q-method-order
+            type: question
+            variant: sequence
+            prompt: q-method-order.prompt
+            objectives: [obj-explain]
+            choices:
+              - { id: rephrase, text: q-method-order.rephrase, feedback: q-method-order.rephrase.fb }
+              - { id: show, text: q-method-order.show, feedback: q-method-order.show.fb }
+              - { id: acknowledge, text: q-method-order.acknowledge, feedback: q-method-order.acknowledge.fb }
+              - { id: explain, text: q-method-order.explain, feedback: q-method-order.explain.fb }
+              - { id: reframe, text: q-method-order.reframe, feedback: q-method-order.reframe.fb }
+          - id: q-jewels
+            type: question
+            variant: single
+            prompt: q-jewels.prompt
+            objectives: [obj-explain]
+            choices:
+              - { id: construction, text: q-jewels.construction, correct: true, feedback: q-jewels.construction.fb }
+              - { id: precision, text: q-jewels.precision, correct: false, feedback: q-jewels.precision.fb }
+              - { id: decorative, text: q-jewels.decorative, correct: false, feedback: q-jewels.decorative.fb }
+      - id: recap
+        title: recap.title
+        blocks:
+          - id: recap-points
+            type: summary
+            heading: recap.heading
+            points: [recap.p1, recap.p2, recap.p3, recap.routine]

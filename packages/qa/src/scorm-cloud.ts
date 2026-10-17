@@ -206,12 +206,24 @@ async function answer(sco: Frame, index: number): Promise<void> {
   for (const block of screens[index]?.blocks ?? []) {
     if (block.type !== "question") continue;
     const q = block as Question;
-    const form = sco
-      .locator("form.question")
-      .filter({ has: sco.locator(`input[name="${q.id}"]`) });
+    const form = sco.locator(`form.question[data-question="${q.id}"]`);
     if ((await form.locator('button[type="submit"]').count()) === 0) continue;
-    for (const c of q.choices.filter((c) => c.correct))
-      await form.locator(`input[value="${c.id}"]`).check();
+    if (q.variant === "sequence") {
+      // Same as the bench (checks/scorm.ts): bring each step up to its place with Move up.
+      for (const [i, c] of q.choices.entries()) {
+        for (;;) {
+          const ids = await form
+            .locator('.steps button[data-move="up"]')
+            .evaluateAll((bs) => bs.map((b) => (b as HTMLElement).dataset.id));
+          if (ids.indexOf(c.id) <= i) break;
+          await form
+            .locator(`button[data-id="${c.id}"][data-move="up"]`)
+            .click();
+        }
+      }
+    } else
+      for (const c of q.choices.filter((c) => c.correct))
+        await form.locator(`input[value="${c.id}"]`).check();
     await form.locator('button[type="submit"]').click();
   }
 }
