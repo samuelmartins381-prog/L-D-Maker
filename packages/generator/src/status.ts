@@ -2,6 +2,7 @@
 import { access } from "node:fs/promises";
 import { loadIngest, staleSources } from "./ingest.ts";
 import { loadProject, paths } from "./project.ts";
+import { loadStoryboard } from "./storyboard.ts";
 
 export interface Step {
   name: string;
@@ -46,27 +47,46 @@ export async function projectStatus(dir: string): Promise<Step[]> {
             detail: `${index.sources.length} source(s), ${index.words} mots, ${index.sources.reduce((n, s) => n + s.anchors.length, 0)} ancres`,
           },
   );
+  const sb = await loadStoryboard(dir);
+  const errors = sb.issues.filter((i) => i.severity === "error").length;
   steps.push(
-    (await exists(p.storyboard))
-      ? { name: "Storyboard", state: "done", detail: "storyboard.yaml présent" }
-      : {
+    !sb.storyboard && sb.hash === ""
+      ? {
           name: "Storyboard",
           state: index && !stale.length ? "todo" : "blocked",
           detail: "à écrire par Claude à partir de ingest/",
-        },
+        }
+      : errors
+        ? {
+            name: "Storyboard",
+            state: "todo",
+            detail: `${errors} erreur(s) (pnpm gen storyboard)`,
+          }
+        : {
+            name: "Storyboard",
+            state: "done",
+            detail: `${sb.issues.length} point(s) à vérifier, page de revue : review/storyboard.html`,
+          },
   );
+  const approval = project.approvals.storyboard;
   steps.push(
-    project.approvals.storyboard
+    !approval
       ? {
           name: "Validation de Sam",
-          state: "done",
-          detail: `le ${project.approvals.storyboard.at} par ${project.approvals.storyboard.by}`,
+          state: sb.storyboard && !errors ? "todo" : "blocked",
+          detail: "en attente de la validation du storyboard par Sam",
         }
-      : {
-          name: "Validation de Sam",
-          state: "blocked",
-          detail: "en attente du storyboard validé",
-        },
+      : approval.hash !== sb.hash
+        ? {
+            name: "Validation de Sam",
+            state: "todo",
+            detail: `le storyboard a changé depuis la validation du ${approval.at} : à revalider`,
+          }
+        : {
+            name: "Validation de Sam",
+            state: "done",
+            detail: `le ${approval.at} par ${approval.by}`,
+          },
   );
   steps.push(
     (await exists(p.module))
