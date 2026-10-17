@@ -46,6 +46,11 @@ Brief complet : `docs/brief.md`.
   service et par étape, total, plafond de budget par projet), puis coût réel affiché. Chaque
   service tiers recevant du contenu de marque = accord de Sam + licence commerciale vérifiée.
 
+## Organisation (ADR 0017, Sam, 2026-10-17)
+Mixte : **création dans Claude Code** (skills, plugins, MCP, abonnement) ; **le dépôt** est la
+colonne vertébrale (sources, contrôles, lecteur, exports, QA) ; **le Studio** est l'écran de
+finition (projet et choix, aperçu, retouches, validation, export). Génération par API : option.
+
 ## Rôles
 - Claude pilote : recherche → recommandation argumentée → décision (ou attente de Sam si la
   décision lui appartient).
@@ -239,5 +244,7 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
     - [ ] Studio (plan du 2026-10-17, ADR 0014 à 0016) : 1. socle Electron + nouveau projet
           (fait le 2026-10-17, testé par Sam sur Mac) ;
           2. moteur API (fait : `engine/`, `pnpm gen generate`, bouton du Studio ; essai réel à
-          faire avec la clé de Sam) ; 3. écran storyboard ; 4. éditeur de module ; 5. profils LMS (Watch
-          Live/Teach on Mars…) et fichier HTML unique ; 6. installateurs signés
+          faire avec la clé de Sam ; passe en option, ADR 0017) ; 3. écran storyboard ; 4. aperçu et
+          retouches du module ; 5. profils LMS (Watch Live/Teach on Mars…) et fichier HTML unique ;
+          6. installateurs signés
+    - [ ] Atelier Claude Code (ADR 0017) : skill `generate-module`, accès aux dossiers de projet
