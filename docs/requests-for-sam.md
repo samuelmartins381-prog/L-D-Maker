@@ -34,6 +34,20 @@ risques (permissions, données).
    des traductions »). Si tu n'as qu'un relecteur sous la main, commence par la langue de ta
    première commande.
 
+12. **Accès de test à Watch Live / Teach on Mars** (Mission Center), via Kylian ou la FHH :
+    seul moyen de valider pour de vrai le profil Watch Live (ADR 0016). En attendant :
+    documentation de Teach on Mars et SCORM Cloud.
+13. **Nom du service du dossier partagé** (Google Drive, OneDrive, Dropbox…) : ton accord pour
+    y stocker les sources des marques est noté (2026-10-17) ; il me faut le nom pour le
+    documenter et tester le verrou entre Sam et Kylian.
+14. **Clé API Anthropic** (pour l'étape 2 du Studio) : à créer sur console.anthropic.com, puis
+    à mettre **en secret d'environnement** `ANTHROPIC_API_KEY` pour mes tests ; dans le Studio,
+    tu la colleras dans les paramètres (stockée chiffrée sur ton ordinateur). Fixe une limite de
+    dépense mensuelle dans la console.
+15. **Signature des installateurs** (étape 6 du Studio) : compte Apple Developer (environ 99 $
+    par an) et certificat de signature Windows (ou Azure Trusted Signing, environ 10 $ par mois).
+    Sans signature, l'installation reste possible mais affiche un avertissement.
+
 ## P2 — plus tard
 8. **Figma MCP** (plugin officiel : `claude plugin install figma@claude-plugins-official`), **seulement si tu fais tes maquettes dans Figma**.
    - _Pourquoi_ : extraire les tokens exacts (couleurs, typographie, espacements) de tes maquettes.

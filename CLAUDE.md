@@ -79,6 +79,9 @@ packages/player/          lecteur Svelte 5 (IIFE), thèmes CSS, textes d'interfa
 packages/builder/         module validé + lecteur → out/<id>/{web,scorm12,scorm2004}/ + ZIP par format
 packages/l10n/             traduction : export/import XLIFF 1.2 et 2.0 (ADR 0006)
 packages/qa/               banc QA (axe, clavier, Lighthouse, faux LMS) + tests e2e (src/e2e/)
+packages/generator/       pipeline sources → storyboard → module (ADR 0013), lecteurs PDF/DOCX/PPTX en JS
+packages/studio/          application de bureau Electron (ADR 0014) — à venir
+projects/                 projets de démonstration du générateur (ex. mouvement-mecanique)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
 clients/, out/            sources clients et modules générés — ignorés par git
@@ -99,6 +102,8 @@ clients/, out/            sources clients et modules générés — ignorés par
   dépôt**. Hors de `pnpm check` (réseau, limites de l'essai : 10 inscriptions actives).
 - `pnpm l10n export <module> --to <lang> [--xliff 1.2|2.0]` puis `pnpm l10n import <module> <xlf>` —
   aller-retour de traduction (URL des liens jamais exportées ; lien perdu ⇒ import refusé)
+- `pnpm gen init|ingest|storyboard|approve|check|build|status <projet>` — générateur (ADR 0013) ;
+  `gen approve` **uniquement sur accord explicite de Sam** (porte par empreinte du storyboard)
 - `[LOCALES=ja,ru] node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures mobile/desktop
   (FR/EN/AR par défaut)
 
@@ -212,4 +217,10 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
     - [ ] e. Glossaire (termes soulignés + glossaire client transmis aux traducteurs)
     - [ ] f. Banque de questions, vrai/faux, appariement ; scénario à embranchements selon le public
   - [ ] 5. Lecture des sources (PDF, PPTX, DOCX) — contenu de test de Sam requis
-  - [ ] 6. Pipeline complet avec storyboard validé par Sam
+  - [ ] 6. Pipeline complet avec storyboard validé par Sam — **prioritaire** (Sam, 2026-10-17) :
+    - [x] Générateur en CLI (ADR 0013) + storyboard de démo `projects/mouvement-mecanique`
+          (en attente de validation de Sam : 5 questions ouvertes)
+    - [x] Lecteurs de sources en JavaScript (pdf.js, OOXML maison) : plus de Python ni pandoc
+    - [ ] Studio (plan du 2026-10-17, ADR 0014 à 0016) : 1. socle Electron + nouveau projet ;
+          2. moteur API ; 3. écran storyboard ; 4. éditeur de module ; 5. profils LMS (Watch
+          Live/Teach on Mars…) et fichier HTML unique ; 6. installateurs signés
