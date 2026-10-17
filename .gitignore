@@ -14,3 +14,5 @@ clients/
 out/
 .svelte-check/
 packages/studio/release/
+# Third-party modules received as inspiration (copyright, size): studied locally, never committed.
+inspirations/modules/
