@@ -1,15 +1,16 @@
 // Reads the project sources into Markdown with traceability anchors (ADR 0013):
-//   <!-- src:<file>#p3 -->        PDF page 3          (pdf_to_markdown.py: pdfplumber; pdftotext fallback)
-//   <!-- src:<file>#slide-5 -->   slide 5             (markitdown)
-//   <!-- src:<file>#h-<slug> -->  heading             (DOCX via pandoc, Markdown and text as is)
+//   <!-- src:<file>#p3 -->        PDF page 3
+//   <!-- src:<file>#slide-5 -->   slide 5
+//   <!-- src:<file>#h-<slug> -->  heading (PDF, DOCX, Markdown, text)
 // The storyboard cites these anchors for everything it plans, so no content comes from nowhere.
-// External tools run as separate programs; nothing from them ships in a module.
-import { spawnSync } from "node:child_process";
+// The readers are plain JavaScript (readers/), so the desktop Studio needs no external program.
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { basename, extname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { unzipSync } from "fflate";
+import { extname, join } from "node:path";
 import { paths, sha256 } from "./project.ts";
+import { readDocx } from "./readers/docx.ts";
+import { readPdf } from "./readers/pdf.ts";
+import { readPptx } from "./readers/pptx.ts";
+import type { ReadResult } from "./readers/types.ts";
 
 export type SourceKind = "pdf" | "docx" | "pptx" | "md" | "txt";
 
@@ -50,32 +51,6 @@ const KINDS: Record<string, SourceKind> = {
   ".markdown": "md",
   ".txt": "txt",
 };
-
-const INSTALL: Record<string, string> = {
-  pdfinfo: "apt-get install poppler-utils",
-  pdftotext: "apt-get install poppler-utils",
-  pdfimages: "apt-get install poppler-utils",
-  pandoc: "apt-get install pandoc",
-  markitdown: "pip install markitdown",
-  python3: "apt-get install python3 && pip install pdfplumber",
-};
-
-function run(cmd: string, args: string[], cwd?: string): string {
-  const r = spawnSync(cmd, args, {
-    cwd,
-    encoding: "utf8",
-    maxBuffer: 64 * 1024 * 1024,
-  });
-  if (r.error && (r.error as NodeJS.ErrnoException).code === "ENOENT")
-    throw new IngestError(
-      `${cmd} is not installed (needed to read sources): ${INSTALL[cmd] ?? cmd}`,
-    );
-  if (r.status !== 0)
-    throw new IngestError(
-      `${cmd} ${args.join(" ")} failed: ${r.stderr.trim()}`,
-    );
-  return r.stdout;
-}
 
 /** Heading slug for anchors: lowercase ASCII, accents removed, words joined by "-". */
 export function slugify(text: string): string {
@@ -131,68 +106,43 @@ const countWords = (markdown: string) =>
     .split(/\s+/)
     .filter(Boolean).length;
 
-const PDF_TO_MARKDOWN = fileURLToPath(
-  new URL("./pdf_to_markdown.py", import.meta.url),
-);
+const READERS: Partial<
+  Record<SourceKind, (data: Uint8Array) => Promise<ReadResult>>
+> = { pdf: readPdf, docx: readDocx, pptx: readPptx };
 
-async function readPdf(src: string, file: string, mediaDir: string) {
-  let markdown: string;
-  try {
-    // Headings recognised by font size (pdfplumber): finer anchors than pages alone.
-    markdown = run("python3", [PDF_TO_MARKDOWN, src]);
-  } catch {
-    // Fallback without pdfplumber: plain text, page by page.
-    const pages = Number(
-      /Pages:\s+(\d+)/.exec(run("pdfinfo", [src]))?.[1] ?? "0",
-    );
-    const parts: string[] = [];
-    for (let p = 1; p <= pages; p++)
-      parts.push(
-        `<!-- page ${p} -->\n${run("pdftotext", [
-          "-f",
-          `${p}`,
-          "-l",
-          `${p}`,
-          src,
-          "-",
-        ])
-          .replace(/\f/g, "")
-          .trim()}`,
-      );
-    markdown = parts.join("\n\n");
-  }
-  await mkdir(mediaDir, { recursive: true });
-  run("pdfimages", ["-png", src, join(mediaDir, "img")]);
+/** Turns the readers' page and slide markers into anchors, then anchors the headings. */
+export function anchorSource(markdown: string, file: string): string {
   return anchorHeadings(
-    markdown.replace(/<!-- page (\d+) -->/g, `<!-- src:${file}#p$1 -->`),
+    markdown
+      .replace(/<!-- page (\d+) -->/g, `<!-- src:${file}#p$1 -->`)
+      .replace(/<!-- slide (\d+) -->/g, `<!-- src:${file}#slide-$1 -->`),
     file,
   );
 }
 
-async function readDocx(src: string, file: string, mediaDir: string) {
-  const markdown = run("pandoc", [
-    src,
-    "-t",
-    "gfm",
-    "--wrap=none",
-    `--extract-media=${mediaDir}`,
-  ]);
-  return anchorHeadings(markdown, file);
-}
-
-async function readPptx(src: string, file: string, mediaDir: string) {
-  const markdown = run("markitdown", [src]).replace(
-    /<!-- Slide number: (\d+) -->/g,
-    `<!-- src:${file}#slide-$1 -->`,
-  );
-  // markitdown names images but does not extract them: take them from the archive.
-  const zip = unzipSync(new Uint8Array(await readFile(src)), {
-    filter: (f) => f.name.startsWith("ppt/media/"),
-  });
-  await mkdir(mediaDir, { recursive: true });
-  for (const [name, data] of Object.entries(zip))
-    await writeFile(join(mediaDir, basename(name)), data);
-  return markdown;
+async function readSource(
+  kind: SourceKind,
+  raw: Buffer,
+  file: string,
+  mediaDir: string,
+): Promise<string> {
+  const reader = READERS[kind];
+  if (!reader) return anchorHeadings(raw.toString("utf8"), file);
+  let result: ReadResult;
+  try {
+    result = await reader(new Uint8Array(raw));
+  } catch (e) {
+    throw new IngestError(`${file}: cannot be read (${(e as Error).message})`);
+  }
+  if (result.media.length) await mkdir(mediaDir, { recursive: true });
+  for (const m of result.media) await writeFile(join(mediaDir, m.name), m.data);
+  // Slide titles are already headings of the slide anchor: no second anchor for them.
+  return kind === "pptx"
+    ? result.markdown.replace(
+        /<!-- slide (\d+) -->/g,
+        `<!-- src:${file}#slide-$1 -->`,
+      )
+    : anchorSource(result.markdown, file);
 }
 
 async function listMedia(dir: string, ingestDir: string): Promise<string[]> {
@@ -233,14 +183,7 @@ export async function ingestProject(dir: string): Promise<IngestIndex> {
     const src = join(p.sources, file);
     const mediaDir = join(p.ingest, "media", file.replace(/\.[^.]+$/, ""));
     const raw = await readFile(src);
-    const markdown =
-      kind === "pdf"
-        ? await readPdf(src, file, mediaDir)
-        : kind === "docx"
-          ? await readDocx(src, file, mediaDir)
-          : kind === "pptx"
-            ? await readPptx(src, file, mediaDir)
-            : anchorHeadings(raw.toString("utf8"), file);
+    const markdown = await readSource(kind, raw, file, mediaDir);
     const out = `${file}.md`;
     await writeFile(join(p.ingest, out), `${markdown.trim()}\n`);
     sources.push({

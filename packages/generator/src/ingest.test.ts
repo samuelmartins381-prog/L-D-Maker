@@ -1,4 +1,3 @@
-import { spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -14,9 +13,6 @@ import {
 
 const DEMO = new URL("../../../projects/mouvement-mecanique", import.meta.url)
   .pathname;
-const has = (cmd: string, arg = "--version") => !spawnSync(cmd, [arg]).error;
-const tools =
-  has("pandoc") && has("markitdown", "--help") && has("pdfinfo", "-v");
 
 /** A throwaway copy of the demo project, so ingest can write freely. */
 function demoCopy(): string {
@@ -44,7 +40,7 @@ describe("anchors", () => {
   });
 });
 
-describe.skipIf(!tools)("ingestProject on the demo sources", () => {
+describe("ingestProject on the demo sources", () => {
   it("reads PDF, PPTX and DOCX into anchored Markdown with their media", async () => {
     const dir = demoCopy();
     const index = await ingestProject(dir);
@@ -63,8 +59,9 @@ describe.skipIf(!tools)("ingestProject on the demo sources", () => {
     expect(pptx?.anchors).toHaveLength(10);
     expect(pptx?.anchors[5]?.label).toMatch(/moins précis qu'un quartz/);
     expect(pptx?.media).toEqual(["media/argumentaire/image1.png"]);
-    // DOCX: one anchor per heading.
-    expect(docx?.anchors[0]?.id).toBe(
+    expect(pdf?.media).toEqual(["media/guide-mouvement/img-000.png"]);
+    // DOCX: one anchor per heading, the document title included.
+    expect(docx?.anchors[1]?.id).toBe(
       "notes-terrain.docx#h-combien-de-temps-tient-elle-si-je-ne-la-porte-pas",
     );
     const text = await readFile(

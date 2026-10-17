@@ -127,6 +127,10 @@
       "markdown": "notes-terrain.docx.md",
       "anchors": [
         {
+          "id": "notes-terrain.docx#h-notes-de-terrain-questions-de-clients",
+          "label": "Notes de terrain — questions de clients"
+        },
+        {
           "id": "notes-terrain.docx#h-combien-de-temps-tient-elle-si-je-ne-la-porte-pas",
           "label": "Combien de temps tient-elle si je ne la porte pas ?"
         },
@@ -159,10 +163,10 @@
           "label": "Elle s'est arrêtée dans le tiroir : elle est cassée ?"
         }
       ],
-      "words": 236,
+      "words": 243,
       "media": []
     }
   ],
-  "words": 1555,
+  "words": 1562,
   "readingMinutes": 8
 }

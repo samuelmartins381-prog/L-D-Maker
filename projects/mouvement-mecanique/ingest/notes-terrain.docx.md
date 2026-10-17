@@ -1,3 +1,6 @@
+<!-- src:notes-terrain.docx#h-notes-de-terrain-questions-de-clients -->
+# Notes de terrain — questions de clients
+
 Questions entendues en boutique et réponses conseillées (contenu de démonstration inventé).
 
 <!-- src:notes-terrain.docx#h-combien-de-temps-tient-elle-si-je-ne-la-porte-pas -->
