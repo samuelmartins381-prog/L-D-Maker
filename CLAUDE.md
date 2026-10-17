@@ -52,6 +52,11 @@ colonne vertébrale (sources, contrôles, lecteur, exports, QA) ; **le Studio** 
 finition (projet et choix, aperçu, retouches, validation, export). Génération par API : option.
 
 ## Rôles
+- **Objectif unique (Sam, 2026-10-17) : la plus haute qualité possible des modules, livrés vite.**
+  Le moyen (Studio, Claude Code, API, outils) est la responsabilité de Claude : il décide, agit et
+  rend compte. Ne pas faire trancher Sam sur la technique.
+- Sam décide seulement de ce qui lui appartient : goûts et retours, accès et budget, envoi de
+  contenu de marque à un service tiers, validation de ce qui part chez un client (portes).
 - Claude pilote : recherche → recommandation argumentée → décision (ou attente de Sam si la
   décision lui appartient).
 - Sam fournit designs, inspirations, contenus de test, accès, retours ; installe MCP/skills/plugins.
