@@ -168,6 +168,25 @@ describe("checkStoryboard", () => {
     expect(codes(sb)).toContain("question-fields");
   });
 
+  it("keeps to Sam's choices: question types and passing score", () => {
+    const choices = {
+      ...project,
+      assessment: {
+        questionTypes: ["single"],
+        questionsPerObjective: 3,
+        passingScore: 60,
+      },
+    };
+    expect(checkStoryboard(valid(), ingest, choices)).toEqual([]);
+    const sb = valid();
+    const q1 = sb.sections[0]?.screens[1]?.blocks[0];
+    if (q1) q1.variant = "multiple";
+    sb.assessment.passingScore = 80;
+    expect(checkStoryboard(sb, ingest, choices).map((i) => i.code)).toEqual(
+      expect.arrayContaining(["question-type", "passing-score"]),
+    );
+  });
+
   it("applies the audit rules: worked example first, self-regulation, image-only assessment, duration", () => {
     const sb = valid();
     const b1 = sb.sections[0]?.screens[0]?.blocks[0];
@@ -198,13 +217,14 @@ describe("Sam's gate", () => {
     mkdirSync(join(dir, "ingest"));
     writeFileSync(join(dir, "ingest", "ingest.json"), JSON.stringify(ingest));
     await saveProject(dir, {
-      schemaVersion: "0.1",
+      schemaVersion: "0.2",
       id: "demo",
       title: "Démo",
       audience: "Conseillers",
       durationMinutes: 10,
       defaultLocale: "fr",
       locales: ["fr"],
+      assessment: { passingScore: 60 },
       approvals: {},
     });
     writeFileSync(join(dir, "storyboard.yaml"), stringify(valid()));
@@ -212,13 +232,14 @@ describe("Sam's gate", () => {
 
     const { hash } = await loadStoryboard(dir);
     await saveProject(dir, {
-      schemaVersion: "0.1",
+      schemaVersion: "0.2",
       id: "demo",
       title: "Démo",
       audience: "Conseillers",
       durationMinutes: 10,
       defaultLocale: "fr",
       locales: ["fr"],
+      assessment: { passingScore: 60 },
       approvals: { storyboard: { hash, at: "2026-10-17", by: "Sam" } },
     });
     await expect(assertApproved(dir)).resolves.toMatchObject({

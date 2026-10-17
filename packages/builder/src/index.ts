@@ -13,3 +13,10 @@ export {
   scorm2004Manifest,
   zipDir,
 } from "./package.ts";
+export {
+  type PackageFormat,
+  PROFILE_IDS,
+  PROFILES,
+  type Profile,
+  type ProfileId,
+} from "./profiles.ts";

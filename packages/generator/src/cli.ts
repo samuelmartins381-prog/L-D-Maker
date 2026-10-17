@@ -111,7 +111,7 @@ try {
     if (!values.title || !values.audience) usage();
     await mkdir(paths(project).sources, { recursive: true });
     await saveProject(project, {
-      schemaVersion: "0.1",
+      schemaVersion: "0.2",
       id: slugify(basename(project)),
       title: values.title as string,
       audience: values.audience as string,

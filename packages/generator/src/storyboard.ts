@@ -136,7 +136,16 @@ export function plannedBlocks(sb: Storyboard) {
 export function checkStoryboard(
   sb: Storyboard,
   ingest: IngestIndex | null,
-  project: { id: string; durationMinutes: number },
+  project: {
+    id: string;
+    durationMinutes: number;
+    /** Sam's choices (project.yaml 0.2); the defaults when absent. */
+    assessment?: {
+      questionTypes: string[];
+      questionsPerObjective: number;
+      passingScore: number;
+    };
+  },
 ): StoryboardIssue[] {
   const issues: StoryboardIssue[] = [];
   const err = (code: string, where: string, message: string) =>
@@ -242,6 +251,16 @@ export function checkStoryboard(
           where,
           `option "${c.text}": name the real misconception it targets`,
         );
+    if (
+      b.variant &&
+      project.assessment &&
+      !project.assessment.questionTypes.includes(b.variant)
+    )
+      err(
+        "question-type",
+        where,
+        `${b.variant} is not among the question types chosen for the project (${project.assessment.questionTypes.join(", ")})`,
+      );
     if (b.variant === "hotspot" && !b.media)
       err(
         "media",
@@ -261,11 +280,11 @@ export function checkStoryboard(
         `objectives (${o.id})`,
         "not assessed by any scored question",
       );
-    else if (items.length < 3)
+    else if (items.length < (project.assessment?.questionsPerObjective ?? 3))
       warn(
         "assessment-items",
         `objectives (${o.id})`,
-        `${items.length} scored question(s): plan at least 3 for a reliable measure`,
+        `${items.length} scored question(s): plan at least ${project.assessment?.questionsPerObjective ?? 3} for a reliable measure`,
       );
     if (items.length && items.every((b) => b.variant === "hotspot"))
       warn(
@@ -274,6 +293,15 @@ export function checkStoryboard(
         "assessed only by image questions: add a text question (ADR 0010)",
       );
   }
+  if (
+    project.assessment &&
+    sb.assessment.passingScore !== project.assessment.passingScore
+  )
+    err(
+      "passing-score",
+      "assessment.passingScore",
+      `${sb.assessment.passingScore} % instead of the ${project.assessment.passingScore} % chosen for the project`,
+    );
   const tolerated =
     scoredCount - Math.ceil((scoredCount * sb.assessment.passingScore) / 100);
   if (scoredCount > 0 && sb.assessment.passingScore > 0 && tolerated < 1)

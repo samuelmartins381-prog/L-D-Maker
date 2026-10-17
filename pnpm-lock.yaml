@@ -45,6 +45,9 @@ importers:
 
   packages/generator:
     dependencies:
+      '@ldm/builder':
+        specifier: workspace:*
+        version: link:../builder
       '@ldm/schema':
         specifier: workspace:*
         version: link:../schema

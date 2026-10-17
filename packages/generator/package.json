@@ -10,6 +10,7 @@
     "ldm-gen": "./src/cli.ts"
   },
   "dependencies": {
+    "@ldm/builder": "workspace:*",
     "@ldm/schema": "workspace:*",
     "fflate": "0.8.3",
     "pdfjs-dist": "6.3.289",

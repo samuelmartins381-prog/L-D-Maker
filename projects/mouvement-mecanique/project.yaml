@@ -1,4 +1,4 @@
-schemaVersion: "0.1"
+schemaVersion: "0.2"
 id: mouvement-mecanique
 title: "Le mouvement mécanique : comprendre et l'expliquer"
 audience: Conseillers de vente en boutique horlogère (hypothèse de démonstration)
@@ -16,4 +16,17 @@ locales:
   - ja
   - zh-Hans
   - ko
+client: Démonstration (contenu inventé)
+outputs:
+  - profile: teach-on-mars
+  - profile: lms-unknown
+design:
+  theme: lumiere
+animation: standard
+assessment:
+  questionTypes: [single, multiple, hotspot, sequence]
+  questionsPerObjective: 3
+  passingScore: 80
+  attempts: 1
+formality: formal
 approvals: {}
