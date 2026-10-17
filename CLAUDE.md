@@ -80,7 +80,7 @@ packages/builder/         module validé + lecteur → out/<id>/{web,scorm12,sco
 packages/l10n/             traduction : export/import XLIFF 1.2 et 2.0 (ADR 0006)
 packages/qa/               banc QA (axe, clavier, Lighthouse, faux LMS) + tests e2e (src/e2e/)
 packages/generator/       pipeline sources → storyboard → module (ADR 0013), lecteurs PDF/DOCX/PPTX en JS
-packages/studio/          application de bureau Electron (ADR 0014) — à venir
+packages/studio/          application de bureau Electron (ADR 0014) : main/ (fichiers, verrou, clé), preload/, renderer/ (Svelte, ui/fr|en.json)
 projects/                 projets de démonstration du générateur (ex. mouvement-mecanique)
 examples/                 modules de démo non confidentiels (validés à chaque `pnpm check`)
 scripts/                  outillage (ex. contrôle des licences)
@@ -104,6 +104,9 @@ clients/, out/            sources clients et modules générés — ignorés par
   aller-retour de traduction (URL des liens jamais exportées ; lien perdu ⇒ import refusé)
 - `pnpm gen init|ingest|storyboard|approve|check|build|status <projet>` — générateur (ADR 0013) ;
   `gen approve` **uniquement sur accord explicite de Sam** (porte par empreinte du storyboard)
+- `pnpm studio` — lance le Studio ; `pnpm test:studio` — test de bout en bout (Playwright pilote
+  Electron, axe sur chaque écran, captures dans `out/studio-e2e/`) ; installateurs Mac/Windows :
+  workflow GitHub « Studio installers » (guide : `docs/studio.md`)
 - `[LOCALES=ja,ru] node scripts/screenshots.ts <web-dir> <sortie> [n° écran…]` — captures mobile/desktop
   (FR/EN/AR par défaut)
 
@@ -180,6 +183,14 @@ une erreur tolérée par le seuil, distracteurs fondés sur des idées reçues r
 travaillé avant l'entraînement, une routine d'autorégulation dans le récapitulatif.
 Au J2 : en faire des étapes formelles du pipeline (ADR à écrire).
 
+## Studio (ADR 0014)
+Electron : `contextIsolation`, `sandbox`, pas de `nodeIntegration` ; l'interface ne parle au système
+que par `window.ldm` (`src/shared/api.ts`, preload). Le code sans Electron (`main/projects.ts`)
+est testé dans Node. Clé API via `safeStorage`, jamais dans le dossier partagé. Verrou
+`.ldm-lock` par projet (12 h). Le main est empaqueté par Vite (paquets `@ldm/*` inclus, pdf.js
+externe et décompressé de l'asar). Les textes de l'interface viennent de `renderer/ui/*.json`.
+Les installateurs Windows exigent Wine sous Linux : on les construit sur GitHub Actions.
+
 ## Outillage (J1)
 TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
 `scripts/check-licenses.mjs` : liste stricte pour les dépendances de production
@@ -221,6 +232,7 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
     - [x] Générateur en CLI (ADR 0013) + storyboard de démo `projects/mouvement-mecanique`
           (en attente de validation de Sam : 5 questions ouvertes)
     - [x] Lecteurs de sources en JavaScript (pdf.js, OOXML maison) : plus de Python ni pandoc
-    - [ ] Studio (plan du 2026-10-17, ADR 0014 à 0016) : 1. socle Electron + nouveau projet ;
+    - [ ] Studio (plan du 2026-10-17, ADR 0014 à 0016) : 1. socle Electron + nouveau projet
+          (fait le 2026-10-17, en attente du retour de Sam sur Mac/Windows) ;
           2. moteur API ; 3. écran storyboard ; 4. éditeur de module ; 5. profils LMS (Watch
           Live/Teach on Mars…) et fichier HTML unique ; 6. installateurs signés
