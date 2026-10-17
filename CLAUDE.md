@@ -29,6 +29,10 @@ Brief complet : `docs/brief.md`.
   - **Confidentialité :** forte sur les nouveautés produits (calibres non lancés). Le contenu
     client ne va jamais dans le dépôt.
   - **Public :** à confirmer (vente en boutique, service après-vente, grand public).
+  - **Savoir horloger :** `docs/knowledge/mouvement-mecanique.md` (principes, échappement,
+    réglage, complications, labels, entretien, idées reçues, pédagogie, glossaire 6 langues).
+    **À lire avant tout storyboard ou module horloger.** Fiche du calibre du client > cette base.
+    Ce qui est inspiré de ciechanow.ski est reformulé, jamais copié (texte et figures protégés).
 
 ## Vision produit (Sam, 2026-10-17)
 - Finalité : Sam s'associe avec Kylian (ancien de la FHH) pour vendre du training et des modules
@@ -86,6 +90,7 @@ docs/decisions/           ADR
 docs/requests-for-sam.md  demandes à Sam, priorisées
 docs/phase0-research.md   livrable phase 0
 docs/audits/              audits pédagogiques (skills éducation)
+docs/knowledge/           savoir métier (horlogerie), lu avant chaque génération
 inspirations/             captures, maquettes, liens déposés par Sam
 packages/                 code (pnpm workspaces), un paquet par brique de l'architecture
 packages/schema/          format de module v0.1 (Zod), chargement, validation, CLI
