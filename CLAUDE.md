@@ -41,6 +41,10 @@ Brief complet : `docs/brief.md`.
 - **Sam doit pouvoir modifier** tout ce que Claude produit (exigence centrale).
 - Plus tard : designs, skills, plugins, inspirations et règles communes (« ce que je ne veux pas
   voir ») fournis par Sam, une fois l'architecture prête.
+- Le Studio orchestrera d'autres services d'IA (motion design, vidéo, images : Higgsfield…) en plus
+  de Claude. Exigence (Sam, 2026-10-17) : **devis complet avant chaque lancement** (coût par
+  service et par étape, total, plafond de budget par projet), puis coût réel affiché. Chaque
+  service tiers recevant du contenu de marque = accord de Sam + licence commerciale vérifiée.
 
 ## Rôles
 - Claude pilote : recherche → recommandation argumentée → décision (ou attente de Sam si la
