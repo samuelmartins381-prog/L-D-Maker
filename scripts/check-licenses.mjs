@@ -22,6 +22,10 @@ const DEV_ALLOWED = new Set([
   "Python-2.0",
   "Unlicense",
   "(MIT OR CC0-1.0)",
+  // Permissive; only in electron-builder's dependencies (Studio installers, never in a module).
+  "WTFPL",
+  "WTFPL OR ISC",
+  "(WTFPL OR MIT)",
 ]);
 
 function listLicenses(prodOnly) {

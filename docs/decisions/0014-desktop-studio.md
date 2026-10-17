@@ -31,6 +31,12 @@ tous écrits en TypeScript pour Node.
   et Kylian modifient le même projet en même temps.
 - Textes d'interface en catalogues (fr, puis en), comme le lecteur.
 
+## Licences
+Electron (MIT), electron-builder (MIT), Svelte (MIT), pdf.js (Apache-2.0), polices Fraunces et Inter
+(OFL-1.1). Outillage seulement : trois dépendances d'electron-builder sous WTFPL (licence
+permissive), ajoutées à la liste élargie de `scripts/check-licenses.mjs` ; rien de cela n'entre
+dans un module livré.
+
 ## Conséquences
 - Je teste ici sous Linux (Playwright pilote Electron) ; Sam et Kylian vérifient sur Mac et
   Windows.

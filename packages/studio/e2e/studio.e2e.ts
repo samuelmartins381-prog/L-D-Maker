@@ -1,0 +1,268 @@
+// End-to-end test of the Studio (ADR 0014): Playwright drives the real Electron app from the first
+// launch to a created project whose sources were read, checks every screen with axe, and checks
+// the lock between two users. Screenshots go to out/studio-e2e/.
+//   node packages/studio/e2e/studio.e2e.ts   (after `pnpm --filter @ldm/studio build`)
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { _electron, type Page } from "playwright-core";
+
+// Electron needs a display: on a headless Linux, run again under a virtual one.
+if (
+  process.platform === "linux" &&
+  !process.env.DISPLAY &&
+  !process.env.LDM_XVFB
+) {
+  const r = spawnSync(
+    "xvfb-run",
+    ["-a", process.execPath, ...process.argv.slice(1)],
+    {
+      stdio: "inherit",
+      env: { ...process.env, LDM_XVFB: "1" },
+    },
+  );
+  process.exit(r.status ?? 1);
+}
+
+const STUDIO = fileURLToPath(new URL("..", import.meta.url));
+const ROOT = fileURLToPath(new URL("../../..", import.meta.url));
+const DEMO_SOURCES = join(ROOT, "projects/mouvement-mecanique/sources");
+const SHOTS = join(ROOT, "out/studio-e2e");
+const require = createRequire(join(STUDIO, "package.json"));
+const electronPath = require("electron") as unknown as string;
+const AXE = readFileSync(
+  createRequire(join(ROOT, "packages/qa/package.json")).resolve(
+    "axe-core/axe.min.js",
+  ),
+  "utf8",
+);
+
+const userData = mkdtempSync(join(tmpdir(), "ldm-studio-user-"));
+const projectsDir = mkdtempSync(join(tmpdir(), "ldm-studio-projects-"));
+mkdirSync(SHOTS, { recursive: true });
+// First launch with the folder already chosen (the native folder dialog cannot be driven).
+writeFileSync(
+  join(userData, "settings.json"),
+  JSON.stringify({ projectsDir, locale: "fr" }),
+);
+
+async function axe(page: Page, label: string): Promise<void> {
+  // evaluate() is not subject to the page's Content-Security-Policy, unlike a script tag.
+  if (!(await page.evaluate(() => "axe" in window))) await page.evaluate(AXE);
+  const violations = await page.evaluate(async () => {
+    const r = await (
+      window as unknown as {
+        axe: {
+          run: (
+            d: Document,
+            o: object,
+          ) => Promise<{
+            violations: { id: string; nodes: { target: string[] }[] }[];
+          }>;
+        };
+      }
+    ).axe.run(document, {
+      runOnly: {
+        type: "tag",
+        values: [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22aa",
+          "best-practice",
+        ],
+      },
+      resultTypes: ["violations"],
+    });
+    return r.violations.map(
+      (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
+    );
+  });
+  assert.deepEqual(violations, [], `axe violations on ${label}`);
+  await page.screenshot({ path: join(SHOTS, `${label}.png`) });
+  console.log(`  ✓ ${label}: 0 axe violation`);
+}
+
+const app = await _electron.launch({
+  executablePath: electronPath,
+  args: [STUDIO, "--no-sandbox"],
+  env: { ...process.env, LDM_STUDIO_USER_DATA: userData },
+});
+const errors: string[] = [];
+try {
+  const page = await app.firstWindow();
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  await page.setViewportSize({ width: 1280, height: 840 });
+  await page.waitForSelector("html[data-ldm-studio-ready]");
+
+  // Welcome: the name is required.
+  await page
+    .getByRole("heading", { name: "Bienvenue dans le Studio" })
+    .waitFor();
+  await axe(page, "01-welcome");
+  await page.getByRole("button", { name: "Commencer" }).click();
+  await page.getByText("Ce champ est obligatoire.").waitFor();
+  await page.getByLabel("Ton prénom").fill("Sam");
+  await page.getByRole("button", { name: "Commencer" }).click();
+
+  // Empty project list.
+  await page
+    .getByRole("heading", { name: "Aucun projet pour l'instant" })
+    .waitFor();
+  await axe(page, "02-projects-empty");
+  await page.getByRole("button", { name: "Nouveau projet" }).first().click();
+
+  // Step 1: essentials (required fields are checked).
+  await page.getByRole("heading", { name: "L'essentiel" }).waitFor();
+  await page.getByRole("button", { name: "Continuer" }).click();
+  assert.equal(await page.getByText("Ce champ est obligatoire.").count(), 2);
+  await page.getByLabel("Titre de la formation").fill("Le mouvement mécanique");
+  await page.getByLabel(/Marque ou client/).fill("Maison de démonstration");
+  await page.getByLabel("Public").fill("Conseillers de vente en boutique");
+  await page
+    .getByLabel(/Brief de la marque/)
+    .fill("Former les conseillers à expliquer le mouvement.");
+  await axe(page, "03-new-essentials");
+  await page.getByRole("button", { name: "Continuer" }).click();
+
+  // Step 2: sources, through the file dialog (mocked in the main process).
+  const files = [
+    "guide-mouvement.pdf",
+    "argumentaire.pptx",
+    "notes-terrain.docx",
+  ].map((f) => join(DEMO_SOURCES, f));
+  await app.evaluate(({ dialog }, filePaths) => {
+    dialog.showOpenDialog = (async () => ({
+      canceled: false,
+      filePaths,
+    })) as typeof dialog.showOpenDialog;
+  }, files);
+  await page.getByRole("button", { name: "Choisir des fichiers…" }).click();
+  await page
+    .getByRole("button", { name: "Retirer argumentaire.pptx" })
+    .waitFor();
+  await axe(page, "04-new-sources");
+  await page.getByRole("button", { name: "Continuer" }).click();
+
+  // Step 3: languages.
+  await page.getByRole("heading", { name: "Langues" }).waitFor();
+  await page.getByRole("checkbox", { name: "Allemand" }).check();
+  await page.getByRole("checkbox", { name: "Japonais" }).check();
+  await axe(page, "05-new-languages");
+  await page.getByRole("button", { name: "Continuer" }).click();
+
+  // Step 4: outputs; at least one is required.
+  await page.getByRole("heading", { name: "Format de sortie" }).waitFor();
+  await page.getByRole("checkbox", { name: /LMS non précisé/ }).uncheck();
+  await page.getByRole("button", { name: "Continuer" }).click();
+  await page.getByText("Choisis au moins une sortie.").waitFor();
+  await page.getByRole("checkbox", { name: /Watch Live/ }).check();
+  await page.getByRole("checkbox", { name: /Fichier HTML unique/ }).check();
+  await axe(page, "06-new-output");
+  await page.getByRole("button", { name: "Continuer" }).click();
+
+  // Step 5: design.
+  await page.getByRole("heading", { name: "Design" }).waitFor();
+  await page
+    .getByRole("checkbox", { name: "Utiliser les couleurs de la marque" })
+    .check();
+  await page.getByRole("radio", { name: /Sobres/ }).check();
+  await axe(page, "07-new-design");
+  await page.getByRole("button", { name: "Continuer" }).click();
+
+  // Step 6: assessment.
+  await page.getByRole("heading", { name: "Évaluation" }).waitFor();
+  await page.getByLabel("Seuil de réussite (%)").fill("75");
+  await page.getByRole("radio", { name: /Tutoiement/ }).check();
+  await axe(page, "08-new-assessment");
+  await page.getByRole("button", { name: "Continuer" }).click();
+
+  // Summary, then creation and reading of the sources.
+  await page.getByRole("heading", { name: "Récapitulatif" }).waitFor();
+  await axe(page, "09-new-summary");
+  await page.getByRole("button", { name: "Créer le projet" }).click();
+  await page
+    .getByText(/3 source\(s\) lues, 1\s562 mots/)
+    .waitFor({ timeout: 60_000 });
+  await axe(page, "10-project");
+
+  const yaml = readFileSync(
+    join(projectsDir, "le-mouvement-mecanique/project.yaml"),
+    "utf8",
+  );
+  for (const expected of [
+    "client: Maison de démonstration",
+    "profile: teach-on-mars",
+    "profile: html-file",
+    "animation: sober",
+    "passingScore: 75",
+    "formality: informal",
+    'primary: "#8a4b2a"',
+  ])
+    assert.ok(
+      yaml.includes(expected),
+      `project.yaml should contain ${expected}`,
+    );
+  assert.match(yaml, /locales:\n {2}- fr\n {2}- de\n {2}- ja/);
+  console.log("  ✓ project.yaml holds every choice");
+
+  // Back to the list: the project is there, waiting for its storyboard.
+  await page.getByRole("button", { name: "← Tous les projets" }).click();
+  await page.getByRole("button", { name: "Le mouvement mécanique" }).waitFor();
+  await page.getByText("Storyboard à générer").waitFor();
+  await axe(page, "11-projects");
+
+  // Lock: a project opened by Kylian is read-only until forced open.
+  writeFileSync(
+    join(projectsDir, "le-mouvement-mecanique/.ldm-lock"),
+    JSON.stringify({ by: "Kylian", at: new Date().toISOString() }),
+  );
+  await page.getByRole("button", { name: "Paramètres" }).click();
+  await page.getByRole("button", { name: "Projets" }).click();
+  await page.getByText("Ouvert par Kylian").waitFor();
+  await page.getByRole("button", { name: "Le mouvement mécanique" }).click();
+  await page.getByText(/Kylian a ouvert ce projet/).waitFor();
+  assert.equal(
+    await page.getByRole("button", { name: "Ajouter des sources…" }).count(),
+    0,
+  );
+  await axe(page, "12-project-locked");
+  await page.getByRole("button", { name: "Ouvrir quand même" }).click();
+  await page.getByRole("button", { name: "Ajouter des sources…" }).waitFor();
+  const lock = JSON.parse(
+    readFileSync(join(projectsDir, "le-mouvement-mecanique/.ldm-lock"), "utf8"),
+  );
+  assert.equal(lock.by, "Sam");
+  console.log(
+    "  ✓ lock: read-only while Kylian holds it, taken over on demand",
+  );
+
+  // Settings, then English.
+  await page.getByRole("button", { name: "Paramètres" }).click();
+  await page.getByRole("heading", { name: "Paramètres" }).waitFor();
+  await axe(page, "13-settings");
+  await page.getByLabel("Langue du Studio").selectOption("en");
+  await page.getByRole("heading", { name: "Settings" }).waitFor();
+  await page.getByRole("button", { name: "Projects" }).click();
+  await page.getByText("Storyboard to generate").waitFor();
+  await axe(page, "14-projects-en");
+
+  // Dark mode.
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.getByRole("button", { name: "Le mouvement mécanique" }).click();
+  await page.getByText(/3 source\(s\) read/).waitFor();
+  await axe(page, "15-project-dark-en");
+
+  assert.deepEqual(errors, [], "no runtime error");
+  console.log(
+    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings",
+  );
+} finally {
+  await app.close();
+}

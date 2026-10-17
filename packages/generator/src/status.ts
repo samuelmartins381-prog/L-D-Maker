@@ -16,6 +16,58 @@ const exists = (f: string) =>
     () => false,
   );
 
+/** Where the project stands, as data (the Studio words it in its own languages). */
+export interface ProjectState {
+  ingest:
+    | { state: "missing" }
+    | { state: "stale"; files: string[] }
+    | { state: "done"; sources: number; words: number; anchors: number };
+  storyboard:
+    | { state: "missing" }
+    | { state: "invalid"; errors: number; warnings: number }
+    | { state: "done"; warnings: number };
+  approval:
+    | { state: "missing" }
+    | { state: "outdated"; at: string; by: string }
+    | { state: "done"; at: string; by: string };
+  module: { exists: boolean };
+}
+
+export async function projectState(dir: string): Promise<ProjectState> {
+  const p = paths(dir);
+  const project = await loadProject(dir);
+  const index = await loadIngest(dir);
+  const stale = index ? await staleSources(dir, index) : [];
+  const sb = await loadStoryboard(dir);
+  const errors = sb.issues.filter((i) => i.severity === "error").length;
+  const warnings = sb.issues.length - errors;
+  const approval = project.approvals.storyboard;
+  return {
+    ingest: !index
+      ? { state: "missing" }
+      : stale.length
+        ? { state: "stale", files: stale }
+        : {
+            state: "done",
+            sources: index.sources.length,
+            words: index.words,
+            anchors: index.sources.reduce((n, s) => n + s.anchors.length, 0),
+          },
+    storyboard:
+      !sb.storyboard && sb.hash === ""
+        ? { state: "missing" }
+        : errors
+          ? { state: "invalid", errors, warnings }
+          : { state: "done", warnings },
+    approval: !approval
+      ? { state: "missing" }
+      : approval.hash !== sb.hash
+        ? { state: "outdated", at: approval.at, by: approval.by }
+        : { state: "done", at: approval.at, by: approval.by },
+    module: { exists: await exists(p.module) },
+  };
+}
+
 export async function projectStatus(dir: string): Promise<Step[]> {
   const p = paths(dir);
   const project = await loadProject(dir);

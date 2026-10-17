@@ -9,10 +9,10 @@
   "scripts": {
     "lint": "biome check .",
     "format": "biome check --write .",
-    "typecheck": "tsc -b && pnpm --filter @ldm/player check:svelte",
+    "typecheck": "tsc -b && pnpm --filter @ldm/player check:svelte && pnpm --filter @ldm/studio check:svelte",
     "test": "vitest run",
     "check:licenses": "node scripts/check-licenses.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/ && pnpm build:examples && pnpm test:e2e && pnpm qa examples/phishing-basics",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:licenses && pnpm validate examples/*/ && pnpm build:examples && pnpm test:e2e && pnpm qa examples/phishing-basics && pnpm test:studio",
     "validate": "node packages/schema/src/cli.ts",
     "build:player": "pnpm --filter @ldm/player build",
     "build": "node packages/builder/src/cli.ts",
@@ -21,7 +21,9 @@
     "qa": "node packages/qa/src/cli.ts",
     "qa:scorm-cloud": "NODE_USE_ENV_PROXY=1 node --no-warnings packages/qa/src/scorm-cloud.ts",
     "l10n": "node packages/l10n/src/cli.ts",
-    "gen": "node packages/generator/src/cli.ts"
+    "gen": "node packages/generator/src/cli.ts",
+    "studio": "pnpm --filter @ldm/studio build && pnpm --filter @ldm/studio start",
+    "test:studio": "pnpm --filter @ldm/studio build && node packages/studio/e2e/studio.e2e.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

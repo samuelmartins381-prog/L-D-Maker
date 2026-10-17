@@ -1,2 +1,7 @@
 packages:
   - "packages/*"
+# Electron downloads its binary in a postinstall script (Studio, ADR 0014).
+onlyBuiltDependencies:
+  - electron
+ignoredBuiltDependencies:
+  - electron-winstaller
