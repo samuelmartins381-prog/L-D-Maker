@@ -14,15 +14,16 @@ import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadModuleSource, validateModule } from "@ldm/schema";
+import { approveStoryboard } from "./approval.ts";
 import { conformToStoryboard } from "./conform.ts";
 import { anthropicClient } from "./engine/llm.ts";
 import { DEFAULT_MODEL, MODELS, type ModelId } from "./engine/pricing.ts";
 import { estimateStoryboard, generateStoryboard } from "./engine/storyboard.ts";
 import { ingestProject, loadIngest, slugify } from "./ingest.ts";
-import { loadProject, paths, saveProject } from "./project.ts";
+import { paths, saveProject } from "./project.ts";
 import { refreshReview } from "./review.ts";
 import { projectStatus } from "./status.ts";
-import { assertApproved, loadStoryboard } from "./storyboard.ts";
+import { assertApproved } from "./storyboard.ts";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const { positionals, values } = parseArgs({
@@ -154,15 +155,7 @@ try {
     if (!(await storyboard())) process.exit(1);
   } else if (command === "approve") {
     if (!(await storyboard())) fail("storyboard en erreur : rien n'est validé");
-    const p = await loadProject(project);
-    const { hash } = await loadStoryboard(project);
-    p.approvals.storyboard = {
-      hash,
-      at: new Date().toISOString().slice(0, 10),
-      by: values.by,
-    };
-    await saveProject(project, p);
-    await storyboard(); // the review page now shows "approved"
+    const { hash } = await approveStoryboard(project, values.by);
     console.log(
       `✓ storyboard validé par ${values.by} (empreinte ${hash.slice(0, 12)})`,
     );

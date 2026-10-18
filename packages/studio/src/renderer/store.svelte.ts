@@ -7,7 +7,13 @@ import type {
 } from "../shared/api.ts";
 import { setLocale } from "./i18n.svelte.ts";
 
-export type Screen = "welcome" | "projects" | "new" | "project" | "settings";
+export type Screen =
+  | "welcome"
+  | "projects"
+  | "new"
+  | "project"
+  | "storyboard"
+  | "settings";
 
 export const app = $state<{
   screen: Screen;

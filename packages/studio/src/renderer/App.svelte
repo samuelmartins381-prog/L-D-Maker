@@ -5,6 +5,7 @@ import NewProject from "./screens/NewProject.svelte";
 import Projects from "./screens/Projects.svelte";
 import ProjectView from "./screens/ProjectView.svelte";
 import SettingsScreen from "./screens/Settings.svelte";
+import StoryboardView from "./screens/StoryboardView.svelte";
 import Welcome from "./screens/Welcome.svelte";
 import { app, closeProject, loadSettings } from "./store.svelte.ts";
 
@@ -36,7 +37,7 @@ async function go(screen: "projects" | "settings") {
             <li>
               <button
                 type="button"
-                aria-current={app.screen === "projects" || app.screen === "new" || app.screen === "project" ? "page" : undefined}
+                aria-current={["projects", "new", "project", "storyboard"].includes(app.screen) ? "page" : undefined}
                 onclick={() => go("projects")}>{t("nav.projects")}</button
               >
             </li>
@@ -67,6 +68,8 @@ async function go(screen: "projects" | "settings") {
           <NewProject />
         {:else if app.screen === "project" && app.project}
           <ProjectView />
+        {:else if app.screen === "storyboard" && app.project}
+          <StoryboardView />
         {:else if app.screen === "settings"}
           <SettingsScreen />
         {/if}

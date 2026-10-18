@@ -1,9 +1,10 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Module } from "@ldm/schema";
 import { describe, expect, it } from "vitest";
 import { stringify } from "yaml";
+import { approveStoryboard, saveStoryboard } from "./approval.ts";
 import { conformToStoryboard } from "./conform.ts";
 import type { IngestIndex } from "./ingest.ts";
 import { saveProject } from "./project.ts";
@@ -250,6 +251,48 @@ describe("Sam's gate", () => {
     changed.assessment.passingScore = 50;
     writeFileSync(join(dir, "storyboard.yaml"), stringify(changed));
     await expect(assertApproved(dir)).rejects.toThrow(GateError);
+  });
+});
+
+describe("Sam's edits and approval (Studio)", () => {
+  it("saves an edited storyboard, approves it, and refuses an invalid one", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "ldm-edit-"));
+    mkdirSync(join(dir, "ingest"));
+    writeFileSync(join(dir, "ingest", "ingest.json"), JSON.stringify(ingest));
+    writeFileSync(
+      join(dir, "ingest", "g.pdf.md"),
+      "<!-- src:g.pdf#h-a -->\n# A\nTexte A.\n<!-- src:g.pdf#h-b -->\n# B\nTexte B.\n",
+    );
+    await saveProject(dir, {
+      schemaVersion: "0.2",
+      id: "demo",
+      title: "Démo",
+      audience: "Conseillers",
+      durationMinutes: 10,
+      defaultLocale: "fr",
+      locales: ["fr"],
+      assessment: { passingScore: 60 },
+      approvals: {},
+    });
+    writeFileSync(join(dir, "storyboard.yaml"), stringify(valid()));
+
+    const edited = valid();
+    edited.module.title = "Titre retouché";
+    const saved = await saveStoryboard(dir, edited, "Sam");
+    expect(saved.storyboard?.module.title).toBe("Titre retouché");
+    expect(existsSync(join(dir, "storyboard.previous.yaml"))).toBe(true);
+
+    const approved = await approveStoryboard(dir, "Sam");
+    expect(approved.hash).toBe(saved.hash);
+    await expect(assertApproved(dir)).resolves.toMatchObject({
+      module: { title: "Titre retouché" },
+    });
+
+    await expect(
+      saveStoryboard(dir, { ...edited, objectives: [] }, "Sam"),
+    ).rejects.toThrow();
+    // The refused edit left the approved storyboard untouched.
+    await expect(assertApproved(dir)).resolves.toBeDefined();
   });
 });
 

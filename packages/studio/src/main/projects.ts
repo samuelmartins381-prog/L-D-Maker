@@ -12,12 +12,15 @@ import {
 } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import {
+  approveStoryboard as approve,
   ingestProject,
   loadProject,
+  loadStoryboard,
   paths,
   projectState,
   saveProject,
   slugify,
+  saveStoryboard as writeStoryboard,
 } from "@ldm/generator";
 import type {
   Lock,
@@ -25,6 +28,7 @@ import type {
   ProjectDetail,
   ProjectSummary,
   SourceFile,
+  StoryboardDetail,
 } from "../shared/api.ts";
 
 export const LOCK_FILE = ".ldm-lock";
@@ -258,4 +262,44 @@ export async function ingest(dir: string, me: string): Promise<ProjectDetail> {
   await assertEditable(dir, me);
   await ingestProject(dir);
   return projectDetail(dir, me);
+}
+
+/** The storyboard as the review screen needs it: content, checks and approval. */
+export async function storyboardDetail(dir: string): Promise<StoryboardDetail> {
+  const { storyboard, issues, hash } = await loadStoryboard(dir);
+  const approval = (await loadProject(dir)).approvals.storyboard;
+  return {
+    ...(storyboard ? { storyboard } : {}),
+    issues,
+    hash,
+    ...(approval
+      ? {
+          approval: {
+            at: approval.at,
+            by: approval.by,
+            current: approval.hash === hash,
+          },
+        }
+      : {}),
+  };
+}
+
+export async function saveStoryboard(
+  dir: string,
+  storyboard: unknown,
+  me: string,
+): Promise<StoryboardDetail> {
+  await assertEditable(dir, me);
+  await writeStoryboard(dir, storyboard, me);
+  return storyboardDetail(dir);
+}
+
+/** Sam's (or Kylian's) gate, recorded under their name. */
+export async function approveStoryboard(
+  dir: string,
+  me: string,
+): Promise<StoryboardDetail> {
+  await assertEditable(dir, me);
+  await approve(dir, me);
+  return storyboardDetail(dir);
 }

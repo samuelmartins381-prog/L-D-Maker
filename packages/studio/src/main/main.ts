@@ -8,6 +8,7 @@ import { estimate, generate } from "./generation.ts";
 import {
   acquireLock,
   addSources,
+  approveStoryboard,
   createProject,
   ingest,
   listProjects,
@@ -16,6 +17,8 @@ import {
   releaseLockSync,
   removeSource,
   SOURCE_EXTENSIONS,
+  saveStoryboard,
+  storyboardDetail,
 } from "./projects.ts";
 import { getSettings, setApiKey, updateSettings } from "./settings.ts";
 
@@ -116,6 +119,13 @@ function registerIpc(win: BrowserWindow): void {
     generate(dir, await root(), await me(), (p) =>
       win.webContents.send("ldm:generationProgress", p),
     ),
+  );
+  handle("storyboard", async (dir: string) => storyboardDetail(dir));
+  handle("saveStoryboard", async (dir: string, storyboard: unknown) =>
+    saveStoryboard(dir, storyboard, await me()),
+  );
+  handle("approveStoryboard", async (dir: string) =>
+    approveStoryboard(dir, await me()),
   );
   ipcMain.handle("ldm:openPath", async (_e, path: string) => {
     await shell.openPath(path);

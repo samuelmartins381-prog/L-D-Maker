@@ -33,8 +33,22 @@ Le Studio est l'application de bureau du générateur (ADR 0014). Il tourne sur 
 3. Claude rédige, puis chaque réponse passe les contrôles automatiques (traçabilité, alignement
    objectifs ↔ questions, règles pédagogiques). Les problèmes trouvés lui sont renvoyés, trois
    réponses au plus. Le coût réel s'affiche à la fin et est noté dans `generation-log.jsonl`.
-4. **Ouvrir la page de revue du storyboard** pour le lire. Régénérer remplace le storyboard ;
-   l'ancien est gardé dans `storyboard.previous.yaml`.
+4. Régénérer remplace le storyboard ; l'ancien est gardé dans `storyboard.previous.yaml`.
+
+## Relire, modifier et valider le storyboard (étape 3)
+1. Dans le projet, **Relire et valider le storyboard**.
+2. En haut : l'état (à valider, validé, modifié depuis la validation) et les contrôles. En
+   dessous : les **questions de Claude pour toi**, puis tout le storyboard, modifiable sur place :
+   titres, objectifs, raison d'être et contenu de chaque bloc, réponses des questions (et
+   laquelle est correcte).
+3. **Enregistrer les modifications** : le storyboard est réécrit et recontrôlé, l'ancien gardé
+   dans `storyboard.previous.yaml`.
+4. **Valider le storyboard**, puis **Je valide** : c'est ton feu vert pour la rédaction du module.
+   La validation est enregistrée à ton nom avec l'empreinte exacte du storyboard ; toute
+   modification ultérieure demande une nouvelle validation. Impossible de valider tant qu'il reste
+   une erreur ou des modifications non enregistrées.
+
+La **page de revue** (bouton à côté) montre en plus l'extrait de source derrière chaque bloc.
 
 **Règles communes** : un fichier `regles-maison.md` placé à la racine du dossier des projets est
 transmis à Claude pour chaque génération (par exemple « jamais de quiz vrai/faux », « toujours un
@@ -56,7 +70,7 @@ projet que l'autre vient de modifier.
 - Lire les sources : nombre de mots et passages repérés (la base de la traçabilité).
 - Suivre l'avancement de chaque projet.
 - Générer le storyboard avec Claude (coût affiché avant et après).
+- Relire, modifier et valider le storyboard.
 
-À venir, dans l'ordre : relecture et validation
-du storyboard dans le Studio (3), rédaction, éditeur et aperçu (4), exports par LMS (5),
+À venir, dans l'ordre : rédaction, éditeur et aperçu (4), exports par LMS (5),
 installateurs signés et mises à jour automatiques (6).

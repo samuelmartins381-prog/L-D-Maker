@@ -254,7 +254,8 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
     - [ ] Studio (plan du 2026-10-17, ADR 0014 à 0016) : 1. socle Electron + nouveau projet
           (fait le 2026-10-17, testé par Sam sur Mac) ;
           2. moteur API (fait : `engine/`, `pnpm gen generate`, bouton du Studio ; essai réel à
-          faire avec la clé de Sam ; passe en option, ADR 0017) ; 3. écran storyboard ; 4. aperçu et
+          faire avec la clé de Sam ; passe en option, ADR 0017) ; 3. écran storyboard (fait le
+          2026-10-18 : relecture, retouche sur place, validation à son nom ; `approval.ts`) ; 4. aperçu et
           retouches du module ; 5. profils LMS (Watch Live/Teach on Mars…) et fichier HTML unique ;
           6. installateurs signés
     - [x] Premier module complet de bout en bout (2026-10-17) : `projects/mouvement-mecanique/module`,

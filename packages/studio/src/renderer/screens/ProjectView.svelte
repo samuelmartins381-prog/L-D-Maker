@@ -146,14 +146,20 @@ const kb = (bytes: number) => Math.max(1, Math.round(bytes / 1024));
           <GenerateStoryboard project={p} again={p.state.storyboard.state !== "missing"} />
         {/if}
         {#if p.state.storyboard.state !== "missing"}
-          <p>
+          <div class="actions">
             <button
               type="button"
-              class="btn"
+              class="btn {p.state.approval.state === 'done' ? '' : 'btn-primary'}"
+              onclick={() => (app.screen = "storyboard")}
+              >{t(p.state.approval.state === "done" ? "project.viewStoryboard" : "project.reviewStoryboard")}</button
+            >
+            <button
+              type="button"
+              class="btn btn-quiet"
               onclick={() => window.ldm.openPath(`${p.dir}${sep(p.dir)}review${sep(p.dir)}storyboard.html`)}
               >{t("project.openReview")}</button
             >
-          </p>
+          </div>
         {/if}
       </section>
     {/if}

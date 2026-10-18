@@ -1,9 +1,14 @@
 // The narrow bridge between the Studio's interface and its main process (ADR 0014): the
 // interface never touches files or keys itself; it calls these functions through the preload.
 import type { ProfileId } from "@ldm/builder/profiles";
-import type { Project, ProjectState } from "@ldm/generator";
+import type {
+  Project,
+  ProjectState,
+  Storyboard,
+  StoryboardIssue,
+} from "@ldm/generator";
 
-export type { ProfileId, Project, ProjectState };
+export type { ProfileId, Project, ProjectState, Storyboard, StoryboardIssue };
 
 /** Languages a module can be produced in: one player interface catalogue each (ADR 0007). */
 export const MODULE_LOCALES = [
@@ -116,6 +121,16 @@ export type GenerationProgress =
   | { stage: "checking"; round: number }
   | { stage: "done" };
 
+/** What the storyboard screen shows and edits. */
+export interface StoryboardDetail {
+  /** Absent when storyboard.yaml cannot be read (the issues say why). */
+  storyboard?: Storyboard;
+  issues: StoryboardIssue[];
+  hash: string;
+  /** current: the approval is for the storyboard as it is now. */
+  approval?: { at: string; by: string; current: boolean };
+}
+
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export interface StudioApi {
@@ -142,6 +157,14 @@ export interface StudioApi {
   estimateStoryboard(dir: string): Promise<Result<GenerationEstimate>>;
   /** Claude writes storyboard.yaml from the sources, the brief and the choices. */
   generateStoryboard(dir: string): Promise<Result<GenerationSummary>>;
+  storyboard(dir: string): Promise<Result<StoryboardDetail>>;
+  /** Writes Sam's edits to storyboard.yaml (an earlier approval no longer applies). */
+  saveStoryboard(
+    dir: string,
+    storyboard: Storyboard,
+  ): Promise<Result<StoryboardDetail>>;
+  /** Records the approval: the gate before the module is written. */
+  approveStoryboard(dir: string): Promise<Result<StoryboardDetail>>;
   /** Subscribes to generation progress; returns the unsubscribe function. */
   onGenerationProgress(listener: (p: GenerationProgress) => void): () => void;
 }

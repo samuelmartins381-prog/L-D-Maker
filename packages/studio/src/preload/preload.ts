@@ -25,6 +25,9 @@ const api: StudioApi = {
   openPath: call("openPath"),
   estimateStoryboard: call("estimateStoryboard"),
   generateStoryboard: call("generateStoryboard"),
+  storyboard: call("storyboard"),
+  saveStoryboard: call("saveStoryboard"),
+  approveStoryboard: call("approveStoryboard"),
   onGenerationProgress: (listener) => {
     const handler = (_e: unknown, p: GenerationProgress) => listener(p);
     ipcRenderer.on("ldm:generationProgress", handler);

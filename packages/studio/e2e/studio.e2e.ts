@@ -301,7 +301,7 @@ try {
     .getByText(/Storyboard ready in 1 answer\(s\): 0 error\(s\)/)
     .waitFor({ timeout: 60_000 });
   await page
-    .getByText("The storyboard is waiting for your approval.")
+    .getByText(/Read the storyboard, edit what needs it, then approve it/)
     .waitFor();
   assert.ok(
     existsSync(
@@ -313,9 +313,48 @@ try {
     "  ✓ generation: estimate, consent, storyboard written and checked",
   );
 
+  // Storyboard screen: read, edit, save, approve (Sam's gate, under his name).
+  const dir = join(projectsDir, "le-mouvement-mecanique");
+  await page
+    .getByRole("button", { name: "Review and approve the storyboard" })
+    .click();
+  await page.getByText("Awaiting approval").waitFor();
+  await axe(page, "18-storyboard-dark-en");
+  await page.emulateMedia({ colorScheme: "light" });
+  const firstScreen = page.getByLabel("Screen title").first();
+  await firstScreen.fill("Bienvenue dans le mouvement");
+  await page.getByText("Unsaved changes").waitFor();
+  assert.ok(
+    await page
+      .getByRole("button", { name: "Approve the storyboard" })
+      .isDisabled(),
+    "no approval with unsaved changes",
+  );
+  await axe(page, "19-storyboard-edited-en");
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await page.getByText("Changes saved.").waitFor();
+  assert.match(
+    readFileSync(join(dir, "storyboard.yaml"), "utf8"),
+    /title: Bienvenue dans le mouvement/,
+  );
+  assert.ok(existsSync(join(dir, "storyboard.previous.yaml")));
+  await page.getByRole("button", { name: "Approve the storyboard" }).click();
+  await page.getByText(/By approving, you agree/).waitFor();
+  await axe(page, "20-storyboard-confirm-en");
+  await page.getByRole("button", { name: "I approve" }).click();
+  await page.getByText(/Approved by Sam on/).waitFor();
+  assert.match(
+    readFileSync(join(dir, "project.yaml"), "utf8"),
+    /storyboard:\s+hash: [0-9a-f]{64}\s+at: \S+\s+by: Sam/,
+  );
+  await page.getByRole("button", { name: "Back to the project" }).click();
+  await page.getByRole("button", { name: "View the storyboard" }).waitFor();
+  await axe(page, "21-project-approved-en");
+  console.log("  ✓ storyboard: edited, saved (previous kept), approved by Sam");
+
   assert.deepEqual(errors, [], "no runtime error");
   console.log(
-    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings → generation",
+    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings → generation → storyboard approved",
   );
 } finally {
   await app.close();
