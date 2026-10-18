@@ -1,8 +1,15 @@
-import { cpSync, existsSync, mkdtempSync, readFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
+import { encodePng } from "../readers/png.ts";
 import type { LlmAnswer, LlmCall, LlmClient } from "./llm.ts";
 import {
   estimateStoryboard,
@@ -128,6 +135,32 @@ describe("generateStoryboard", () => {
     await expect(generateStoryboard(dir, { client: fake([]) })).rejects.toThrow(
       /extra\.md/,
     );
+  });
+});
+
+describe("images sent to Claude", () => {
+  it("sends the images within the API limits and names the others", async () => {
+    const dir = demo();
+    const index = JSON.parse(
+      readFileSync(join(dir, "ingest", "ingest.json"), "utf8"),
+    );
+    // A readable image, and one wider than the API accepts (header only matters).
+    writeFileSync(
+      join(dir, "ingest", "ok.png"),
+      encodePng(4, 4, 1, new Uint8Array(16)),
+    );
+    writeFileSync(
+      join(dir, "ingest", "huge.png"),
+      encodePng(9000, 1, 1, new Uint8Array(9000)),
+    );
+    index.sources[0].media.push("ok.png", "huge.png");
+    writeFileSync(join(dir, "ingest", "ingest.json"), JSON.stringify(index));
+    const client = fake([JSON.stringify(handDraft())]);
+    await generateStoryboard(dir, { client });
+    const content = JSON.stringify(client.calls[0]?.messages);
+    expect(content).toContain("Image ingest/ok.png");
+    expect(content).not.toContain("Image ingest/huge.png");
+    expect(content).toMatch(/Images not sent[^"]*ingest\/huge\.png/);
   });
 });
 

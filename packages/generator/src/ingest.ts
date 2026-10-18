@@ -34,7 +34,12 @@ export interface IngestedSource {
   media: string[];
 }
 
+/** Bumped when the readers change what they extract: older readings are then read again. */
+export const READER_VERSION = 2;
+
 export interface IngestIndex {
+  /** Absent before version 2 (images were extracted at full size). */
+  readerVersion?: number;
   sources: IngestedSource[];
   words: number;
   /** Reading time of the raw sources at 200 words per minute. */
@@ -198,6 +203,7 @@ export async function ingestProject(dir: string): Promise<IngestIndex> {
   }
   const words = sources.reduce((n, s) => n + s.words, 0);
   const index: IngestIndex = {
+    readerVersion: READER_VERSION,
     sources,
     words,
     readingMinutes: Math.round(words / 200),
@@ -223,6 +229,9 @@ export async function staleSources(
   const files = (await readdir(p.sources).catch(() => [])).filter(
     (f) => KINDS[extname(f).toLowerCase()],
   );
+  // Read by older readers: every source is read again.
+  if ((index.readerVersion ?? 1) < READER_VERSION)
+    return index.sources.map((s) => s.file).sort();
   const known = new Map(index.sources.map((s) => [s.file, s.hash]));
   const stale = files.filter((f) => !known.has(f));
   for (const f of files)

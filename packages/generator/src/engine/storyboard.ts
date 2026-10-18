@@ -9,6 +9,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { stringify } from "yaml";
 import { type IngestIndex, loadIngest, staleSources } from "../ingest.ts";
 import { loadProject, type Project, paths } from "../project.ts";
+import { imageSize } from "../readers/image.ts";
 import { refreshReview } from "../review.ts";
 import {
   checkStoryboard,
@@ -38,7 +39,10 @@ const SCHEMA = zodOutputFormat(StoryboardDraft).schema as Record<
 
 export const GENERATION_LOG = "generation-log.jsonl";
 const MAX_IMAGES = 8;
+// API limits: 5 MB per image once in base64, 8000 px per side, 32 MB per request.
 const MAX_IMAGE_BYTES = 3_500_000;
+const MAX_IMAGE_SIDE = 8000;
+const MAX_TOTAL_IMAGE_BYTES = 15_000_000;
 const IMAGE_TYPES: Record<
   string,
   "image/png" | "image/jpeg" | "image/gif" | "image/webp"
@@ -135,13 +139,26 @@ async function sourceBlocks(
     });
   }
   let images = 0;
+  let total = 0;
+  const skipped: string[] = [];
   for (const s of ingest.sources)
     for (const m of s.media) {
       const type = IMAGE_TYPES[extname(m).toLowerCase()];
-      if (!type || images >= MAX_IMAGES) continue;
+      if (!type) continue;
       const data = await readFile(join(paths(dir).ingest, m));
-      if (data.length > MAX_IMAGE_BYTES) continue;
+      const size = imageSize(data);
+      if (
+        images >= MAX_IMAGES ||
+        !size ||
+        data.length > MAX_IMAGE_BYTES ||
+        total + data.length > MAX_TOTAL_IMAGE_BYTES ||
+        Math.max(size.width, size.height) > MAX_IMAGE_SIDE
+      ) {
+        skipped.push(`ingest/${m}`);
+        continue;
+      }
       images++;
+      total += data.length;
       blocks.push(
         { type: "text", text: `Image ingest/${m} (from ${s.file}):` },
         {
@@ -154,6 +171,11 @@ async function sourceBlocks(
         },
       );
     }
+  if (skipped.length)
+    blocks.push({
+      type: "text",
+      text: `Images not sent (count, size or weight limits): ${skipped.join(", ")}. Plan their use from the surrounding text only.`,
+    });
   const anchors = ingest.sources
     .flatMap((s) => s.anchors.map((a) => `- ${a.id} — ${a.label}`))
     .join("\n");

@@ -81,4 +81,12 @@ describe("ingestProject on the demo sources", () => {
     writeFileSync(join(dir, "sources", "extra.md"), "# Ajout\n");
     expect(await staleSources(dir, index)).toEqual(["extra.md"]);
   });
+
+  it("reads everything again after a change of the readers", async () => {
+    const dir = demoCopy();
+    const { readerVersion: _, ...older } = await ingestProject(dir);
+    expect(await staleSources(dir, older)).toEqual(
+      older.sources.map((s) => s.file).sort(),
+    );
+  });
 });

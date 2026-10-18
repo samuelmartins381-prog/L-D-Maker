@@ -37,21 +37,29 @@ const outputConfig = (schema: Record<string, unknown>) => ({
   format: { type: "json_schema" as const, schema },
 });
 
-/** Words a learner-facing person can act on, for the errors Sam may see. */
+/** Words Sam can act on, with the request id Anthropic support asks for. */
 function explain(e: unknown): never {
+  if (!(e instanceof Anthropic.APIError)) throw e;
+  const id = e.requestID ? ` (request ${e.requestID})` : "";
   if (e instanceof Anthropic.AuthenticationError)
-    throw new LlmError("the API key was refused (check it in Settings)");
+    throw new LlmError(`the API key was refused (check it in Settings)${id}`);
   if (e instanceof Anthropic.PermissionDeniedError)
-    throw new LlmError("this API key may not use this model");
+    throw new LlmError(`this API key may not use this model${id}`);
   if (e instanceof Anthropic.RateLimitError)
-    throw new LlmError("rate limit or spending limit reached; retry later");
-  if (e instanceof Anthropic.BadRequestError)
-    throw new LlmError(`request refused by the API: ${e.message}`);
+    throw new LlmError(
+      `rate limit or spending limit reached; retry later${id}`,
+    );
   if (e instanceof Anthropic.APIConnectionError)
     throw new LlmError("no connection to the Claude API");
-  if (e instanceof Anthropic.APIError)
-    throw new LlmError(`Claude API error ${e.status}: ${e.message}`);
-  throw e;
+  // The API refused the request, then the connection closed before its reason could be read:
+  // in practice a request too heavy (images) for the network on the way.
+  if (e.status === 400 && /terminated/i.test(e.message))
+    throw new LlmError(
+      `the API refused the request and the connection closed before saying why; the sources may be too heavy (read them again with this version)${id}`,
+    );
+  if (e instanceof Anthropic.BadRequestError)
+    throw new LlmError(`request refused by the API: ${e.message}${id}`);
+  throw new LlmError(`Claude API error ${e.status}: ${e.message}${id}`);
 }
 
 export function anthropicClient(apiKey: string): LlmClient {
@@ -63,7 +71,8 @@ export function anthropicClient(apiKey: string): LlmClient {
           model: call.model,
           system: call.system,
           messages: call.messages,
-          output_config: outputConfig(call.schema),
+          // Only what changes the input size: the effort setting is not counted.
+          output_config: { format: outputConfig(call.schema).format },
         });
         return r.input_tokens;
       } catch (e) {

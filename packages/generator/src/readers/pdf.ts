@@ -3,6 +3,7 @@
 // the most characters. Lines are joined back into paragraphs. Each page starts with
 // `<!-- page N -->`; embedded images are extracted as PNG.
 import { createRequire } from "node:module";
+import { downscale } from "./image.ts";
 import { encodePng } from "./png.ts";
 import type { ReadResult } from "./types.ts";
 
@@ -57,7 +58,7 @@ function toLines(items: TextItem[]): Line[] {
     .filter((l) => l.text);
 }
 
-/** Pixels of a pdf.js image object as PNG; undefined for formats not handled. */
+/** Pixels of a pdf.js image object as PNG, at most MAX_EDGE wide or high; undefined for formats not handled. */
 function imageToPng(img: {
   width: number;
   height: number;
@@ -66,21 +67,25 @@ function imageToPng(img: {
 }): Uint8Array | undefined {
   const { width, height, kind, data } = img;
   if (!data) return undefined;
-  if (kind === 2) return encodePng(width, height, 3, new Uint8Array(data));
-  if (kind === 3) return encodePng(width, height, 4, new Uint8Array(data));
-  if (kind === 1) {
+  let channels: 1 | 3 | 4;
+  let pixels: Uint8Array;
+  if (kind === 2 || kind === 3) {
+    channels = kind === 2 ? 3 : 4;
+    pixels = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  } else if (kind === 1) {
     // 1 bit per pixel, rows padded to a byte.
     const stride = (width + 7) >> 3;
-    const grey = new Uint8Array(width * height);
+    channels = 1;
+    pixels = new Uint8Array(width * height);
     for (let y = 0; y < height; y++)
       for (let x = 0; x < width; x++)
-        grey[y * width + x] =
+        pixels[y * width + x] =
           ((data[y * stride + (x >> 3)] as number) >> (7 - (x & 7))) & 1
             ? 255
             : 0;
-    return encodePng(width, height, 1, grey);
-  }
-  return undefined;
+  } else return undefined;
+  const small = downscale(width, height, channels, pixels);
+  return encodePng(small.width, small.height, channels, small.pixels);
 }
 
 export async function readPdf(data: Uint8Array): Promise<ReadResult> {
@@ -95,6 +100,8 @@ export async function readPdf(data: Uint8Array): Promise<ReadResult> {
   const pages: Line[][] = [];
   const media: ReadResult["media"] = [];
   const imagePages = new Set<number>();
+  // An image repeated on several pages (a logo, a frame) is extracted once.
+  const seen = new Set<string>();
   for (let n = 1; n <= doc.numPages; n++) {
     const page = await doc.getPage(n);
     const content = await page.getTextContent();
@@ -103,6 +110,11 @@ export async function readPdf(data: Uint8Array): Promise<ReadResult> {
     for (const [i, fn] of ops.fnArray.entries()) {
       if (fn !== lib.OPS.paintImageXObject) continue;
       const name = (ops.argsArray[i] as [string])[0];
+      if (seen.has(name)) {
+        imagePages.add(n);
+        continue;
+      }
+      seen.add(name);
       const img = await new Promise<Parameters<typeof imageToPng>[0]>((ok) =>
         (name.startsWith("g_") ? page.commonObjs : page.objs).get(name, ok),
       );
