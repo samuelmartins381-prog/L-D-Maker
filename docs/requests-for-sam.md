@@ -48,11 +48,33 @@ risques (permissions, données).
     par an) et certificat de signature Windows (ou Azure Trusted Signing, environ 10 $ par mois).
     Sans signature, l'installation reste possible mais affiche un avertissement.
 
+16. **Niveau « motion design » des agences** (2026-10-20, après la proposition d'agence reçue,
+    `inspirations/notes.md`). Ce qui fait ce niveau, c'est surtout **notre lecteur** (thème,
+    navigation, animations, je le code) et **les visuels de la marque**. Les outils aident en
+    amont. Par ordre d'utilité :
+    - a. **Connecteur Figma** (officiel, annuaire Anthropic). Sur claude.ai : Paramètres →
+      Connecteurs → Figma → Connecter. Compte Figma gratuit pour commencer.
+      - _Pourquoi_ : un écran maquetté (par toi, Kylian ou un graphiste) que je reproduis au pixel
+        près, animations comprises (skill `figma-implement-motion`). Je peux aussi te poser des
+        maquettes dans Figma à valider **avant** de coder.
+      - _Données_ : seulement les fichiers Figma partagés.
+      - _Alternative_ : des captures, moins précises.
+    - b. **Plugin `frontend-design`** (Anthropic, gratuit) : une skill de conception
+      d'interfaces de haut niveau, pour le thème « cinéma » et les nouveaux écrans. Rien ne sort
+      du dépôt.
+    - c. **Higgsfield** (déjà connecté), pour ce que le code ne fait pas : objets détourés, images
+      agrandies proprement, courtes boucles vidéo, voix off, modèle 3D d'une montre.
+      - _Accord par projet_ : uniquement sur des visuels que la marque autorise à envoyer.
+      - _Licence commerciale_ : à vérifier sur le plan Higgsfield utilisé.
+    - **Écartés** : Adobe, Canva, Moda, Webflow (font doublon ou sortent de notre lecteur) ;
+      un service de voix séparé (Higgsfield fait déjà la voix off) ; le visualiseur 3D de démo
+      (si on fait de la 3D, ce sera dans le lecteur, pour maîtriser le poids sur LMS et mobile).
+    - **Plus important que tout outil** : pour chaque marque, son **kit visuel**. Il comprend
+      des montres détourées en haute définition, des photos d'archives libres de droits pour le
+      module, les polices et la charte. Le style de la proposition repose entièrement dessus.
+
 ## P2 — plus tard
-8. **Figma MCP** (plugin officiel : `claude plugin install figma@claude-plugins-official`), **seulement si tu fais tes maquettes dans Figma**.
-   - _Pourquoi_ : extraire les tokens exacts (couleurs, typographie, espacements) de tes maquettes.
-   - _Alternative_ : des captures PNG dans `inspirations/`, moins précises.
-   - _Risques_ : lecture des fichiers Figma auxquels tu donnes accès.
+8. **Figma** : remonté en P1 le 2026-10-20 (voir le n° 16).
 9. **Playwright MCP** (Microsoft, Apache-2.0), optionnel : inspection interactive des modules pendant la conception. Les tests automatisés n'en ont pas besoin.
 10. **Accès sandbox à un LMS client** (Cornerstone, SuccessFactors, Docebo, 360Learning…) dès qu'une commande le permet : ce sera notre troisième LMS de test.
 11. **Higgsfield** (déjà connecté) : je ne l'utilise pas sans ton accord explicite, à cause du contenu client possible dans les prompts et des droits commerciaux des visuels à vérifier.
