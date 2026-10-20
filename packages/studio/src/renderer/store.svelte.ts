@@ -13,6 +13,7 @@ export type Screen =
   | "new"
   | "project"
   | "storyboard"
+  | "texts"
   | "settings";
 
 export const app = $state<{
@@ -20,7 +21,15 @@ export const app = $state<{
   settings: Settings | null;
   project: ProjectDetail | null;
   error: string | null;
-}>({ screen: "projects", settings: null, project: null, error: null });
+  /** Result of the last long task on a project, kept in view after the page changes. */
+  notice: { dir: string; lines: string[]; notes: string[] } | null;
+}>({
+  screen: "projects",
+  settings: null,
+  project: null,
+  error: null,
+  notice: null,
+});
 
 export async function loadSettings(): Promise<void> {
   const s = await window.ldm.settings();
@@ -60,6 +69,9 @@ export type StageKey =
   | "stage.approval"
   | "stage.approvalOutdated"
   | "stage.module"
+  | "stage.moduleInvalid"
+  | "stage.translations"
+  | "stage.export"
   | "stage.ready";
 
 /** The step a project is waiting for, as a catalogue key. */
@@ -71,5 +83,8 @@ export function stageOf(s: ProjectState, hasSources = true): StageKey {
   if (s.storyboard.state === "invalid") return "stage.storyboardInvalid";
   if (s.approval.state === "missing") return "stage.approval";
   if (s.approval.state === "outdated") return "stage.approvalOutdated";
-  return s.module.exists ? "stage.ready" : "stage.module";
+  if (!s.module.exists) return "stage.module";
+  if (s.module.errors) return "stage.moduleInvalid";
+  if (s.module.translations.some((x) => x.pending)) return "stage.translations";
+  return s.module.exports.length ? "stage.ready" : "stage.export";
 }

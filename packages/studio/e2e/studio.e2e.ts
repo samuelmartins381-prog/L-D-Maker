@@ -16,6 +16,8 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { draftToModule, moduleToDraft } from "@ldm/generator";
+import { Module } from "@ldm/schema";
 import { _electron, type Page } from "playwright-core";
 
 // Electron needs a display: on a headless Linux, run again under a virtual one.
@@ -69,6 +71,53 @@ const {
 draft.assessment = { passingScore: 75 };
 const fakeAnswer = join(userData, "fake-storyboard.json");
 writeFileSync(fakeAnswer, JSON.stringify(draft));
+// The module Claude would write: the hand-written demo module as a draft, its picture taken from the
+// sources the test reads. The translator answers every key of it, marked [EN].
+const demoModule = Module.parse(
+  yamlLib.parse(
+    readFileSync(
+      join(ROOT, "projects/mouvement-mecanique/module/module.yaml"),
+      "utf8",
+    ),
+  ),
+);
+const demoDraft = moduleToDraft(
+  demoModule,
+  JSON.parse(
+    readFileSync(
+      join(ROOT, "projects/mouvement-mecanique/module/strings/fr.json"),
+      "utf8",
+    ),
+  ),
+);
+const draftText = JSON.stringify({
+  ...demoDraft,
+  notes: [
+    "Un visuel de la marque remplacerait avantageusement le schéma du guide.",
+  ],
+}).replaceAll("media/movement.svg", "ingest/media/guide-mouvement/img-000.png");
+const fakeModule = join(userData, "fake-module.json");
+writeFileSync(fakeModule, draftText);
+const { strings: draftStrings } = draftToModule(JSON.parse(draftText), {
+  id: "x",
+  version: "1.0.0",
+  defaultLocale: "fr",
+  locales: ["fr"],
+  durationMinutes: 20,
+  passingScore: 75,
+  completion: "all-screens-and-passed",
+  bloom: {},
+});
+const fakeTranslation = join(userData, "fake-translation.json");
+writeFileSync(
+  fakeTranslation,
+  JSON.stringify({
+    items: Object.entries(draftStrings).map(([key, text]) => ({
+      key,
+      text: `[EN] ${text}`,
+    })),
+  }),
+);
 // First launch with the folder already chosen (the native folder dialog cannot be driven).
 writeFileSync(
   join(userData, "settings.json"),
@@ -121,6 +170,9 @@ const app = await _electron.launch({
     ...process.env,
     LDM_STUDIO_USER_DATA: userData,
     LDM_STUDIO_FAKE_LLM: fakeAnswer,
+    LDM_STUDIO_FAKE_LLM_MODULE: fakeModule,
+    LDM_STUDIO_FAKE_LLM_TRANSLATE: fakeTranslation,
+    LDM_STUDIO_NO_OPEN: "1",
   },
 });
 const errors: string[] = [];
@@ -352,10 +404,77 @@ try {
   await axe(page, "21-project-approved-en");
   console.log("  ✓ storyboard: edited, saved (previous kept), approved by Sam");
 
+  // Module: price first (writing + translations), then written, translated, previewed.
+  await page.getByRole("button", { name: "Write the module" }).click();
+  await page.getByText(/Estimated total:/).waitFor();
+  assert.ok(!existsSync(join(dir, "module")), "nothing written before consent");
+  await axe(page, "22-module-confirm-en");
+  await page.getByRole("button", { name: "Start generating" }).click();
+  await page
+    .getByText(/Module written in 1 answer\(s\): 0 error\(s\)/)
+    .waitFor({ timeout: 60_000 });
+  await page.getByText("Translated into: German, Japanese.").waitFor();
+  await page.getByText(/visuel de la marque/).waitFor();
+  const moduleYaml = readFileSync(join(dir, "module/module.yaml"), "utf8");
+  assert.match(moduleYaml, /- fr\n\s+- de\n\s+- ja/);
+  assert.ok(existsSync(join(dir, "module/media/guide-mouvement-img-000.png")));
+  await axe(page, "23-module-written-en");
+  await page.getByRole("button", { name: "Preview", exact: true }).click();
+  await page.getByRole("button", { name: "Preview", exact: true }).waitFor();
+  for (
+    let i = 0;
+    i < 50 && !existsSync(join(dir, "out/preview/index.html"));
+    i++
+  )
+    await page.waitForTimeout(200);
+  assert.ok(existsSync(join(dir, "out/preview/index.html")), "preview built");
+  console.log("  ✓ module: estimate, consent, written, translated, previewed");
+
+  // Sam edits one text: its translations become due, and only it is sent again.
+  await page.getByRole("button", { name: "Edit the texts" }).click();
+  await page.getByLabel("Module title").waitFor();
+  await axe(page, "24-texts-en");
+  await page.getByLabel("Module title").fill("Le mouvement : expliqué");
+  await page.getByText(/1 text\(s\) changed/).waitFor();
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await page.getByText("Changes saved.").waitFor();
+  assert.equal(
+    JSON.parse(readFileSync(join(dir, "module/strings/fr.json"), "utf8"))[
+      "meta.title"
+    ],
+    "Le mouvement : expliqué",
+  );
+  await page.getByRole("button", { name: "Back to the project" }).click();
+  await page.getByText("2 text(s) to translate or translate again.").waitFor();
+  await page.getByRole("button", { name: "Update the translations" }).click();
+  await page.getByRole("button", { name: "Start generating" }).click();
+  await page.getByText(/Translations updated: German, Japanese/).waitFor();
+  console.log("  ✓ texts: edited with French typography, translations redone");
+
+  // Export: one package per format of the chosen outputs.
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByText(/Exported: .*scorm12\.zip/).waitFor({ timeout: 60_000 });
+  assert.ok(
+    existsSync(join(dir, "out/le-mouvement-mecanique-1.0.0-scorm12.zip")),
+  );
+  assert.ok(
+    existsSync(join(dir, "out/le-mouvement-mecanique-1.0.0-html5.zip")),
+  );
+  await axe(page, "25-exported-en");
+  console.log("  ✓ export: SCORM 1.2 (Watch Live) and HTML packages in out/");
+
   assert.deepEqual(errors, [], "no runtime error");
   console.log(
-    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings → generation → storyboard approved",
+    "✓ Studio end-to-end: welcome → new project → sources read → lock → settings → generation → storyboard approved → module written, edited, translated, exported",
   );
+} catch (e) {
+  // What the window showed when the test failed.
+  const page = await app.firstWindow();
+  await page.screenshot({ path: join(SHOTS, "failure.png"), fullPage: true });
+  console.error(
+    `  window text: ${(await page.innerText("main")).slice(0, 1500)}`,
+  );
+  throw e;
 } finally {
   await app.close();
 }

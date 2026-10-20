@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { t } from "./i18n.svelte.ts";
+import ModuleTexts from "./screens/ModuleTexts.svelte";
 import NewProject from "./screens/NewProject.svelte";
 import Projects from "./screens/Projects.svelte";
 import ProjectView from "./screens/ProjectView.svelte";
@@ -37,7 +38,7 @@ async function go(screen: "projects" | "settings") {
             <li>
               <button
                 type="button"
-                aria-current={["projects", "new", "project", "storyboard"].includes(app.screen) ? "page" : undefined}
+                aria-current={["projects", "new", "project", "storyboard", "texts"].includes(app.screen) ? "page" : undefined}
                 onclick={() => go("projects")}>{t("nav.projects")}</button
               >
             </li>
@@ -70,6 +71,8 @@ async function go(screen: "projects" | "settings") {
           <ProjectView />
         {:else if app.screen === "storyboard" && app.project}
           <StoryboardView />
+        {:else if app.screen === "texts" && app.project}
+          <ModuleTexts />
         {:else if app.screen === "settings"}
           <SettingsScreen />
         {/if}

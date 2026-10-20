@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { ExportSummary } from "../../shared/api.ts";
 import { t, tk } from "../i18n.svelte.ts";
 import {
   app,
@@ -8,6 +9,7 @@ import {
   unwrap,
 } from "../store.svelte.ts";
 import GenerateStoryboard from "./GenerateStoryboard.svelte";
+import WriteModule from "./WriteModule.svelte";
 
 const p = $derived(app.project);
 let reading = $state(false);
@@ -21,8 +23,8 @@ const progress = $derived.by(() => {
     sources: s.ingest.state === "done",
     storyboard: s.storyboard.state === "done",
     approval: s.approval.state === "done",
-    module: s.module.exists,
-    export: false,
+    module: s.module.exists && s.module.errors === 0,
+    export: s.module.exports.length > 0,
   };
   const keys = [
     "sources",
@@ -41,16 +43,44 @@ const progress = $derived.by(() => {
 const nextKey = $derived.by(() => {
   if (!p) return null;
   const stage = stageOf(p.state, p.sources.length > 0);
-  return stage === "stage.sources"
-    ? "project.next.sources"
-    : stage === "stage.ingest"
-      ? "project.next.ingest"
-      : stage === "stage.storyboard" || stage === "stage.storyboardInvalid"
-        ? "project.next.storyboard"
-        : stage === "stage.approval" || stage === "stage.approvalOutdated"
-          ? "project.next.approval"
-          : "project.next.module";
+  const keys: Record<string, string> = {
+    "stage.sources": "project.next.sources",
+    "stage.ingest": "project.next.ingest",
+    "stage.storyboard": "project.next.storyboard",
+    "stage.storyboardInvalid": "project.next.storyboard",
+    "stage.approval": "project.next.approval",
+    "stage.approvalOutdated": "project.next.approval",
+    "stage.module": "project.next.module",
+    "stage.moduleInvalid": "project.next.moduleInvalid",
+    "stage.translations": "project.next.translations",
+    "stage.export": "project.next.export",
+    "stage.ready": "project.next.ready",
+  };
+  return keys[stage] ?? "project.next.module";
 });
+
+const approved = $derived(p?.state.approval.state === "done");
+const pendingTexts = $derived(
+  p?.state.module.translations.reduce((n, x) => n + x.pending, 0) ?? 0,
+);
+let busy = $state<"preview" | "export" | null>(null);
+let exported = $state<ExportSummary | null>(null);
+
+async function preview() {
+  if (!p) return;
+  busy = "preview";
+  unwrap(await window.ldm.previewModule(p.dir));
+  busy = null;
+}
+
+async function exportAll() {
+  if (!p) return;
+  busy = "export";
+  exported = unwrap(await window.ldm.exportModule(p.dir));
+  busy = null;
+  const updated = unwrap(await window.ldm.openProject(p.dir));
+  if (updated) app.project = updated;
+}
 
 const fmtTime = (iso: string) =>
   new Intl.DateTimeFormat(app.settings?.locale, {
@@ -144,6 +174,67 @@ const kb = (bytes: number) => Math.max(1, Math.round(bytes / 1024));
         <p>{tk(nextKey)}</p>
         {#if p.state.ingest.state === "done" && p.state.approval.state !== "done"}
           <GenerateStoryboard project={p} again={p.state.storyboard.state !== "missing"} />
+        {/if}
+        {#if app.notice?.dir === p.dir}
+          <div class="result" role="status">
+            {#each app.notice.lines as line, i (i)}<p>{line}</p>{/each}
+            {#if app.notice.notes.length}
+              <p><strong>{t("module.notes")}</strong></p>
+              <ul>
+                {#each app.notice.notes as n, i (i)}<li>{n}</li>{/each}
+              </ul>
+            {/if}
+            <p>
+              <button type="button" class="btn btn-quiet" onclick={() => (app.notice = null)}
+                >{t("common.close")}</button
+              >
+            </p>
+          </div>
+        {/if}
+        {#if approved && !p.state.module.exists}
+          <WriteModule project={p} mode="write" />
+        {:else if approved}
+          {#if p.state.module.errors}
+            <p class="notice">{t("project.moduleErrors", { n: p.state.module.errors })}</p>
+          {/if}
+          <div class="actions">
+            <button type="button" class="btn btn-primary" onclick={preview} disabled={busy !== null}
+              >{busy === "preview" ? t("project.previewing") : t("project.preview")}</button
+            >
+            <button type="button" class="btn" onclick={() => (app.screen = "texts")}
+              >{t("project.editTexts")}</button
+            >
+            {#if p.editable}
+              <button
+                type="button"
+                class="btn"
+                onclick={exportAll}
+                disabled={busy !== null || p.state.module.errors > 0}
+                >{busy === "export" ? t("project.exporting") : t("project.export")}</button
+              >
+            {/if}
+          </div>
+          {#if exported}
+            <p aria-live="polite">
+              {t("project.exported", { files: exported.files.join(", ") })}
+              {#if exported.generic.length}
+                <br /><span class="help"
+                  >{t("project.exportGeneric", {
+                    profiles: exported.generic.map((g) => tk(`profile.${g}`)).join(", "),
+                  })}</span
+                >
+              {/if}
+            </p>
+          {/if}
+          {#if pendingTexts}
+            <p>{t("project.translationsDue", { n: pendingTexts })}</p>
+          {/if}
+          <!-- Always there, so that its result stays shown once nothing is left to translate. -->
+          <WriteModule project={p} mode="translate" />
+          <details>
+            <summary>{t("project.rewrite")}</summary>
+            <WriteModule project={p} mode="write" again={true} />
+          </details>
         {/if}
         {#if p.state.storyboard.state !== "missing"}
           <div class="actions">
@@ -346,6 +437,19 @@ const kb = (bytes: number) => Math.max(1, Math.round(bytes / 1024));
     display: grid;
     gap: 0.6rem;
     border-inline-start: 4px solid var(--accent);
+  }
+
+  .result {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--success-soft);
+  }
+
+  .result ul {
+    margin: 0;
+    padding-inline-start: 1.25rem;
   }
 
   .grid {

@@ -121,7 +121,9 @@ clients/, out/            sources clients et modules générés — ignorés par
   dépôt**. Hors de `pnpm check` (réseau, limites de l'essai : 10 inscriptions actives).
 - `pnpm l10n export <module> --to <lang> [--xliff 1.2|2.0]` puis `pnpm l10n import <module> <xlf>` —
   aller-retour de traduction (URL des liens jamais exportées ; lien perdu ⇒ import refusé)
-- `pnpm gen init|ingest|storyboard|approve|check|build|status <projet>` — générateur (ADR 0013) ;
+- `pnpm gen init|ingest|generate|storyboard|approve|write|translate|check|build|status <projet>` —
+  générateur (ADR 0013, 0015) ; `generate`, `write` et `translate` appellent Claude (`ANTHROPIC_API_KEY`,
+  clé rattachée à un espace de travail) ;
   `gen approve` **uniquement sur accord explicite de Sam** (porte par empreinte du storyboard)
 - `pnpm studio` — lance le Studio ; `pnpm test:studio` — test de bout en bout (Playwright pilote
   Electron, axe sur chaque écran, captures dans `out/studio-e2e/`) ; installateurs Mac/Windows :
@@ -255,8 +257,10 @@ TypeScript 7 (strict), Vitest, Biome (lint + format), contrôle des licences
           (fait le 2026-10-17, testé par Sam sur Mac) ;
           2. moteur API (fait : `engine/`, `pnpm gen generate`, bouton du Studio ; essai réel à
           faire avec la clé de Sam ; passe en option, ADR 0017) ; 3. écran storyboard (fait le
-          2026-10-18 : relecture, retouche sur place, validation à son nom ; `approval.ts`) ; 4. aperçu et
-          retouches du module ; 5. profils LMS (Watch Live/Teach on Mars…) et fichier HTML unique ;
+          2026-10-18 : relecture, retouche sur place, validation à son nom ; `approval.ts`) ; 4. rédaction,
+          traduction, aperçu, retouche des textes et export (fait le 2026-10-20 : `engine/module.ts`,
+          `engine/translate.ts`, brouillon `draft.ts`, lecteur livré en ressource du Studio ;
+          essai réel avec la clé à faire) ; 5. profils LMS (Watch Live/Teach on Mars…) et fichier HTML unique ;
           6. installateurs signés
     - [x] Premier module complet de bout en bout (2026-10-17) : `projects/mouvement-mecanique/module`,
           6 langues (fr, en, de, it, ja, zh-Hans), banc 264 pages OK, SCORM Cloud 1.2 réussi ;

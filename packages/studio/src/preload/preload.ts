@@ -28,6 +28,13 @@ const api: StudioApi = {
   storyboard: call("storyboard"),
   saveStoryboard: call("saveStoryboard"),
   approveStoryboard: call("approveStoryboard"),
+  estimateModule: call("estimateModule"),
+  writeModule: call("writeModule"),
+  translateModule: call("translateModule"),
+  previewModule: call("previewModule"),
+  moduleTexts: call("moduleTexts"),
+  saveModuleTexts: call("saveModuleTexts"),
+  exportModule: call("exportModule"),
   onGenerationProgress: (listener) => {
     const handler = (_e: unknown, p: GenerationProgress) => listener(p);
     ipcRenderer.on("ldm:generationProgress", handler);

@@ -1,6 +1,6 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   type CompiledContent,
   LOCALES_DIR,
@@ -16,14 +16,17 @@ import {
 } from "@ldm/schema";
 import { guardScript, guardStyle } from "./prerender-guard.ts";
 
-const PLAYER_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../player",
-);
-const PLAYER_DIST = join(PLAYER_DIR, "dist");
+/**
+ * The built player: next to this package in the repository, or wherever LDM_PLAYER_DIR says (the
+ * Studio ships it as a resource, where the bundled code cannot find it by a relative path).
+ */
+const playerDir = () =>
+  process.env.LDM_PLAYER_DIR ??
+  join(dirname(fileURLToPath(import.meta.url)), "../../player");
+const playerDist = () => join(playerDir(), "dist");
 /** Build-time renderer of the first screen (ADR 0012), produced by the player's --ssr build. */
-const PRERENDER = join(PLAYER_DIR, "dist-ssr/prerender.js");
-const UI_DIR = join(PLAYER_DIR, "src/ui");
+const prerenderFile = () => join(playerDir(), "dist-ssr/prerender.js");
+const uiDir = () => join(playerDir(), "src/ui");
 
 export class BuildError extends Error {
   readonly issues: Issue[];
@@ -51,7 +54,7 @@ async function loadUiCatalogs(
   locales: readonly string[],
 ): Promise<Record<string, StringCatalog>> {
   const available = new Set(
-    (await readdir(UI_DIR)).map((f) => f.replace(/\.json$/, "")),
+    (await readdir(uiDir())).map((f) => f.replace(/\.json$/, "")),
   );
   const ui: Record<string, StringCatalog> = {};
   const missing: string[] = [];
@@ -63,7 +66,7 @@ async function loadUiCatalogs(
         ? lang
         : undefined;
     if (!file) missing.push(locale);
-    else ui[locale] = await readJson(join(UI_DIR, `${file}.json`));
+    else ui[locale] = await readJson(join(uiDir(), `${file}.json`));
   }
   if (missing.length)
     throw new BuildError(
@@ -113,7 +116,7 @@ export async function buildWeb(
   const source = await loadModuleSource(moduleDir);
 
   const manifest = await readJson<Record<string, ViteManifestEntry>>(
-    join(PLAYER_DIST, ".vite/manifest.json"),
+    join(playerDist(), ".vite/manifest.json"),
   ).catch(() => {
     throw new BuildError(
       "player is not built: run `pnpm --filter @ldm/player build`",
@@ -145,7 +148,9 @@ export async function buildWeb(
     ui: { [def]: ui[def] as StringCatalog, en: ui.en as StringCatalog },
   };
 
-  const { prerender } = (await import(PRERENDER).catch(() => {
+  const { prerender } = (await import(
+    pathToFileURL(prerenderFile()).href
+  ).catch(() => {
     throw new BuildError(
       "player prerenderer is not built: run `pnpm --filter @ldm/player build`",
     );
@@ -157,8 +162,8 @@ export async function buildWeb(
 
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
-  await cp(join(PLAYER_DIST, entry.file), join(outDir, entry.file));
-  await cp(join(PLAYER_DIST, "assets"), join(outDir, "assets"), {
+  await cp(join(playerDist(), entry.file), join(outDir, entry.file));
+  await cp(join(playerDist(), "assets"), join(outDir, "assets"), {
     recursive: true,
   });
   if (source.mediaFiles.length)

@@ -54,6 +54,23 @@ La **page de revue** (bouton à côté) montre en plus l'extrait de source derri
 transmis à Claude pour chaque génération (par exemple « jamais de quiz vrai/faux », « toujours un
 cas client par section »). Écris-les librement, en français.
 
+## Rédiger, relire, traduire et exporter le module (étape 4)
+1. Une fois le storyboard validé, **Rédiger le module** : le Studio affiche le devis complet
+   (rédaction, puis traductions dans chaque langue du projet, et le total), puis attend ton accord.
+2. Claude rédige tous les textes à partir du storyboard validé, des sources et de la base de
+   savoir horloger ; le module est contrôlé comme un module fait à la main (format, règles
+   pédagogiques, conformité au storyboard) et renvoyé à Claude en cas de problème, trois
+   réponses au plus. Ses **notes pour toi** (une image manquante, un choix fait) s'affichent à la
+   fin et restent dans `module-notes.md`. Les traductions suivent automatiquement.
+3. **Aperçu** : le module s'ouvre dans ton navigateur, tel que l'apprenant le verra.
+4. **Retoucher les textes** : tous les textes de la langue principale, écran par écran. Après
+   l'enregistrement, **Mettre à jour les traductions** ne retraduit que les textes modifiés.
+5. **Exporter** : un paquet par sortie choisie, dans le dossier `out/` du projet, qui s'ouvre.
+   Watch Live et les LMS dont le profil n'est pas encore réglé reçoivent un SCORM 1.2 standard ;
+   le fichier HTML unique est remplacé, en attendant, par le site HTML zippé.
+
+Réécrire le module remplace l'actuel, conservé dans `module.previous/`.
+
 ## Travailler à deux
 Quand l'un de vous ouvre un projet, le Studio pose un verrou (`.ldm-lock`) : l'autre le voit
 « Ouvert par … » et ne peut que le consulter, pour éviter que vos modifications se croisent. Le
@@ -71,6 +88,7 @@ projet que l'autre vient de modifier.
 - Suivre l'avancement de chaque projet.
 - Générer le storyboard avec Claude (coût affiché avant et après).
 - Relire, modifier et valider le storyboard.
+- Rédiger, traduire, prévisualiser, retoucher et exporter le module.
 
-À venir, dans l'ordre : rédaction, éditeur et aperçu (4), exports par LMS (5),
+À venir, dans l'ordre : réglages propres à chaque LMS, dont Watch Live, et fichier HTML unique (5),
 installateurs signés et mises à jour automatiques (6).

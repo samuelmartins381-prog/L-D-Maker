@@ -117,9 +117,45 @@ export interface GenerationSummary {
 
 /** Progress of a generation, pushed by the main process. */
 export type GenerationProgress =
-  | { stage: "writing"; round: number; chars: number }
-  | { stage: "checking"; round: number }
+  | { stage: "writing"; round: number; chars: number; locale?: string }
+  | { stage: "checking"; round: number; locale?: string }
   | { stage: "done" };
+
+export interface ModuleEstimate extends GenerationEstimate {
+  /** Languages the module will then be translated into, and the price range of that. */
+  translationLocales: string[];
+  translationLowUsd: number;
+  translationHighUsd: number;
+}
+
+export interface ModuleWriteSummary extends GenerationSummary {
+  /** Claude's notes for Sam (a missing image, an assumption…). */
+  notes: string[];
+  /** Languages translated after writing. */
+  translated: string[];
+}
+
+export interface TranslationSummary {
+  translated: { locale: string; texts: number }[];
+  costUsd: number;
+}
+
+/** The module's texts in the writing language, grouped as the learner meets them. */
+export interface ModuleTexts {
+  defaultLocale: string;
+  groups: {
+    id: string;
+    title: string;
+    entries: { key: string; field: string; text: string }[];
+  }[];
+}
+
+export interface ExportSummary {
+  folder: string;
+  files: string[];
+  /** Profiles exported in a generic format until their own options are ready (ADR 0016). */
+  generic: string[];
+}
 
 /** What the storyboard screen shows and edits. */
 export interface StoryboardDetail {
@@ -165,6 +201,21 @@ export interface StudioApi {
   ): Promise<Result<StoryboardDetail>>;
   /** Records the approval: the gate before the module is written. */
   approveStoryboard(dir: string): Promise<Result<StoryboardDetail>>;
+  /** Price of writing the module, then translating it into the project's languages. */
+  estimateModule(dir: string): Promise<Result<ModuleEstimate>>;
+  /** Claude writes the module from the approved storyboard, then translates it. */
+  writeModule(dir: string): Promise<Result<ModuleWriteSummary>>;
+  /** Translates the texts new or changed since the last translation, in every language. */
+  translateModule(dir: string): Promise<Result<TranslationSummary>>;
+  /** Builds the module and opens it in the browser, as a learner sees it. */
+  previewModule(dir: string): Promise<Result<void>>;
+  moduleTexts(dir: string): Promise<Result<ModuleTexts>>;
+  saveModuleTexts(
+    dir: string,
+    changes: Record<string, string>,
+  ): Promise<Result<ModuleTexts>>;
+  /** One package per output chosen for the project, in out/; the folder opens. */
+  exportModule(dir: string): Promise<Result<ExportSummary>>;
   /** Subscribes to generation progress; returns the unsubscribe function. */
   onGenerationProgress(listener: (p: GenerationProgress) => void): () => void;
 }

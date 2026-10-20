@@ -4,7 +4,19 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import type { NewProject, Result, StudioLocale } from "../shared/api.ts";
-import { estimate, generate } from "./generation.ts";
+import {
+  estimate,
+  estimateModule,
+  generate,
+  translateAll,
+  writeModule,
+} from "./generation.ts";
+import {
+  buildPreview,
+  exportModule,
+  moduleTexts,
+  saveModuleTexts,
+} from "./module.ts";
 import {
   acquireLock,
   addSources,
@@ -23,6 +35,10 @@ import {
 import { getSettings, setApiKey, updateSettings } from "./settings.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
+// The built player the module builds need: shipped as a resource, or in the repository in development.
+process.env.LDM_PLAYER_DIR ??= app.isPackaged
+  ? join(process.resourcesPath, "player")
+  : join(HERE, "../../../player");
 // Tests run the Studio against a throwaway profile.
 if (process.env.LDM_STUDIO_USER_DATA)
   app.setPath("userData", process.env.LDM_STUDIO_USER_DATA);
@@ -127,6 +143,35 @@ function registerIpc(win: BrowserWindow): void {
   handle("approveStoryboard", async (dir: string) =>
     approveStoryboard(dir, await me()),
   );
+  const progress = (p: unknown) =>
+    win.webContents.send("ldm:generationProgress", p);
+  handle("estimateModule", async (dir: string) =>
+    estimateModule(dir, await root()),
+  );
+  handle("writeModule", async (dir: string) =>
+    writeModule(dir, await root(), await me(), progress),
+  );
+  handle("translateModule", async (dir: string) =>
+    translateAll(dir, await root(), await me(), progress),
+  );
+  handle("previewModule", async (dir: string) => {
+    const page = await buildPreview(dir);
+    // End-to-end tests check the build without opening a browser.
+    if (process.env.LDM_STUDIO_NO_OPEN) return;
+    const error = await shell.openPath(page);
+    if (error) throw new Error(error);
+  });
+  handle("moduleTexts", async (dir: string) => moduleTexts(dir));
+  handle(
+    "saveModuleTexts",
+    async (dir: string, changes: Record<string, string>) =>
+      saveModuleTexts(dir, changes, await me()),
+  );
+  handle("exportModule", async (dir: string) => {
+    const r = await exportModule(dir, await me());
+    if (!process.env.LDM_STUDIO_NO_OPEN) await shell.openPath(r.folder);
+    return r;
+  });
   ipcMain.handle("ldm:openPath", async (_e, path: string) => {
     await shell.openPath(path);
   });

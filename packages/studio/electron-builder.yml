@@ -13,6 +13,14 @@ asar: true
 # pdf.js is loaded from node_modules at run time (see generator/readers/pdf.ts).
 asarUnpack:
   - node_modules/pdfjs-dist/**
+# The built player that module previews and exports are made from (LDM_PLAYER_DIR, main.ts).
+extraResources:
+  - from: ../player/dist
+    to: player/dist
+  - from: ../player/dist-ssr
+    to: player/dist-ssr
+  - from: ../player/src/ui
+    to: player/src/ui
 mac:
   category: public.app-category.education
   target:
