@@ -1,8 +1,12 @@
 // Where a project stands in the pipeline (ADR 0013) and what to do next.
-import { access } from "node:fs/promises";
+import { access, readdir } from "node:fs/promises";
+import { join } from "node:path";
+import { loadModuleSource, validateModule } from "@ldm/schema";
+import { conformToStoryboard } from "./conform.ts";
+import { translationStatus } from "./engine/translate.ts";
 import { loadIngest, staleSources } from "./ingest.ts";
 import { loadProject, paths } from "./project.ts";
-import { loadStoryboard } from "./storyboard.ts";
+import { loadStoryboard, type Storyboard } from "./storyboard.ts";
 
 export interface Step {
   name: string;
@@ -30,11 +34,55 @@ export interface ProjectState {
     | { state: "missing" }
     | { state: "outdated"; at: string; by: string }
     | { state: "done"; at: string; by: string };
-  module: { exists: boolean };
+  module: {
+    exists: boolean;
+    /** Schema and pedagogy errors, plus differences from the storyboard. */
+    errors: number;
+    warnings: number;
+    /** Each project language other than the default: texts left to translate. */
+    translations: { locale: string; pending: number; total: number }[];
+    /** ZIP files exported to out/. */
+    exports: string[];
+  };
+}
+
+async function moduleState(
+  dir: string,
+  storyboard: Storyboard | undefined,
+): Promise<ProjectState["module"]> {
+  const moduleDir = paths(dir).module;
+  if (!(await exists(join(moduleDir, "module.yaml"))))
+    return {
+      exists: false,
+      errors: 0,
+      warnings: 0,
+      translations: [],
+      exports: [],
+    };
+  let errors = 0;
+  let warnings = 0;
+  try {
+    const v = validateModule(await loadModuleSource(moduleDir));
+    errors = v.issues.filter((i) => i.severity === "error").length;
+    warnings = v.issues.length - errors;
+    if (v.module && storyboard)
+      errors += conformToStoryboard(v.module, storyboard).length;
+  } catch {
+    errors = 1; // unreadable module.yaml or catalogue
+  }
+  const exports = (await readdir(join(dir, "out")).catch(() => [] as string[]))
+    .filter((f) => f.endsWith(".zip"))
+    .sort();
+  return {
+    exists: true,
+    errors,
+    warnings,
+    translations: await translationStatus(dir),
+    exports,
+  };
 }
 
 export async function projectState(dir: string): Promise<ProjectState> {
-  const p = paths(dir);
   const project = await loadProject(dir);
   const index = await loadIngest(dir);
   const stale = index ? await staleSources(dir, index) : [];
@@ -64,7 +112,7 @@ export async function projectState(dir: string): Promise<ProjectState> {
       : approval.hash !== sb.hash
         ? { state: "outdated", at: approval.at, by: approval.by }
         : { state: "done", at: approval.at, by: approval.by },
-    module: { exists: await exists(p.module) },
+    module: await moduleState(dir, sb.storyboard),
   };
 }
 

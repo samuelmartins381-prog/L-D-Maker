@@ -2,20 +2,28 @@
 // in; a storyboard comes out, checked by the same rules as a hand-written one. Problems found are
 // sent back for correction, up to `maxRounds` answers in all. The result is written as
 // storyboard.yaml, which Sam reviews, edits and approves: nothing here approves anything.
-import { appendFile, copyFile, readFile, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { copyFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import type Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { stringify } from "yaml";
-import { type IngestIndex, loadIngest, staleSources } from "../ingest.ts";
+import type { IngestIndex } from "../ingest.ts";
 import { loadProject, type Project, paths } from "../project.ts";
-import { imageSize } from "../readers/image.ts";
 import { refreshReview } from "../review.ts";
 import {
   checkStoryboard,
   Storyboard,
   type StoryboardIssue,
 } from "../storyboard.ts";
+import {
+  choicesText,
+  freshIngest,
+  GenerationError,
+  type GenerationEvent,
+  knowledgeBlock,
+  logGeneration,
+  sourceBlocks,
+} from "./common.ts";
 import type { LlmCall, LlmClient } from "./llm.ts";
 import {
   addUsage,
@@ -37,33 +45,17 @@ const SCHEMA = zodOutputFormat(StoryboardDraft).schema as Record<
   unknown
 >;
 
-export const GENERATION_LOG = "generation-log.jsonl";
-const MAX_IMAGES = 8;
-// API limits: 5 MB per image once in base64, 8000 px per side, 32 MB per request.
-const MAX_IMAGE_BYTES = 3_500_000;
-const MAX_IMAGE_SIDE = 8000;
-const MAX_TOTAL_IMAGE_BYTES = 15_000_000;
-const IMAGE_TYPES: Record<
-  string,
-  "image/png" | "image/jpeg" | "image/gif" | "image/webp"
-> = {
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".gif": "image/gif",
-  ".webp": "image/webp",
-};
-
-export class GenerationError extends Error {}
-
-export type GenerationEvent =
-  | { stage: "writing"; round: number; chars: number }
-  | { stage: "checking"; round: number }
-  | { stage: "done" };
+export {
+  GENERATION_LOG,
+  GenerationError,
+  type GenerationEvent,
+} from "./common.ts";
 
 export interface GenerateOptions {
   client: LlmClient;
   model?: ModelId;
+  /** The studio's domain knowledge (docs/knowledge), if any. */
+  knowledge?: string;
   /** Sam's common rules for every module ("what I never want to see"), if any. */
   houseRules?: string;
   /** Answers allowed in all, the first included. */
@@ -89,113 +81,16 @@ export interface Estimate {
   highUsd: number;
 }
 
-/** Sources must be read and up to date: the anchors they carry are what the storyboard cites. */
-async function freshIngest(dir: string): Promise<IngestIndex> {
-  const ingest = await loadIngest(dir);
-  if (!ingest) throw new GenerationError("sources not read yet");
-  const stale = await staleSources(dir, ingest);
-  if (stale.length)
-    throw new GenerationError(
-      `sources changed since reading: ${stale.join(", ")}`,
-    );
-  return ingest;
-}
-
-function choicesText(project: Project, houseRules?: string): string {
-  const a = project.assessment;
-  return [
-    "# Project",
-    `Title: ${project.title}`,
-    project.client ? `Brand or client: ${project.client}` : "",
-    `Audience: ${project.audience}`,
-    `Target duration: ${project.durationMinutes} minutes`,
-    `Writing language (defaultLocale): ${project.defaultLocale}; translations planned: ${project.locales.join(", ")}`,
-    `Address the learner: ${project.formality === "formal" ? "formally (vous, Sie, usted…)" : "informally (tu, du, tú…)"}`,
-    `Question types allowed: ${a.questionTypes.join(", ")}`,
-    `Scored questions per objective: at least ${a.questionsPerObjective}`,
-    `Passing score: ${a.passingScore} %`,
-    `Attempts per question: ${a.attempts}`,
-    `Animation level: ${project.animation}`,
-    `Delivered to: ${project.outputs.map((o) => o.profile).join(", ")}`,
-    project.brief ? `\n# Brief from the brand\n${project.brief}` : "",
-    houseRules?.trim()
-      ? `\n# Studio rules for every module (must be respected)\n${houseRules.trim()}`
-      : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
-
-async function sourceBlocks(
-  dir: string,
-  ingest: IngestIndex,
-): Promise<Anthropic.ContentBlockParam[]> {
-  const blocks: Anthropic.ContentBlockParam[] = [];
-  for (const s of ingest.sources) {
-    const md = await readFile(join(paths(dir).ingest, s.markdown), "utf8");
-    blocks.push({
-      type: "text",
-      text: `<source file="${s.file}">\n${md}\n</source>`,
-    });
-  }
-  let images = 0;
-  let total = 0;
-  const skipped: string[] = [];
-  for (const s of ingest.sources)
-    for (const m of s.media) {
-      const type = IMAGE_TYPES[extname(m).toLowerCase()];
-      if (!type) continue;
-      const data = await readFile(join(paths(dir).ingest, m));
-      const size = imageSize(data);
-      if (
-        images >= MAX_IMAGES ||
-        !size ||
-        data.length > MAX_IMAGE_BYTES ||
-        total + data.length > MAX_TOTAL_IMAGE_BYTES ||
-        Math.max(size.width, size.height) > MAX_IMAGE_SIDE
-      ) {
-        skipped.push(`ingest/${m}`);
-        continue;
-      }
-      images++;
-      total += data.length;
-      blocks.push(
-        { type: "text", text: `Image ingest/${m} (from ${s.file}):` },
-        {
-          type: "image",
-          source: {
-            type: "base64",
-            media_type: type,
-            data: data.toString("base64"),
-          },
-        },
-      );
-    }
-  if (skipped.length)
-    blocks.push({
-      type: "text",
-      text: `Images not sent (count, size or weight limits): ${skipped.join(", ")}. Plan their use from the surrounding text only.`,
-    });
-  const anchors = ingest.sources
-    .flatMap((s) => s.anchors.map((a) => `- ${a.id} — ${a.label}`))
-    .join("\n");
-  // The sources are the long, stable part: cached for the correction rounds.
-  blocks.push({
-    type: "text",
-    text: `# Source anchors (the only valid sourceRefs)\n${anchors}`,
-    cache_control: { type: "ephemeral" },
-  });
-  return blocks;
-}
-
 async function firstCall(
   dir: string,
   model: ModelId,
   houseRules?: string,
+  knowledge?: string,
 ): Promise<{ call: LlmCall; project: Project; ingest: IngestIndex }> {
   const project = await loadProject(dir);
   const ingest = await freshIngest(dir);
   const content: Anthropic.ContentBlockParam[] = [
+    ...knowledgeBlock(knowledge),
     ...(await sourceBlocks(dir, ingest)),
     {
       type: "text",
@@ -218,10 +113,18 @@ async function firstCall(
 /** Price range before generating, from the exact size of what will be sent. */
 export async function estimateStoryboard(
   dir: string,
-  options: Pick<GenerateOptions, "client" | "model" | "houseRules">,
+  options: Pick<
+    GenerateOptions,
+    "client" | "model" | "houseRules" | "knowledge"
+  >,
 ): Promise<Estimate> {
   const model = options.model ?? DEFAULT_MODEL;
-  const { call } = await firstCall(dir, model, options.houseRules);
+  const { call } = await firstCall(
+    dir,
+    model,
+    options.houseRules,
+    options.knowledge,
+  );
   const inputTokens = await options.client.countTokens(call);
   return {
     model,
@@ -252,6 +155,7 @@ export async function generateStoryboard(
     dir,
     model,
     options.houseRules,
+    options.knowledge,
   );
   let usage = ZERO_USAGE;
   let best: { storyboard: Storyboard; issues: StoryboardIssue[] } | undefined;
@@ -337,20 +241,16 @@ export async function generateStoryboard(
     usage,
     costUsd: cost(model, usage),
   };
-  await appendFile(
-    join(dir, GENERATION_LOG),
-    `${JSON.stringify({
-      at: new Date().toISOString(),
-      step: "storyboard",
-      prompt: STORYBOARD_PROMPT_VERSION,
-      model,
-      rounds: round,
-      usage,
-      costUsd: Number(result.costUsd.toFixed(4)),
-      errors: best.issues.filter((i) => i.severity === "error").length,
-      warnings: best.issues.filter((i) => i.severity === "warning").length,
-    })}\n`,
-  );
+  await logGeneration(dir, {
+    step: "storyboard",
+    prompt: STORYBOARD_PROMPT_VERSION,
+    model,
+    rounds: round,
+    usage,
+    costUsd: result.costUsd,
+    errors: best.issues.filter((i) => i.severity === "error").length,
+    warnings: best.issues.filter((i) => i.severity === "warning").length,
+  });
   await refreshReview(dir);
   options.onProgress?.({ stage: "done" });
   return result;

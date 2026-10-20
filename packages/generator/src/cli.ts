@@ -4,21 +4,30 @@
 //   ldm-gen ingest <dir>          read sources/ into ingest/ (anchored Markdown)
 //   ldm-gen generate <dir> [--model m] [--estimate]   Claude writes storyboard.yaml (ANTHROPIC_API_KEY)
 //   ldm-gen storyboard <dir>      check storyboard.yaml, write review/storyboard.html
+//   ldm-gen write <dir> [--model m] [--estimate]   Claude writes module/ from the approved storyboard
+//   ldm-gen translate <dir> [--to de] [--model m]  Claude translates the texts new or changed
 //   ldm-gen approve <dir> [--by Sam]   record Sam's approval (only on Sam's explicit go)
 //   ldm-gen check <dir>           module/ valid and conform to the approved storyboard
 //   ldm-gen build <dir>           check, then build every format and run the QA bench
 //   ldm-gen status <dir>
 import { spawnSync } from "node:child_process";
-import { mkdir } from "node:fs/promises";
-import { basename, resolve } from "node:path";
+import { mkdir, readdir, readFile } from "node:fs/promises";
+import { basename, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadModuleSource, validateModule } from "@ldm/schema";
 import { approveStoryboard } from "./approval.ts";
 import { conformToStoryboard } from "./conform.ts";
+import type { GenerationEvent } from "./engine/common.ts";
 import { anthropicClient } from "./engine/llm.ts";
+import { estimateModule, writeModule } from "./engine/module.ts";
 import { DEFAULT_MODEL, MODELS, type ModelId } from "./engine/pricing.ts";
 import { estimateStoryboard, generateStoryboard } from "./engine/storyboard.ts";
+import {
+  estimateTranslations,
+  translateModule,
+  translationStatus,
+} from "./engine/translate.ts";
 import { ingestProject, loadIngest, slugify } from "./ingest.ts";
 import { paths, saveProject } from "./project.ts";
 import { refreshReview } from "./review.ts";
@@ -37,17 +46,55 @@ const { positionals, values } = parseArgs({
     by: { type: "string", default: "Sam" },
     model: { type: "string" },
     estimate: { type: "boolean", default: false },
+    to: { type: "string" },
   },
 });
 const [command, dir] = positionals;
 const usage = (): never => {
   console.error(
-    "usage: ldm-gen <init|ingest|generate|storyboard|approve|check|build|status> <dir>\n  init: --title <t> --audience <a> [--minutes 20] [--locale fr] [--locales fr,en]",
+    "usage: ldm-gen <init|ingest|generate|storyboard|approve|write|translate|check|build|status> <dir>\n  init: --title <t> --audience <a> [--minutes 20] [--locale fr] [--locales fr,en]",
   );
   process.exit(2);
 };
 if (!dir) usage();
 const project = resolve(dir as string);
+/** The studio's domain knowledge, sent with every generation. */
+async function knowledge(): Promise<string> {
+  const folder = join(ROOT, "docs/knowledge");
+  const files = (await readdir(folder).catch(() => [] as string[])).filter(
+    (f) => f.endsWith(".md"),
+  );
+  const texts = await Promise.all(
+    files.sort().map((f) => readFile(join(folder, f), "utf8")),
+  );
+  return texts.join("\n\n");
+}
+
+function apiClient() {
+  const key =
+    process.env.ANTHROPIC_API_KEY ||
+    fail("ANTHROPIC_API_KEY manquante (secret d'environnement)");
+  const model = (values.model ?? DEFAULT_MODEL) as ModelId;
+  if (!(model in MODELS)) fail(`modèle inconnu : ${model}`);
+  return { client: anthropicClient(key), model };
+}
+
+/** Progress of a generation, on one line. */
+function progress(label: string) {
+  let shown = 0;
+  return (e: GenerationEvent) => {
+    if (e.stage === "writing" && e.chars - shown > 2000) {
+      shown = e.chars;
+      process.stdout.write(
+        `\r  ${label}, réponse ${e.round} : ${e.chars} caractères`,
+      );
+    } else if (e.stage === "checking") {
+      shown = 0;
+      process.stdout.write(`\n  vérification de la réponse ${e.round}\n`);
+    }
+  };
+}
+
 const fail = (message: string): never => {
   console.error(`✗ ${message}`);
   process.exit(1);
@@ -118,32 +165,22 @@ try {
       `  Total : ${index.words} mots, ~${index.readingMinutes} min de lecture`,
     );
   } else if (command === "generate") {
-    const key =
-      process.env.ANTHROPIC_API_KEY ||
-      fail("ANTHROPIC_API_KEY manquante (secret d'environnement)");
-    const model = (values.model ?? DEFAULT_MODEL) as ModelId;
-    if (!(model in MODELS)) fail(`modèle inconnu : ${model}`);
-    const client = anthropicClient(key);
-    const est = await estimateStoryboard(project, { client, model });
+    const { client, model } = apiClient();
+    const k = await knowledge();
+    const est = await estimateStoryboard(project, {
+      client,
+      model,
+      knowledge: k,
+    });
     console.log(
       `≈ ${est.inputTokens} jetons envoyés ; coût estimé ${est.lowUsd.toFixed(2)} à ${est.highUsd.toFixed(2)} $ (${model})`,
     );
     if (!values.estimate) {
-      let shown = 0;
       const r = await generateStoryboard(project, {
         client,
         model,
-        onProgress: (e) => {
-          if (e.stage === "writing" && e.chars - shown > 2000) {
-            shown = e.chars;
-            process.stdout.write(
-              `\r  réponse ${e.round} : ${e.chars} caractères`,
-            );
-          } else if (e.stage === "checking") {
-            shown = 0;
-            process.stdout.write(`\n  vérification de la réponse ${e.round}\n`);
-          }
-        },
+        knowledge: k,
+        onProgress: progress("storyboard"),
       });
       const errors = r.issues.filter((i) => i.severity === "error").length;
       console.log(
@@ -153,6 +190,48 @@ try {
     }
   } else if (command === "storyboard") {
     if (!(await storyboard())) process.exit(1);
+  } else if (command === "write") {
+    const { client, model } = apiClient();
+    const k = await knowledge();
+    const est = await estimateModule(project, { client, model, knowledge: k });
+    const tr = await estimateTranslations(project, model);
+    console.log(
+      `≈ ${est.inputTokens} jetons envoyés ; rédaction ${est.lowUsd.toFixed(2)} à ${est.highUsd.toFixed(2)} $, traductions (${tr.locales.join(", ")}) ${tr.lowUsd.toFixed(2)} à ${tr.highUsd.toFixed(2)} $ (${model})`,
+    );
+    if (!values.estimate) {
+      const r = await writeModule(project, {
+        client,
+        model,
+        knowledge: k,
+        onProgress: progress("rédaction"),
+      });
+      const errors = r.issues.filter((i) => i.severity === "error");
+      for (const i of r.issues)
+        console.log(
+          `${i.severity === "error" ? "✗" : "!"} ${i.where} : ${i.message}`,
+        );
+      for (const n of r.notes) console.log(`  note : ${n}`);
+      console.log(
+        `${errors.length ? "✗" : "✓"} module écrit en ${r.rounds} réponse(s) : ${errors.length} erreur(s) ; coût réel ${r.costUsd.toFixed(2)} $`,
+      );
+    }
+  } else if (command === "translate") {
+    const { client, model } = apiClient();
+    const k = await knowledge();
+    const targets = values.to
+      ? [values.to]
+      : (await translationStatus(project)).map((s) => s.locale);
+    for (const locale of targets) {
+      const r = await translateModule(project, locale, {
+        client,
+        model,
+        knowledge: k,
+        onProgress: progress(locale),
+      });
+      console.log(
+        `\n✓ ${locale} : ${r.translated} texte(s) traduit(s) ; coût ${r.costUsd.toFixed(2)} $`,
+      );
+    }
   } else if (command === "approve") {
     if (!(await storyboard())) fail("storyboard en erreur : rien n'est validé");
     const { hash } = await approveStoryboard(project, values.by);
