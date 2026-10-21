@@ -428,7 +428,13 @@ try {
   )
     await page.waitForTimeout(200);
   assert.ok(existsSync(join(dir, "out/preview/index.html")), "preview built");
-  console.log("  ✓ module: estimate, consent, written, translated, previewed");
+  const journal = readFileSync(join(userData, "studio.log"), "utf8");
+  assert.match(journal, /✓ writeModule \(/);
+  assert.match(journal, /progress: checking 1/);
+  assert.doesNotMatch(journal, /sk-ant-/, "no key in the journal");
+  console.log(
+    "  ✓ module: estimate, consent, written, translated, previewed, journaled",
+  );
 
   // Sam edits one text: its translations become due, and only it is sent again.
   await page.getByRole("button", { name: "Edit the texts" }).click();

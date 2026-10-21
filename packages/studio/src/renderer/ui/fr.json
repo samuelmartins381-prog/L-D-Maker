@@ -297,8 +297,7 @@
   "module.estimateTranslations": "Traductions ({languages}) : {low} à {high}.",
   "module.total": "Total estimé : {low} à {high}.",
   "module.replaces": "Le module actuel sera remplacé ; il est conservé à côté (module.previous).",
-  "module.starting": "Envoi à Claude…",
-  "module.writing": "Claude rédige (réponse {round}, {chars} caractères)…",
+  "module.writing": "Claude rédige (réponse {round}, {chars} caractères, {time})…",
   "module.translating": "Traduction en {language} ({chars} caractères)…",
   "module.checkingTranslation": "Vérification de la traduction en {language}…",
   "module.done": "Module rédigé en {rounds} réponse(s) : {errors} erreur(s), {warnings} point(s) à vérifier. Coût total : {cost}.",
@@ -327,5 +326,12 @@
   "field.item-title": "Titre du volet",
   "field.item-body": "Contenu du volet",
   "field.point": "Point clé",
-  "common.close": "Fermer"
+  "common.close": "Fermer",
+  "module.thinking": "Claude lit le storyboard et les sources, puis rédige… ({time}). Comptez plusieurs minutes.",
+  "module.seconds": "{s} s",
+  "module.minutes": "{m} min {s} s",
+  "settings.log": "Journal de diagnostic",
+  "settings.logHelp": "En cas de problème, ouvre le journal et envoie-le à Claude : il ne contient ni clé ni texte de tes projets.",
+  "settings.openLog": "Ouvrir le journal",
+  "generate.thinking": "Claude réfléchit au storyboard… Comptez quelques minutes."
 }

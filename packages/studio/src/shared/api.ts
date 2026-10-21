@@ -117,7 +117,14 @@ export interface GenerationSummary {
 
 /** Progress of a generation, pushed by the main process. */
 export type GenerationProgress =
-  | { stage: "writing"; round: number; chars: number; locale?: string }
+  | {
+      stage: "writing";
+      round: number;
+      chars: number;
+      /** The characters are Claude's thinking, not yet the answer. */
+      thinking?: boolean;
+      locale?: string;
+    }
   | { stage: "checking"; round: number; locale?: string }
   | { stage: "done" };
 
@@ -216,6 +223,10 @@ export interface StudioApi {
   ): Promise<Result<ModuleTexts>>;
   /** One package per output chosen for the project, in out/; the folder opens. */
   exportModule(dir: string): Promise<Result<ExportSummary>>;
+  /** Writes a line in the Studio's diagnostic journal (interface errors). */
+  log(message: string): Promise<void>;
+  /** Opens the diagnostic journal, to send it when something goes wrong. */
+  openLog(): Promise<void>;
   /** Subscribes to generation progress; returns the unsubscribe function. */
   onGenerationProgress(listener: (p: GenerationProgress) => void): () => void;
 }

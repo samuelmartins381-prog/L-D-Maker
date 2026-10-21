@@ -3,7 +3,12 @@
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
-import type { NewProject, Result, StudioLocale } from "../shared/api.ts";
+import type {
+  GenerationProgress,
+  NewProject,
+  Result,
+  StudioLocale,
+} from "../shared/api.ts";
 import {
   estimate,
   estimateModule,
@@ -11,6 +16,7 @@ import {
   translateAll,
   writeModule,
 } from "./generation.ts";
+import { log, logPath, setLogFolder } from "./log.ts";
 import {
   buildPreview,
   exportModule,
@@ -45,6 +51,13 @@ if (process.env.LDM_STUDIO_USER_DATA)
 
 if (!app.requestSingleInstanceLock()) app.quit();
 
+setLogFolder(app.getPath("userData"));
+log(`start: Studio ${app.getVersion()}, ${process.platform} ${process.arch}`);
+process.on("uncaughtException", (e) => log(`uncaught: ${e.stack ?? e}`));
+process.on("unhandledRejection", (e) =>
+  log(`unhandled: ${(e as Error)?.stack ?? e}`),
+);
+
 /** Projects opened by this Studio, whose locks are released on quit. */
 const open = new Set<string>();
 /** Last known user name, for the synchronous release of locks on quit. */
@@ -69,9 +82,16 @@ function handle<A extends unknown[], T>(
   fn: (...args: A) => Promise<T>,
 ): void {
   ipcMain.handle(`ldm:${name}`, async (_e, ...args): Promise<Result<T>> => {
+    const start = Date.now();
+    log(`→ ${name}`);
     try {
-      return { ok: true, value: await fn(...(args as A)) };
+      const value = await fn(...(args as A));
+      log(`✓ ${name} (${((Date.now() - start) / 1000).toFixed(1)} s)`);
+      return { ok: true, value };
     } catch (e) {
+      log(
+        `✗ ${name} (${((Date.now() - start) / 1000).toFixed(1)} s): ${(e as Error).stack ?? e}`,
+      );
       return { ok: false, error: (e as Error).message };
     }
   });
@@ -143,8 +163,14 @@ function registerIpc(win: BrowserWindow): void {
   handle("approveStoryboard", async (dir: string) =>
     approveStoryboard(dir, await me()),
   );
-  const progress = (p: unknown) =>
+  // Progress goes to the interface; the journal notes each change of stage, not every character.
+  let lastStage = "";
+  const progress = (p: GenerationProgress) => {
+    const stage = `${p.stage}${"round" in p ? ` ${p.round}` : ""}${"locale" in p && p.locale ? ` ${p.locale}` : ""}`;
+    if (stage !== lastStage) log(`  progress: ${stage}`);
+    lastStage = stage;
     win.webContents.send("ldm:generationProgress", p);
+  };
   handle("estimateModule", async (dir: string) =>
     estimateModule(dir, await root()),
   );
@@ -171,6 +197,13 @@ function registerIpc(win: BrowserWindow): void {
     const r = await exportModule(dir, await me());
     if (!process.env.LDM_STUDIO_NO_OPEN) await shell.openPath(r.folder);
     return r;
+  });
+  ipcMain.handle("ldm:log", (_e, message: string) =>
+    log(`interface: ${String(message).slice(0, 2000)}`),
+  );
+  ipcMain.handle("ldm:openLog", async () => {
+    const path = logPath();
+    if (path) await shell.openPath(path);
   });
   ipcMain.handle("ldm:openPath", async (_e, path: string) => {
     await shell.openPath(path);

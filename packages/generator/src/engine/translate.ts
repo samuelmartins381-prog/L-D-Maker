@@ -169,8 +169,13 @@ export async function translateModule(
     let ok = false;
     while (rounds < maxRounds && !ok) {
       rounds++;
-      const answer = await options.client.complete(call, (chars) =>
-        options.onProgress?.({ stage: "writing", round: rounds, chars }),
+      const answer = await options.client.complete(call, (chars, thinking) =>
+        options.onProgress?.({
+          stage: "writing",
+          round: rounds,
+          chars,
+          ...(thinking ? { thinking } : {}),
+        }),
       );
       usage = addUsage(usage, answer.usage);
       options.onProgress?.({ stage: "checking", round: rounds });

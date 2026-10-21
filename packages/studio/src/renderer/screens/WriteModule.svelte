@@ -28,6 +28,9 @@ let estimate = $state<ModuleEstimate | null>(null);
 let progress = $state<GenerationProgress | null>(null);
 let written = $state<ModuleWriteSummary | null>(null);
 let translated = $state<TranslationSummary | null>(null);
+/** Seconds since the launch: shows at once that the click was taken, even while Claude thinks. */
+let elapsed = $state(0);
+let failed = $state<string | null>(null);
 
 const usd = (n: number) =>
   new Intl.NumberFormat(locale(), {
@@ -47,13 +50,35 @@ onDestroy(unsubscribe);
 
 async function prepare() {
   step = "estimating";
+  failed = null;
   estimate = unwrap(await window.ldm.estimateModule(project.dir));
   step = estimate ? "confirm" : "idle";
+  if (!estimate) failed = app.error;
 }
+
+const duration = (s: number) =>
+  s < 60
+    ? t("module.seconds", { s })
+    : t("module.minutes", { m: Math.floor(s / 60), s: s % 60 });
 
 async function run() {
   step = "running";
   progress = null;
+  failed = null;
+  elapsed = 0;
+  const started = Date.now();
+  const timer = setInterval(() => {
+    elapsed = Math.round((Date.now() - started) / 1000);
+  }, 1000);
+  try {
+    if (!(await work())) failed = app.error;
+  } finally {
+    clearInterval(timer);
+  }
+}
+
+/** true when the module was written (or translated). */
+async function work(): Promise<boolean> {
   if (mode === "write") {
     written = unwrap(await window.ldm.writeModule(project.dir));
     step = written ? "done" : "idle";
@@ -82,19 +107,30 @@ async function run() {
     translated = unwrap(await window.ldm.translateModule(project.dir));
     step = translated ? "done" : "idle";
   }
+  const ok = step === "done";
+  const error = app.error;
   const updated = unwrap(await window.ldm.openProject(project.dir));
   if (updated) app.project = updated;
+  app.error = error;
+  return ok;
 }
 
 const status = $derived.by(() => {
   if (step === "estimating") return t("generate.estimating");
   if (step !== "running") return "";
-  if (!progress || progress.stage === "done") return t("module.starting");
+  if (!progress || progress.stage === "done")
+    return t("module.thinking", { time: duration(elapsed) });
   const lang = progress.locale ? tk(`locale.${progress.locale}`) : null;
+  if (progress.stage === "writing" && progress.thinking && !lang)
+    return t("module.thinking", { time: duration(elapsed) });
   if (progress.stage === "writing")
     return lang
       ? t("module.translating", { language: lang, chars: progress.chars })
-      : t("module.writing", { round: progress.round, chars: progress.chars });
+      : t("module.writing", {
+          round: progress.round,
+          chars: progress.chars,
+          time: duration(elapsed),
+        });
   return lang
     ? t("module.checkingTranslation", { language: lang })
     : t("generate.checking", { round: progress.round });
@@ -173,6 +209,9 @@ const status = $derived.by(() => {
           })
         : t("module.nothingToTranslate")}
     </p>
+  {/if}
+  {#if failed}
+    <p class="notice notice-error" role="alert">{t("common.error", { message: failed })}</p>
   {/if}
   <p class="status" aria-live="polite">
     {#if step === "running" || step === "estimating"}

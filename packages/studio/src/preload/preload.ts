@@ -35,6 +35,8 @@ const api: StudioApi = {
   moduleTexts: call("moduleTexts"),
   saveModuleTexts: call("saveModuleTexts"),
   exportModule: call("exportModule"),
+  log: call("log"),
+  openLog: call("openLog"),
   onGenerationProgress: (listener) => {
     const handler = (_e: unknown, p: GenerationProgress) => listener(p);
     ipcRenderer.on("ldm:generationProgress", handler);

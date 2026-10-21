@@ -69,6 +69,16 @@ async function removeKey() {
     </div>
   </section>
 
+  <section class="card block" aria-labelledby="log-title">
+    <h2 id="log-title" class="label-like">{t("settings.log")}</h2>
+    <p class="help">{t("settings.logHelp")}</p>
+    <p>
+      <button type="button" class="btn" onclick={() => window.ldm.openLog()}
+        >{t("settings.openLog")}</button
+      >
+    </p>
+  </section>
+
   <form class="card block" onsubmit={saveKey} aria-labelledby="key-title">
     <h2 id="key-title" class="label-like">{t("settings.apiKey")}</h2>
     <p class="help">{t("settings.apiKeyHelp")}</p>

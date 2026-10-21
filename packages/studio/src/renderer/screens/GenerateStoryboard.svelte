@@ -51,14 +51,16 @@ const status = $derived(
   step === "estimating"
     ? t("generate.estimating")
     : step === "running"
-      ? progress?.stage === "writing"
-        ? t("generate.writing", {
-            round: progress.round,
-            chars: progress.chars,
-          })
-        : progress?.stage === "checking"
-          ? t("generate.checking", { round: progress.round })
-          : t("generate.starting")
+      ? progress?.stage === "writing" && progress.thinking
+        ? t("generate.thinking")
+        : progress?.stage === "writing"
+          ? t("generate.writing", {
+              round: progress.round,
+              chars: progress.chars,
+            })
+          : progress?.stage === "checking"
+            ? t("generate.checking", { round: progress.round })
+            : t("generate.starting")
       : "",
 );
 </script>

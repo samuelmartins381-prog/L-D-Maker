@@ -28,7 +28,7 @@ const IMAGE_TYPES: Record<
 export class GenerationError extends Error {}
 
 export type GenerationEvent =
-  | { stage: "writing"; round: number; chars: number }
+  | { stage: "writing"; round: number; chars: number; thinking?: boolean }
   | { stage: "checking"; round: number }
   | { stage: "done" };
 

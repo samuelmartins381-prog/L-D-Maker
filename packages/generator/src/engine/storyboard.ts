@@ -163,8 +163,13 @@ export async function generateStoryboard(
 
   while (round < maxRounds) {
     round++;
-    const answer = await options.client.complete(call, (chars) =>
-      options.onProgress?.({ stage: "writing", round, chars }),
+    const answer = await options.client.complete(call, (chars, thinking) =>
+      options.onProgress?.({
+        stage: "writing",
+        round,
+        chars,
+        ...(thinking ? { thinking } : {}),
+      }),
     );
     usage = addUsage(usage, answer.usage);
     options.onProgress?.({ stage: "checking", round });

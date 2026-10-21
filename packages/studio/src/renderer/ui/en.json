@@ -297,8 +297,7 @@
   "module.estimateTranslations": "Translations ({languages}): {low} to {high}.",
   "module.total": "Estimated total: {low} to {high}.",
   "module.replaces": "The current module will be replaced; it is kept next to it (module.previous).",
-  "module.starting": "Sending to Claude…",
-  "module.writing": "Claude is writing (answer {round}, {chars} characters)…",
+  "module.writing": "Claude is writing (answer {round}, {chars} characters, {time})…",
   "module.translating": "Translating into {language} ({chars} characters)…",
   "module.checkingTranslation": "Checking the {language} translation…",
   "module.done": "Module written in {rounds} answer(s): {errors} error(s), {warnings} point(s) to check. Total cost: {cost}.",
@@ -327,5 +326,12 @@
   "field.item-title": "Panel title",
   "field.item-body": "Panel content",
   "field.point": "Key point",
-  "common.close": "Close"
+  "common.close": "Close",
+  "module.thinking": "Claude reads the storyboard and the sources, then writes… ({time}). Allow several minutes.",
+  "module.seconds": "{s} s",
+  "module.minutes": "{m} min {s} s",
+  "settings.log": "Diagnostic journal",
+  "settings.logHelp": "If something goes wrong, open the journal and send it to Claude: it holds no key and no text from your projects.",
+  "settings.openLog": "Open the journal",
+  "generate.thinking": "Claude is thinking about the storyboard… Allow a few minutes."
 }

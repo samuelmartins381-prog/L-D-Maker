@@ -23,10 +23,13 @@ export interface LlmAnswer {
 
 export interface LlmClient {
   countTokens(call: LlmCall): Promise<number>;
-  /** `onProgress` receives the number of answer characters received so far. */
+  /**
+   * `onProgress` receives the characters received so far, and whether the latest were Claude's
+   * thinking (summarised) rather than the answer: a long silence otherwise looks like a hang.
+   */
   complete(
     call: LlmCall,
-    onProgress?: (chars: number) => void,
+    onProgress?: (chars: number, thinking?: boolean) => void,
   ): Promise<LlmAnswer>;
 }
 
@@ -84,7 +87,7 @@ export function anthropicClient(apiKey: string): LlmClient {
         const stream = client.messages.stream({
           model: call.model,
           max_tokens: call.maxTokens,
-          thinking: { type: "adaptive" },
+          thinking: { type: "adaptive", display: "summarized" },
           output_config: outputConfig(call.schema),
           system: call.system,
           messages: call.messages,
@@ -93,6 +96,11 @@ export function anthropicClient(apiKey: string): LlmClient {
         stream.on("text", (delta) => {
           chars += delta.length;
           onProgress?.(chars);
+        });
+        let thought = 0;
+        stream.on("thinking", (delta) => {
+          thought += delta.length;
+          onProgress?.(thought, true);
         });
         const message = await stream.finalMessage();
         if (message.stop_reason === "refusal")
