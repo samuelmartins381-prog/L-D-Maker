@@ -53,7 +53,10 @@ async function prepare() {
   failed = null;
   estimate = unwrap(await window.ldm.estimateModule(project.dir));
   step = estimate ? "confirm" : "idle";
-  if (!estimate) failed = app.error;
+  if (!estimate) {
+    failed = app.error;
+    app.error = null;
+  }
 }
 
 const duration = (s: number) =>
@@ -71,7 +74,11 @@ async function run() {
     elapsed = Math.round((Date.now() - started) / 1000);
   }, 1000);
   try {
-    if (!(await work())) failed = app.error;
+    if (!(await work())) {
+      // Shown under the button, where Sam is looking; not twice.
+      failed = app.error;
+      app.error = null;
+    }
   } finally {
     clearInterval(timer);
   }

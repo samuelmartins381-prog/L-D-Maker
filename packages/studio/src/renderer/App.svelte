@@ -51,9 +51,19 @@ async function go(screen: "projects" | "settings") {
             </li>
           </ul>
         </nav>
-        {#if app.settings?.userName}
-          <p class="user muted">{app.settings.userName}</p>
-        {/if}
+        <div class="foot">
+          {#if app.settings?.userName}
+            <p class="muted">{app.settings.userName}</p>
+          {/if}
+          <p class="muted build">
+            {t("app.build", {
+              date: new Intl.DateTimeFormat(app.settings?.locale, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(__STUDIO_BUILD__.date)),
+            })}{__STUDIO_BUILD__.commit ? ` · ${__STUDIO_BUILD__.commit}` : ""}
+          </p>
+        </div>
       </header>
       <main>
         <div aria-live="polite">
@@ -152,10 +162,16 @@ async function go(screen: "projects" | "settings") {
     box-shadow: inset 3px 0 0 var(--accent);
   }
 
-  .user {
+  .foot {
     margin-block-start: auto;
     padding-inline: 0.75rem;
+    display: grid;
+    gap: 0.25rem;
     font-size: var(--text-sm);
+  }
+
+  .build {
+    font-size: var(--text-xs);
   }
 
   main {

@@ -30,7 +30,7 @@ import {
   logGeneration,
   sourceBlocks,
 } from "./common.ts";
-import type { LlmCall, LlmClient } from "./llm.ts";
+import { jsonText, type LlmCall, type LlmClient } from "./llm.ts";
 import {
   addUsage,
   cost,
@@ -97,6 +97,8 @@ async function firstCall(
     system: MODULE_SYSTEM,
     messages: [{ role: "user", content }],
     schema: SCHEMA,
+    // A whole module is too large a schema for the API to enforce: described, then checked.
+    constrained: false,
     // Thinking and a 20-minute module with feedback on every choice: room for both.
     maxTokens: 128_000,
   };
@@ -141,9 +143,17 @@ async function check(
 ) {
   let json: unknown;
   try {
-    json = JSON.parse(text);
-  } catch {
-    json = undefined;
+    json = JSON.parse(jsonText(text));
+  } catch (e) {
+    return {
+      issues: [
+        {
+          severity: "error",
+          where: "(answer)",
+          message: `not a valid JSON object (${(e as Error).message}): answer with the JSON object only`,
+        } as ModuleIssue,
+      ],
+    };
   }
   const draft = ModuleDraft.safeParse(json);
   if (!draft.success)

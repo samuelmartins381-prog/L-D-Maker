@@ -7,8 +7,14 @@ export interface LlmCall {
   model: ModelId;
   system: string;
   messages: Anthropic.MessageParam[];
-  /** JSON Schema the answer must follow (structured outputs). */
+  /** JSON Schema the answer must follow. */
   schema: Record<string, unknown>;
+  /**
+   * true (default): the API enforces the schema (structured outputs). false: the schema is given
+   * in the system prompt and the answer is checked afterwards — for schemas too large for the
+   * API to compile ("compiled grammar is too large"), such as a whole module.
+   */
+  constrained?: boolean;
   maxTokens: number;
 }
 
@@ -35,10 +41,26 @@ export interface LlmClient {
 
 export class LlmError extends Error {}
 
-const outputConfig = (schema: Record<string, unknown>) => ({
-  effort: "high" as const,
-  format: { type: "json_schema" as const, schema },
-});
+const outputConfig = (call: LlmCall) =>
+  call.constrained === false
+    ? { effort: "high" as const }
+    : {
+        effort: "high" as const,
+        format: { type: "json_schema" as const, schema: call.schema },
+      };
+
+/** The system prompt, with the schema written out when the API does not enforce it. */
+const systemOf = (call: LlmCall) =>
+  call.constrained === false
+    ? `${call.system}\n\nAnswer with one JSON object, nothing before or after it, that follows this JSON Schema (constraints are in the descriptions):\n${JSON.stringify(call.schema)}`
+    : call.system;
+
+/** The JSON object in an answer, without the code fences a free-form answer may wrap it in. */
+export function jsonText(text: string): string {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  return start >= 0 && end > start ? text.slice(start, end + 1) : text;
+}
 
 /** Words Sam can act on, with the request id Anthropic support asks for. */
 function explain(e: unknown): never {
@@ -72,10 +94,16 @@ export function anthropicClient(apiKey: string): LlmClient {
       try {
         const r = await client.messages.countTokens({
           model: call.model,
-          system: call.system,
+          system: systemOf(call),
           messages: call.messages,
           // Only what changes the input size: the effort setting is not counted.
-          output_config: { format: outputConfig(call.schema).format },
+          ...(call.constrained === false
+            ? {}
+            : {
+                output_config: {
+                  format: { type: "json_schema" as const, schema: call.schema },
+                },
+              }),
         });
         return r.input_tokens;
       } catch (e) {
@@ -88,8 +116,8 @@ export function anthropicClient(apiKey: string): LlmClient {
           model: call.model,
           max_tokens: call.maxTokens,
           thinking: { type: "adaptive", display: "summarized" },
-          output_config: outputConfig(call.schema),
-          system: call.system,
+          output_config: outputConfig(call),
+          system: systemOf(call),
           messages: call.messages,
         });
         let chars = 0;

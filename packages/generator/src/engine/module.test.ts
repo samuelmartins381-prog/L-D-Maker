@@ -115,11 +115,16 @@ describe("writeModule", () => {
 
   it("writes a valid module from the approved storyboard, after a correction round", async () => {
     const dir = await approvedDemo();
-    const client = replay(["{}", demoDraft()]);
+    const client = replay(["Voici le module, en résumé.", demoDraft()]);
     const e = await estimateModule(dir, { client, knowledge: "Le spiral…" });
     expect(e.inputTokens).toBe(30_000);
     const r = await writeModule(dir, { client, knowledge: "Le spiral…" });
     expect(r.rounds).toBe(2);
+    // Too large a schema for the API to enforce: given in the prompt, checked afterwards.
+    expect(client.calls[0]?.constrained).toBe(false);
+    expect(JSON.stringify(client.calls[1]?.messages.at(-1))).toContain(
+      "not a valid JSON object",
+    );
     expect(r.issues.filter((i) => i.severity === "error")).toEqual([]);
     // The storyboard and the knowledge went out; the correction named the problems.
     const sent = JSON.stringify(client.calls[0]?.messages);
@@ -141,6 +146,15 @@ describe("writeModule", () => {
       '"step":"module"',
     );
     await expect(assertApproved(dir)).resolves.toBeDefined();
+  });
+
+  it("accepts the module wrapped in a code fence, as a free-form answer may be", async () => {
+    const dir = await approvedDemo();
+    const r = await writeModule(dir, {
+      client: replay([`Voici le module :\n\`\`\`json\n${demoDraft()}\n\`\`\``]),
+    });
+    expect(r.rounds).toBe(1);
+    expect(r.issues.filter((i) => i.severity === "error")).toEqual([]);
   });
 
   it("keeps the previous module when writing again", async () => {

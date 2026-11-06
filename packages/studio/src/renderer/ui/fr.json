@@ -333,5 +333,6 @@
   "settings.log": "Journal de diagnostic",
   "settings.logHelp": "En cas de problème, ouvre le journal et envoie-le à Claude : il ne contient ni clé ni texte de tes projets.",
   "settings.openLog": "Ouvrir le journal",
-  "generate.thinking": "Claude réfléchit au storyboard… Comptez quelques minutes."
+  "generate.thinking": "Claude réfléchit au storyboard… Comptez quelques minutes.",
+  "app.build": "Version du {date}"
 }
